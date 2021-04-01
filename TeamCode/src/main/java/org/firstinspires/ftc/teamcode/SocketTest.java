@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,6 +16,7 @@ import java.text.RuleBasedCollator;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+@Disabled
 @TeleOp(name = "Socket Test", group="Iterative Opmode")
 public class SocketTest extends OpMode implements Runnable {
     boolean active = true;
@@ -46,7 +48,7 @@ public class SocketTest extends OpMode implements Runnable {
         try {
             server = new Socket("192.168.49.193", 5038);
             out = new DataOutputStream(server.getOutputStream());
-            in = new DataInputStream(server.getInputStream());
+//            in = new DataInputStream(server.getInputStream());
 
             while (active) {
 

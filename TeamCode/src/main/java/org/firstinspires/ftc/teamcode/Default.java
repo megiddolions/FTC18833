@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import java.util.logging.SocketHandler;
 
 public abstract class Default extends OpMode {
-    DriveSubsystem driveSubsystem;
-    ShooterSubsystem shooter;
+    protected DriveSubsystem driveSubsystem;
+    protected ShooterSubsystem shooter;
 
     @Override
     public void init() {
