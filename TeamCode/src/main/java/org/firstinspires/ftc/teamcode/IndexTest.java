@@ -124,7 +124,7 @@ public class IndexTest extends OpMode implements Runnable {
         // not including time var
         int vars_count = 2;
         try {
-            server = new Socket("192.168.49.72", 5038);
+            server = new Socket(Constants.NetworkConstants.computer_ip, Constants.NetworkConstants.server_port);
             out = new DataOutputStream(server.getOutputStream());
 //            in = new DataInputStream(server.getInputStream());
 

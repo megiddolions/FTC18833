@@ -1,16 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.MegiddoGamepad;
+import org.firstinspires.ftc.teamcode.lib.Util;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.Constants.NetworkConstants;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
@@ -18,10 +22,8 @@ import java.util.concurrent.TimeUnit;
 public class VelocityControl extends OpMode implements Runnable {
 
     private static int option = 0;
-    private static double velocity = 0.5;
-    private static double index_speed = 1;
-    private static double change_rate = 0.1;
-    private static boolean manual_index = false;
+    private static double velocity = 10 * 60;
+    private static double change_rate = 125;
     // Subsystems
     private ShooterSubsystem shooter;
     // Gamepads
@@ -29,6 +31,7 @@ public class VelocityControl extends OpMode implements Runnable {
     MegiddoGamepad Gamepad2;
     // Debug
     boolean active = false;
+    boolean shooter_active;
 
     @Override
     public void init() {
@@ -40,6 +43,8 @@ public class VelocityControl extends OpMode implements Runnable {
         active = true;
         Thread thread = new Thread(this);
         thread.start();
+
+        shooter_active = false;
     }
 
     @Override
@@ -52,33 +57,29 @@ public class VelocityControl extends OpMode implements Runnable {
         Gamepad1.update(gamepad1);
         Gamepad2.update(gamepad2);
 
+        if (shooter_active) {
+            shooter.setVelocity(velocity);
+        }
+
         if (Gamepad1.a_Pressed()) {
-            if (shooter.getLeftVelocity() != 0) {
+            shooter_active = !shooter_active;
+            if (!shooter_active)
                 shooter.setVelocity(0);
-            } else {
-                shooter.setVelocity(velocity);
-            }
-        } else if (shooter.getPower() != 0) {
-            shooter.setPower(velocity);
         }
 
 
         if (Gamepad1.dpad_down_Pressed()) {
             option++;
-            if (option == 5)
+            if (option == 6)
                 option = 0;
         } else if (Gamepad1.dpad_up_Pressed()) {
             option--;
             if (option == -1)
-                option = 4;
+                option = 5;
         }
 
-        if (manual_index) {
-            shooter.index(gamepad1.right_stick_y);
-        } else {
-            if (Gamepad1.x_Pressed()) {
-                shooter.toggle_index(index_speed);
-            }
+        if (Gamepad1.x_Pressed()) {
+            shooter.toggle_index(1);
         }
 
         // UI
@@ -88,13 +89,20 @@ public class VelocityControl extends OpMode implements Runnable {
                     velocity += change_rate;
                     break;
                 case 1:
-                    index_speed += change_rate;
+                    shooter.pid.p += change_rate;
                     break;
                 case 2:
-                    manual_index = !manual_index;
+                    shooter.pid.i += change_rate;
                     break;
                 case 3:
-                    change_rate *= 2;
+                    shooter.pid.d += change_rate;
+                    break;
+                case 4:
+                    shooter.pid.f += change_rate;
+                    break;
+                case 5:
+                    change_rate /= 2;
+                    break;
             }
         } else if (Gamepad1.dpad_right_Pressed()) {
             switch (option) {
@@ -102,21 +110,30 @@ public class VelocityControl extends OpMode implements Runnable {
                     velocity -= change_rate;
                     break;
                 case 1:
-                    index_speed -= change_rate;
+                    shooter.pid.p -= change_rate;
                     break;
                 case 2:
-                    manual_index = !manual_index;
+                    shooter.pid.i -= change_rate;
                     break;
                 case 3:
+                    shooter.pid.d -= change_rate;
+                    break;
+                case 4:
+                    shooter.pid.f -= change_rate;
+                    break;
+                case 5:
                     change_rate /= 2;
+                    break;
             }
         }
 
-        telemetry.addData("time", getRuntime());
-        telemetry.addData((option == 0 ? "* " : "   ") + "Velocity", "%.3f", velocity);
-        telemetry.addData((option == 1 ? "* " : "   ") + "index speed", "%.3f", index_speed);
-        telemetry.addData((option == 2 ? "* " : "   ") + "manual index", manual_index);
-        telemetry.addData((option == 3 ? "* " : "   ") + "change rate", "%.3f", change_rate);
+//        telemetry.addData("time", getRuntime());
+        telemetry.addData((option == 0 ? "* " : "   ") + "Velocity(RPM)", "%.3f", velocity);
+        telemetry.addData((option == 1 ? "* " : "   ") + "P", shooter.pid.p);
+        telemetry.addData((option == 2 ? "* " : "   ") + "I", shooter.pid.i);
+        telemetry.addData((option == 3 ? "* " : "   ") + "D", shooter.pid.d);
+        telemetry.addData((option == 4 ? "* " : "   ") + "F", shooter.pid.f);
+        telemetry.addData((option == 5 ? "* " : "   ") + "change rate", "%.3f", change_rate);
         telemetry.update();
     }
 
@@ -128,7 +145,7 @@ public class VelocityControl extends OpMode implements Runnable {
         // not including time var
         int vars_count = 2;
         try {
-            server = new Socket("192.168.49.72", 5038);
+            server = new Socket(NetworkConstants.computer_ip, NetworkConstants.server_port);
             out = new DataOutputStream(server.getOutputStream());
 //            in = new DataInputStream(server.getInputStream());
 
