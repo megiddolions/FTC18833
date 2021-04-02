@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
@@ -26,6 +27,9 @@ public class DriveSubsystem extends SubsystemBase {
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+//        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void setMode(DcMotor.RunMode mode) {
@@ -33,6 +37,13 @@ public class DriveSubsystem extends SubsystemBase {
         rearRight.setMode(mode);
         rearLeft.setMode(mode);
         rearLeft.setMode(mode);
+    }
+
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
+        rearLeft.setZeroPowerBehavior(behavior);
+        rearRight.setZeroPowerBehavior(behavior);
+        rearLeft.setZeroPowerBehavior(behavior);
+        rearLeft.setZeroPowerBehavior(behavior);
     }
 
     public void stop() {
@@ -84,5 +95,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     public int getFrontRightEncoder() {
         return frontRight.getCurrentPosition();
+    }
+
+    public void differentialDrive(double forward, double tankPivot, double strafing) {
+        frontLeft.setPower(forward + tankPivot - strafing);
+        rearLeft.setPower(forward + tankPivot + strafing);
+        frontRight.setPower(forward - tankPivot + strafing);
+        rearRight.setPower(forward - tankPivot - strafing);
     }
 }
