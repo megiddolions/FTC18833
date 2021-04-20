@@ -6,15 +6,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
+import org.firstinspires.ftc.teamcode.lib.Util;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx left;
     private final DcMotorEx right;
     private final DcMotorEx indexer;
+    private final Servo leftLift;
+    private final Servo rightLift;
     public PIDFCoefficients pid;
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
@@ -22,10 +26,17 @@ public class ShooterSubsystem extends SubsystemBase {
         right = hardwareMap.get(DcMotorEx.class, ShooterConstants.kRightShooterName);
         indexer = hardwareMap.get(DcMotorEx.class, ShooterConstants.kIndexShooterName);
 
+        leftLift = hardwareMap.servo.get("LeftLift");
+        rightLift = hardwareMap.servo.get("RightLift");
+
+        //setLift(0);
+
         left.setDirection(DcMotorSimple.Direction.REVERSE);
         right.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        indexer.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightLift.setDirection(Servo.Direction.REVERSE);
+
+        indexer.setDirection(DcMotorSimple.Direction.REVERSE);
 
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -56,6 +67,14 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+
+
+    public void update_toggle(double power) {
+        if (getPower() == 0) {
+            setPower(power);
+        }
+    }
+
     public void toggle_index(double power) {
         if (indexer.getPower() == 0) {
             indexer.setPower(power);
@@ -77,6 +96,9 @@ public class ShooterSubsystem extends SubsystemBase {
         return ShooterConstants.ticks_per_second_to_RPM(right.getVelocity());
     }
 
+    public double getIndex() {
+        return indexer.getPower();
+    }
 
     public int get_left_encoder() {
         return left.getCurrentPosition();
@@ -84,5 +106,17 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public int get_right_encoder() {
         return right.getCurrentPosition();
+    }
+
+    public void setLift(double position) {
+        // Mechanical minimum and maximum of system
+        final double min = 0.20;
+        final double max = 0.55;
+        leftLift.setPosition(Util.clamp(position, max, min));
+        rightLift.setPosition(Util.clamp(position, max, min));
+    }
+
+    public double getLift() {
+        return leftLift.getPosition();
     }
 }

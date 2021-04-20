@@ -10,4 +10,8 @@ public final class Util {
     public String getTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
+
+    public static double clamp(double v, double max, double min) {
+        return Math.max(min, Math.min(max, v));
+    }
 }

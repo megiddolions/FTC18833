@@ -97,10 +97,10 @@ public class DriveSubsystem extends SubsystemBase {
         return frontRight.getCurrentPosition();
     }
 
-    public void differentialDrive(double forward, double tankPivot, double strafing) {
-        frontLeft.setPower(forward + tankPivot - strafing);
-        rearLeft.setPower(forward + tankPivot + strafing);
-        frontRight.setPower(forward - tankPivot + strafing);
-        rearRight.setPower(forward - tankPivot - strafing);
+    public void differentialDrive(double y, double x, double spin) {
+        frontLeft.setPower(spin-y+x);
+        rearLeft.setPower(spin+y+x);
+        frontRight.setPower(spin-y-x);
+        rearRight.setPower(spin+y-x);
     }
 }
