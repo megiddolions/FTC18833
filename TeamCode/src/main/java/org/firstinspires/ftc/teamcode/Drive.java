@@ -35,7 +35,7 @@ public class Drive extends Default {
         }
 
         if (Gamepad2.a_Pressed()) {
-            shooter.toggle(0.54);
+            shooter.toggle(0.53);
         }
 
         if (Gamepad2.dpad_up_Pressed()) {
