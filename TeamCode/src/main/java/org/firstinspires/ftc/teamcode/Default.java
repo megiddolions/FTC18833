@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
+import org.firstinspires.ftc.teamcode.lib.CommandBaseOpMode;
 import org.firstinspires.ftc.teamcode.lib.MegiddoGamepad;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.openftc.easyopencv.OpenCvCameraException;
 
-import java.util.logging.SocketHandler;
-
-public abstract class Default extends OpMode {
+public abstract class Default extends CommandBaseOpMode {
     protected DriveSubsystem driveSubsystem;
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
@@ -23,8 +15,19 @@ public abstract class Default extends OpMode {
     @Override
     public void init() {
         Robot.getInstance().init(this);
-        shooter = new ShooterSubsystem(hardwareMap);
-        driveSubsystem = new DriveSubsystem(hardwareMap);
-        intake = new IntakeSubsystem(hardwareMap);
+        shooter = new ShooterSubsystem();
+        driveSubsystem = new DriveSubsystem();
+        intake = new IntakeSubsystem();
+
+        driveSubsystem.setHorizontalSpeed(0.8);
+        driveSubsystem.setAnglerSpeed(0.6);
+        driveSubsystem.setVerticalSpeed(0.6);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        Gamepad1.update(gamepad1);
+        Gamepad2.update(gamepad2);
     }
 }

@@ -6,9 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class Drive extends Default {
     @Override
     public void loop() {
-        Gamepad1.update(gamepad1);
-        Gamepad2.update(gamepad2);
-
+        update();
         if (gamepad1.dpad_left || gamepad1.left_bumper) {
             driveSubsystem.driveLeft(1);
         } else if (gamepad1.dpad_right || gamepad1.right_bumper) {
@@ -42,6 +40,20 @@ public class Drive extends Default {
             shooter.setLift(shooter.getLift() + 0.05);
         } else if (Gamepad2.dpad_down_Pressed()) {
             shooter.setLift(shooter.getLift() - 0.05);
+        }
+
+        if (Gamepad1.left_stick_button_Pressed()) {
+            driveSubsystem.setVerticalSpeed(1);
+            driveSubsystem.setHorizontalSpeed(1);
+        } else if (Gamepad1.left_bumper_Released()) {
+            driveSubsystem.setVerticalSpeed(0.6);
+            driveSubsystem.setHorizontalSpeed(0.8);
+        }
+
+        if (Gamepad1.right_stick_button_Pressed()) {
+            driveSubsystem.setAnglerSpeed(1);
+        } else if (Gamepad1.right_bumper_Released()) {
+            driveSubsystem.setAnglerSpeed(0.6);
         }
 
         telemetry.addData("Lift", shooter.getLift());

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -14,11 +15,15 @@ public class DriveSubsystem extends SubsystemBase {
     private final DcMotorEx frontLeft;
     private final DcMotorEx frontRight;
 
-    public DriveSubsystem(HardwareMap hardwareMap) {
-        rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
-        rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
-        frontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
-        frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
+    private double angler_drive_speed_modifier = 1;
+    private double vertical_drive_speed_modifier = 1;
+    private double horizontal_drive_speed_modifier = 1;
+
+    public DriveSubsystem() {
+        rearLeft = Robot.OpMode().hardwareMap.get(DcMotorEx.class, "RearLeft");
+        rearRight = Robot.OpMode().hardwareMap.get(DcMotorEx.class, "RearRight");
+        frontLeft = Robot.OpMode().hardwareMap.get(DcMotorEx.class, "FrontLeft");
+        frontRight = Robot.OpMode().hardwareMap.get(DcMotorEx.class, "FrontRight");
 
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -97,10 +102,26 @@ public class DriveSubsystem extends SubsystemBase {
         return frontRight.getCurrentPosition();
     }
 
+    public void setAnglerSpeed(double modifier) {
+        angler_drive_speed_modifier = modifier;
+    }
+
+    public void setVerticalSpeed(double modifier) {
+        vertical_drive_speed_modifier = modifier;
+    }
+
+    public void setHorizontalSpeed(double modifier) {
+        horizontal_drive_speed_modifier = modifier;
+    }
+
     public void differentialDrive(double y, double x, double spin) {
-        frontLeft.setPower(-spin+y+x);
-        rearLeft.setPower(-spin+y-x);
-        frontRight.setPower(spin+y-x);
-        rearRight.setPower(spin+y+x);
+        double raw_spin = spin * angler_drive_speed_modifier;
+        double raw_x = x * horizontal_drive_speed_modifier;
+        double raw_y = y * vertical_drive_speed_modifier;
+
+        frontLeft.setPower(-raw_spin+raw_y+raw_x);
+        rearLeft.setPower(-raw_spin+raw_y-raw_x);
+        frontRight.setPower(raw_spin+raw_y-raw_x);
+        rearRight.setPower(raw_spin+raw_y+raw_x);
     }
 }

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.lib.Util;
@@ -21,15 +22,15 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Servo rightLift;
     public PIDFCoefficients pid;
 
-    public ShooterSubsystem(HardwareMap hardwareMap) {
-        left = hardwareMap.get(DcMotorEx.class, ShooterConstants.kLeftShooterName);
-        right = hardwareMap.get(DcMotorEx.class, ShooterConstants.kRightShooterName);
-        indexer = hardwareMap.get(DcMotorEx.class, ShooterConstants.kIndexShooterName);
+    public ShooterSubsystem() {
+        left = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kLeftShooterName);
+        right = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kRightShooterName);
+        indexer = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kIndexShooterName);
 
-        leftLift = hardwareMap.servo.get("LeftLift");
-        rightLift = hardwareMap.servo.get("RightLift");
+        leftLift = Robot.OpMode().hardwareMap.servo.get("LeftLift");
+        rightLift = Robot.OpMode().hardwareMap.servo.get("RightLift");
 
-        //setLift(0);
+        setLift(0);
 
         left.setDirection(DcMotorSimple.Direction.REVERSE);
         right.setDirection(DcMotorSimple.Direction.FORWARD);
