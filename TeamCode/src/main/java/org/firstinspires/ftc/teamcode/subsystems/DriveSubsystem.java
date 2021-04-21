@@ -98,9 +98,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void differentialDrive(double y, double x, double spin) {
-        frontLeft.setPower(spin-y+x);
-        rearLeft.setPower(spin+y+x);
-        frontRight.setPower(spin-y-x);
-        rearRight.setPower(spin+y-x);
+        frontLeft.setPower(-spin+y+x);
+        rearLeft.setPower(-spin+y-x);
+        frontRight.setPower(spin+y-x);
+        rearRight.setPower(spin+y+x);
     }
 }

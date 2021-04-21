@@ -14,8 +14,8 @@ public class Drive extends Default {
         } else if (gamepad1.dpad_right || gamepad1.right_bumper) {
             driveSubsystem.driveRight(1);
         } else {
-            driveSubsystem.setPower(-gamepad1.left_stick_y * 0.7, - gamepad1.right_stick_y * 0.7);
-//            driveSubsystem.differentialDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
+//            driveSubsystem.setPower(-gamepad1.left_stick_y * 0.7, - gamepad1.right_stick_y * 0.7);
+            driveSubsystem.differentialDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
         }
 
         if (Gamepad2.left_bumper_Pressed()) {
