@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.vison;
 
+import android.text.PrecomputedText;
+
+import org.firstinspires.ftc.teamcode.Robot;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -22,17 +26,22 @@ public class RingPipeLine extends OpenCvPipeline {
     
     @Override
     public Mat processFrame(Mat input) {
-        Mat hsvThresholdOutput = new Mat();
+//        Mat hsvThresholdOutput = new Mat();
 
-        hsvThreshold(input, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
+        if (Robot.opMode.gamepad1.a) {
+            Imgcodecs.imwrite("/sdcard/images/file.png", input);
+        }
 
-        Mat cvErodeOutput = new Mat();
-        cvErode(hsvThresholdOutput, cvErodeKernel, cvErodeAnchor, cvErodeIterations, cvErodeBordertype, cvErodeBordervalue, cvErodeOutput);
+//        hsvThreshold(input, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
-        Mat output = new Mat();
-        mask(input, cvErodeOutput, output);
+//        Mat cvErodeOutput = new Mat();
+//        cvErode(hsvThresholdOutput, cvErodeKernel, cvErodeAnchor, cvErodeIterations, cvErodeBordertype, cvErodeBordervalue, cvErodeOutput);
 
-        return output;
+//        Mat output = new Mat();
+//        mask(input, cvErodeOutput, output);
+
+//        return output;
+        return input;
     }
 
     /**

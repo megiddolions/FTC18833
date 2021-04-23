@@ -11,7 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
     DcMotor intake_motor;
 
     public IntakeSubsystem() {
-        intake_motor = Robot.OpMode().hardwareMap.dcMotor.get("IntakeMotor");
+        intake_motor = Robot.opMode.hardwareMap.dcMotor.get("IntakeMotor");
         intake_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake_motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }

@@ -17,27 +17,23 @@ import org.firstinspires.ftc.teamcode.lib.Util;
 public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx left;
     private final DcMotorEx right;
-    private final DcMotorEx indexer;
     private final Servo leftLift;
     private final Servo rightLift;
     public PIDFCoefficients pid;
 
     public ShooterSubsystem() {
-        left = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kLeftShooterName);
-        right = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kRightShooterName);
-        indexer = Robot.OpMode().hardwareMap.get(DcMotorEx.class, ShooterConstants.kIndexShooterName);
+        left = Robot.opMode.hardwareMap.get(DcMotorEx.class, ShooterConstants.kLeftShooterName);
+        right = Robot.opMode.hardwareMap.get(DcMotorEx.class, ShooterConstants.kRightShooterName);
 
-        leftLift = Robot.OpMode().hardwareMap.servo.get("LeftLift");
-        rightLift = Robot.OpMode().hardwareMap.servo.get("RightLift");
+        leftLift = Robot.opMode.hardwareMap.servo.get("LeftLift");
+        rightLift = Robot.opMode.hardwareMap.servo.get("RightLift");
 
         setLift(0);
 
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
-        right.setDirection(DcMotorSimple.Direction.FORWARD);
+        left.setDirection(DcMotorSimple.Direction.FORWARD);
+        right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         rightLift.setDirection(Servo.Direction.REVERSE);
-
-        indexer.setDirection(DcMotorSimple.Direction.REVERSE);
 
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -56,10 +52,6 @@ public class ShooterSubsystem extends SubsystemBase {
         return left.getPower();
     }
 
-    public void index(double power) {
-        indexer.setPower(power);
-    }
-
     public void toggle(double power) {
         if (getPower() == 0) {
             setPower(power);
@@ -76,14 +68,6 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    public void toggle_index(double power) {
-        if (indexer.getPower() == 0) {
-            indexer.setPower(power);
-        } else {
-            indexer.setPower(0);
-        }
-    }
-
     public void setVelocity(double RPM) {
         left.setVelocity(ShooterConstants.RPM_to_ticks_per_second(RPM));
         right.setVelocity(ShooterConstants.RPM_to_ticks_per_second(RPM));
@@ -95,10 +79,6 @@ public class ShooterSubsystem extends SubsystemBase {
     
     public double getRightVelocity() {
         return ShooterConstants.ticks_per_second_to_RPM(right.getVelocity());
-    }
-
-    public double getIndex() {
-        return indexer.getPower();
     }
 
     public int get_left_encoder() {

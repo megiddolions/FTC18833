@@ -14,4 +14,8 @@ public final class Util {
     public static double clamp(double v, double max, double min) {
         return Math.max(min, Math.min(max, v));
     }
+
+    public static double maxAbs(double a, double b){
+        return Math.abs(a) > Math.abs(b) ? a : b;
+    }
 }

@@ -12,6 +12,6 @@ public abstract class CommandBaseOpMode extends OpMode {
 
     @Override
     public void stop() {
-        Robot.getInstance().clearSubsystems();
+        Robot.clearSubsystems();
     }
 }
