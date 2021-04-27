@@ -13,7 +13,8 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+
+import static org.commandftc.RobotUniversal.opMode;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
@@ -123,8 +124,7 @@ public class MecanumDriveOdometry {
      * @param wheelSpeeds The current wheel speeds.
      * @return The new pose of the robot.
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
-        return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelSpeeds);
+        return updateWithTime(opMode.getRuntime(), gyroAngle, wheelSpeeds);
     }
 }
