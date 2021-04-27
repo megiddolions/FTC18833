@@ -9,6 +9,11 @@ public final class Constants {
             public final static double ticks_per_revolution = 28;
         }
     }
+    
+    public final static class  DriveTrainConstants {
+        public final static double ticks_per_revolution =
+                15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
+    }
 
     public final static class ShooterConstants {
         public final static double kTicks_per_revolution = MotorConstants.REV_HD_HEX.ticks_per_revolution;
@@ -40,5 +45,14 @@ public final class Constants {
 
         public final static int camera_width = 1280;
         public final static int camera_height = 800;
+    }
+    
+    public final static class OdometryConstants {
+        public final static double left_wheel_x = 0;
+        public final static double right_wheel_x = 0;
+        public final static double vertical_wheel_y = 0;
+        public final static double horizontal_wheel_y = 0;
+        
+        public final static double vertical_wheels_difference = Math.abs(left_wheel_x - right_wheel_x);
     }
 }

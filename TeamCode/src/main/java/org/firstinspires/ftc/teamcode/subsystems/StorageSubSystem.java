@@ -3,55 +3,22 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
+import org.commandftc.Subsystem;
 
-public class StorageSubSystem extends SubsystemBase {
+import static org.commandftc.RobotUniversal.*;
+
+public class StorageSubSystem extends Subsystem {
     private final DcMotor indexer;
     private final ColorSensor colorSensor;
 //    private final DistanceSensor distanceSensor;
-    private StorageState storageState = StorageState.Waiting;
-
-    private enum StorageState {
-        Waiting(false, true),
-        Start(true, false),
-        Middle(true, true),
-        End(true, false);
-
-        final boolean active;
-        final boolean seen_ring;
-
-        StorageState(boolean active, boolean seen_ring) {
-            this.active = active;
-            this.seen_ring = seen_ring;
-        }
-        
-        StorageState next(boolean seeing_ring) {
-            if (this.seen_ring == seeing_ring) {
-                switch (this) {
-                    case Waiting:
-                        return Start;
-                    case Start:
-                        return Middle;
-                    case Middle:
-                        return End;
-                    case End:
-                        return Waiting;
-                }
-            }
-            return this;
-        }
-    }
 
     private final ColorRange ringColor = new ColorRange()
             .red(550, 3000).green(0, 2000).blue(0, 2000);
 
     public StorageSubSystem() {
-        indexer = Robot.opMode.hardwareMap.dcMotor.get("IndexMotor");
-        colorSensor = Robot.opMode.hardwareMap.get(ColorSensor.class, "StorageSensor");
+        indexer = hardwareMap.dcMotor.get("IndexMotor");
+        colorSensor = hardwareMap.get(ColorSensor.class, "StorageSensor");
 //        distanceSensor = Robot.opMode.hardwareMap.get(DistanceSensor.class, "StorageSensor");
         indexer.setDirection(DcMotorSimple.Direction.REVERSE);
         indexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -68,20 +35,10 @@ public class StorageSubSystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Robot.opMode.telemetry.addData("Red", colorSensor.red());
-        Robot.opMode.telemetry.addData("Green", colorSensor.green());
-        Robot.opMode.telemetry.addData("Blue", colorSensor.blue());
-        Robot.opMode.telemetry.addData("has ring", seeing_ring());
-//        Robot.opMode.telemetry.addData("Distance(mm)", distanceSensor.getDistance(DistanceUnit.MM));
-        
-        
-        storageState = storageState.next(seeing_ring());
-
-        if (storageState.active) {
-            index(1);
-        } else {
-            index(0);
-        }
+//        telemetry.addData("Red", colorSensor.red());
+//        telemetry.addData("Green", colorSensor.green());
+//        telemetry.addData("Blue", colorSensor.blue());
+        telemetry.addData("has ring", seeing_ring());
     }
 
     private class ColorRange {

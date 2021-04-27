@@ -2,78 +2,96 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.commandftc.Command;
+import org.commandftc.Trigger;
+import org.commandftc.opModes.CommandBasedTeleOp;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVuforiaCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
+import org.firstinspires.ftc.teamcode.commands.Intake.StartIntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
+import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.ManualStorageCommand;
 import org.firstinspires.ftc.teamcode.lib.Util;
+import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.VuforiaSubsystem;
 
-@TeleOp(name="Drive", group = "Iterative Opmode")
-public class Drive extends Default {
-    boolean constStorage = true;
-    boolean constIntake = false;
-    double speedGear;
+@TeleOp(name="drive")
+public class Drive extends CommandBasedTeleOp {
+    protected DriveTrainSubsystem driveTrain;
+    protected ShooterSubsystem shooter;
+    protected IntakeSubsystem intake;
+    protected StorageSubSystem storage;
+    protected VisionSubsystem vision;
+    protected VuforiaSubsystem vuforia;
+
+    protected TankDriveCommand tankDriveCommand;
+    protected DriveSideWaysCommand driveSideWaysCommandCommand;
+    protected Command alignRobotCommand; // method of aligning could changed
+
+    protected StartIntakeCommand startIntakeCommand;
+
+    protected AutomaticStorageCommand automaticStorageCommand;
+    protected ManualStorageCommand manualStorageCommand;
+
+    protected SetShooterSpeedCommand startShooterCommand;
+    protected SetShooterLiftCommand raiseShooterCommand;
+    protected SetShooterLiftCommand lowerShooterCommand;
+
     @Override
-    public void loop() {
-        update();
-        if (gamepad1.dpad_left || gamepad1.left_bumper) {
-            driveSubsystem.driveLeft(1);
-        } else if (gamepad1.dpad_right || gamepad1.right_bumper) {
-            driveSubsystem.driveRight(1);
-        }else if((gamepad1.left_stick_button
-                && Math.abs(gamepad1.left_stick_y) < 0.2)
-                ||(gamepad1.right_stick_button && Math.abs(gamepad1.right_stick_y) < 0.2)){
-            driveSubsystem.setPower(Util.maxAbs(-gamepad1.left_stick_y,-gamepad1.right_stick_y),
-                    Util.maxAbs(-gamepad1.left_stick_y,-gamepad1.right_stick_y));
-        } else {
-            speedGear = (gamepad2.left_trigger > 0.1) ? 0.3 : ((gamepad2.right_trigger > 0.1) ? 1 : 0.7);
-            driveSubsystem.setPower(-gamepad1.left_stick_y * speedGear, -gamepad1.right_stick_y * speedGear);
-//            driveSubsystem.differentialDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
-        }
+    public void assign() {
+        driveTrain = new DriveTrainSubsystem();
+        shooter = new ShooterSubsystem();
+        intake = new IntakeSubsystem();
+        storage = new StorageSubSystem();
+        vision = new VisionSubsystem();
+        vuforia = new VuforiaSubsystem();
 
-//
-//        if (Math.abs(gamepad2.right_stick_y) > 0.1) {
-//            intake.intake(-gamepad2.right_stick_y);
-//        } else {
-//            intake.intake(0);
-//        }
+        addSubsystems(driveTrain, shooter, intake, storage, vision, vuforia);
 
-        constIntake = (0.9 < -gamepad2.left_stick_y && gamepad2.left_stick_button) || constIntake;
-        constIntake = (!(-0.5 > -gamepad2.left_stick_y)) && constIntake;
+        tankDriveCommand = new TankDriveCommand(driveTrain,
+                () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
+        driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
+                () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
+        alignRobotCommand = new AlignRobotVuforiaCommand(driveTrain, vuforia);
 
-        if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+        startIntakeCommand = new StartIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
-            intake.intake((constIntake) ? 1 : -gamepad2.left_stick_y);
-        } else if (!constIntake){
-            intake.intake(0);
-        }
+        automaticStorageCommand = new AutomaticStorageCommand(storage);
+        manualStorageCommand = new ManualStorageCommand(storage, () -> -gamepad2.right_stick_y);
 
+        startShooterCommand = new SetShooterSpeedCommand(shooter, storage, 0.5);
+        raiseShooterCommand = new SetShooterLiftCommand(shooter, 0.05);
+        lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.05);
 
-        constStorage = (0.9 < -gamepad2.right_stick_y && gamepad2.right_stick_button) || constStorage;
-        constStorage = (!(-0.5 > -gamepad2.right_stick_y)) && constStorage;
-        if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+        // DriveTrain
+        driveTrain.setDefaultCommand(tankDriveCommand);
+        new Trigger(() -> Math.abs(Util.maxAbs(gamepad1.left_stick_x, gamepad1.right_stick_x)) >
+                Math.abs(Util.maxAbs(gamepad1.left_stick_y, gamepad1.right_stick_y)))
+                .whileHeld(driveSideWaysCommandCommand);
+        new Trigger(() -> gamepad1.x).whileHeld(alignRobotCommand);
 
-            storage.index((constStorage) ? 1 : -gamepad2.right_stick_y);
-        } else if (!constStorage){
-            storage.index(0);
-            constStorage = true;
-        }
+        // Intake
+        intake.setDefaultCommand(startIntakeCommand);
 
+        // Storage
+        storage.setDefaultCommand(automaticStorageCommand);
+        new Trigger(() -> Math.abs(gamepad2.right_stick_y) > 0.2).whileHeld(manualStorageCommand);
 
+        // Shooter
+        new Trigger(() -> gamepad2.x).whenHeld(startShooterCommand);
+        // Shooter lift
+        new Trigger(() -> gamepad2.dpad_up).whenPressed(raiseShooterCommand);
+        new Trigger(() -> gamepad2.dpad_down).whenPressed(lowerShooterCommand);
 
-        if (Gamepad2.y_Pressed()) {
-            shooter.toggle(0.53);
-        }
-
-        if (Gamepad2.dpad_up_Pressed()) {
-            shooter.setLift(shooter.getLift() + 0.05);
-        } else if (Gamepad2.dpad_down_Pressed()) {
-            shooter.setLift(shooter.getLift() - 0.05);
-        }
-
-//        telemetry.addData("Subsystems", Robot.subsystems.keySet());
-//        telemetry.addData("Lift", shooter.getLift());
-        telemetry.addData("constIntake:",constIntake);
-        telemetry.addData("constStorage:",constStorage);
-        telemetry.addData("Right Y:",gamepad2.right_stick_y);
-        telemetry.addData("Left Y:",gamepad2.left_stick_y);
-
-        telemetry.update();
+        telemetry.addData("Distance", vuforia::distance);
+        telemetry.addData("Lift", shooter::getLift);
+        telemetry.addData("Shooter", shooter::getLeftVelocity);
+        telemetry.addData("Runtime", this::getRuntime);
     }
 }

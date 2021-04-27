@@ -2,16 +2,16 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
+import org.commandftc.Subsystem;
 
-public class IntakeSubsystem extends SubsystemBase {
+import static org.commandftc.RobotUniversal.hardwareMap;
+
+public class IntakeSubsystem extends Subsystem {
     DcMotor intake_motor;
 
     public IntakeSubsystem() {
-        intake_motor = Robot.opMode.hardwareMap.dcMotor.get("IntakeMotor");
+        intake_motor = hardwareMap.dcMotor.get("IntakeMotor");
         intake_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake_motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }

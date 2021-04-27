@@ -4,32 +4,42 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.lib.SubsystemBase;
+import org.commandftc.Subsystem;
 
-public class DriveSubsystem extends SubsystemBase {
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+
+import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
+
+import static org.commandftc.RobotUniversal.*;
+
+public class DriveTrainSubsystem extends Subsystem {
     private final DcMotorEx rearLeft;
     private final DcMotorEx rearRight;
     private final DcMotorEx frontLeft;
     private final DcMotorEx frontRight;
 
-    private double angler_drive_speed_modifier = 1;
-    private double vertical_drive_speed_modifier = 1;
-    private double horizontal_drive_speed_modifier = 1;
+//    private double angler_drive_speed_modifier = 1;
+//    private double vertical_drive_speed_modifier = 1;
+//    private double horizontal_drive_speed_modifier = 1;
 
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public DriveSubsystem() {
-        rearLeft = Robot.opMode.hardwareMap.get(DcMotorEx.class, "RearLeft");
-        rearRight = Robot.opMode.hardwareMap.get(DcMotorEx.class, "RearRight");
-        frontLeft = Robot.opMode.hardwareMap.get(DcMotorEx.class, "FrontLeft");
-        frontRight = Robot.opMode.hardwareMap.get(DcMotorEx.class, "FrontRight");
-        imu = Robot.OpMode().hardwareMap.get(BNO055IMU.class, "imu");
+    public MecanumDriveKinematics kinematics;
+    public MecanumDriveOdometry odometry;
+
+    public DriveTrainSubsystem() {
+        rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
+        rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
+        frontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
+        frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -56,18 +66,48 @@ public class DriveSubsystem extends SubsystemBase {
 
         imu.initialize(parameters);
 
-        Robot.opMode.telemetry.update();
-
         resetAngle();
+
+        kinematics = new MecanumDriveKinematics(
+                new Translation2d(0.28, 0.34),
+                new Translation2d(0.28, -0.34),
+                new Translation2d(-0.28, 0.34),
+                new Translation2d(-0.28, -0.34)
+        );
+//        odometry = new MecanumDriveOdometry(kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
     }
 
     @Override
     public void periodic() {
-        Robot.OpMode().telemetry.addData("Gyro", getHeading());
+
+//        odometry.update(getHeading(), getWheelSpeeds());
     }
 
-    public double getHeading() {
-        return imu.getAngularOrientation().firstAngle - imu_angle_offset;
+    public MecanumDriveWheelSpeeds getWheelSpeeds() {
+        return new MecanumDriveWheelSpeeds(
+                frontLeft_getRate(), frontRight_getRate(),
+                rearLeft_getRate(), rearRight_getRate());
+    }
+
+    public Rotation2d getHeading() {
+        return new Rotation2d((imu.getAngularOrientation().firstAngle - imu_angle_offset)
+                / 180 * Math.PI); // Convert to radians
+    }
+
+    public double frontLeft_getRate() {
+        return frontLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+    }
+
+    public double frontRight_getRate() {
+        return frontRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+    }
+
+    public double rearLeft_getRate() {
+        return rearLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+    }
+
+    public double rearRight_getRate() {
+        return rearRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
     }
 
     public void resetAngle() {
@@ -139,30 +179,30 @@ public class DriveSubsystem extends SubsystemBase {
         return frontRight.getCurrentPosition();
     }
 
-    public void setAnglerSpeed(double modifier) {
-        angler_drive_speed_modifier = modifier;
-    }
-
-    public void setVerticalSpeed(double modifier) {
-        vertical_drive_speed_modifier = modifier;
-    }
-
-    public void setHorizontalSpeed(double modifier) {
-        horizontal_drive_speed_modifier = modifier;
-    }
-
-    public void differentialDrive(double y, double x, double spin) {
-        double raw_spin = spin * angler_drive_speed_modifier;
-
-        double vector_abs = Math.sqrt(x*x + y*y);
-        double angle = (x < 0 ? Math.PI : 0) + (x != 0 ? Math.atan(y/x) : Math.PI / 2) - getHeading() * 0;
-
-        double raw_x = vector_abs * Math.cos(angle) * horizontal_drive_speed_modifier;
-        double raw_y = vector_abs * Math.sin(angle) * vertical_drive_speed_modifier;
-
-        frontLeft.setPower(-raw_spin+raw_y+raw_x);
-        rearLeft.setPower(-raw_spin+raw_y-raw_x);
-        frontRight.setPower(raw_spin+raw_y-raw_x);
-        rearRight.setPower(raw_spin+raw_y+raw_x);
-    }
+//    public void setAnglerSpeed(double modifier) {
+//        angler_drive_speed_modifier = modifier;
+//    }
+//
+//    public void setVerticalSpeed(double modifier) {
+//        vertical_drive_speed_modifier = modifier;
+//    }
+//
+//    public void setHorizontalSpeed(double modifier) {
+//        horizontal_drive_speed_modifier = modifier;
+//    }
+//
+//    public void differentialDrive(double y, double x, double spin) {
+//        double raw_spin = spin * angler_drive_speed_modifier;
+//
+//        double vector_abs = Math.sqrt(x*x + y*y);
+//        double angle = (x < 0 ? Math.PI : 0) + (x != 0 ? Math.atan(y/x) : Math.PI / 2) - getHeading().getRadians() * 0;
+//
+//        double raw_x = vector_abs * Math.cos(angle) * horizontal_drive_speed_modifier;
+//        double raw_y = vector_abs * Math.sin(angle) * vertical_drive_speed_modifier;
+//
+//        frontLeft.setPower(-raw_spin+raw_y+raw_x);
+//        rearLeft.setPower(-raw_spin+raw_y-raw_x);
+//        frontRight.setPower(raw_spin+raw_y-raw_x);
+//        rearRight.setPower(raw_spin+raw_y+raw_x);
+//    }
 }
