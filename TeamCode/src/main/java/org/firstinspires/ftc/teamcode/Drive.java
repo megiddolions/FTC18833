@@ -93,5 +93,7 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("Lift", shooter::getLift);
         telemetry.addData("Shooter", shooter::getLeftVelocity);
         telemetry.addData("Runtime", this::getRuntime);
+        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
+        telemetry.addData("Visible Target", vuforia::Visible_Target);
     }
 }

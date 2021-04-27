@@ -25,7 +25,6 @@ public class SetShooterSpeedCommand extends Command {
         this.power = power;
         state = State.Starting;
         addRequirements(shooter, storage);
-        telemetry.addData("State", () -> state);
     }
 
     @Override

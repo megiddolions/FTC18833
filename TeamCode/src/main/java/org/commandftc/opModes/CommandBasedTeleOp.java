@@ -48,6 +48,7 @@ public abstract class CommandBasedTeleOp extends OpMode {
     public final void loop() {
         CommandScheduler.setOpModeActive(true);
         CommandScheduler.runOnce();
+        telemetry.update();
     }
 
     @Override

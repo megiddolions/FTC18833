@@ -17,13 +17,11 @@ public class SaveVideoPipeLine extends OpenCvPipeline {
     @SuppressLint("SdCardPath")
     @Override
     public Mat processFrame(Mat input) {
-        telemetry.addData("frame size", input.size());
         if (opMode.gamepad1.a) {
             Mat out = new Mat();
             Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2RGB);
             String filepath = "/sdcard/images/" + Util.getTime() + ".png";
             Imgcodecs.imwrite(filepath, out);
-            telemetry.addData("filepath", filepath);
         }
         return input;
     }

@@ -102,7 +102,7 @@ public class VuforiaSubsystem extends Subsystem {
         OpenGLMatrix lastLocation = null;
         for (VuforiaTrackable trackable : allTrackballs) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                telemetry.addData("Visible Target", trackable.getName());
+                visible_Target = trackable.getName();
                 targetVisible.set(true);
 
                 // getUpdatedRobotLocation() will return null if no new information is available since
@@ -126,8 +126,12 @@ public class VuforiaSubsystem extends Subsystem {
 //            telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
         }
         else {
-            telemetry.addData("Visible Target", "none");
+            visible_Target = "none";
         }
+    }
+    private String visible_Target = "none";
+    public String Visible_Target() {
+        return visible_Target;
     }
 
     public boolean has_target() {

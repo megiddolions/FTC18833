@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import java.util.function.DoubleFunction;
 
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
+
 public final class Constants {
 
     public final static class MotorConstants {
@@ -13,6 +16,13 @@ public final class Constants {
     public final static class  DriveTrainConstants {
         public final static double ticks_per_revolution =
                 15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
+
+        public final static MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
+                new Translation2d(0.28, 0.34),
+                new Translation2d(0.28, -0.34),
+                new Translation2d(-0.28, 0.34),
+                new Translation2d(-0.28, -0.34)
+        );
     }
 
     public final static class ShooterConstants {

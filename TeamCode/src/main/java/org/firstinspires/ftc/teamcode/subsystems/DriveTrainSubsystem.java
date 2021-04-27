@@ -31,7 +31,6 @@ public class DriveTrainSubsystem extends Subsystem {
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public MecanumDriveKinematics kinematics;
     public MecanumDriveOdometry odometry;
 
     public DriveTrainSubsystem() {
@@ -68,19 +67,13 @@ public class DriveTrainSubsystem extends Subsystem {
 
         resetAngle();
 
-        kinematics = new MecanumDriveKinematics(
-                new Translation2d(0.28, 0.34),
-                new Translation2d(0.28, -0.34),
-                new Translation2d(-0.28, 0.34),
-                new Translation2d(-0.28, -0.34)
-        );
-//        odometry = new MecanumDriveOdometry(kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
+        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
     }
 
     @Override
     public void periodic() {
 
-//        odometry.update(getHeading(), getWheelSpeeds());
+        odometry.update(getHeading(), getWheelSpeeds());
     }
 
     public MecanumDriveWheelSpeeds getWheelSpeeds() {
