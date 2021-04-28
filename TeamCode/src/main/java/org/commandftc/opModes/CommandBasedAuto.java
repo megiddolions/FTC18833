@@ -42,6 +42,10 @@ public abstract class CommandBasedAuto extends OpMode {
         plan();
         registerSubsystems();
         CommandScheduler.unregisterAllButtons();
+    }
+
+    @Override
+    public final void start() {
         CommandScheduler.scheduleCommand(autoCmd);
     }
 

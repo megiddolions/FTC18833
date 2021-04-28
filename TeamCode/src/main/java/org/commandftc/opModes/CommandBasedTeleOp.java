@@ -15,8 +15,8 @@ public abstract class CommandBasedTeleOp extends OpMode {
 
     private Set<Subsystem> subsystems = new HashSet<>();
 
-    protected Gp gp1 = new Gp(gamepad1);
-    protected Gp gp2 = new Gp(gamepad2);
+    protected Gp gp1;
+    protected Gp gp2;
 
 
     protected final void addSubsystems(Subsystem ... sss) {
@@ -38,6 +38,9 @@ public abstract class CommandBasedTeleOp extends OpMode {
         RobotUniversal.hardwareMap = hardwareMap;
         RobotUniversal.telemetry = telemetry;
         RobotUniversal.opMode = this;
+
+        gp1 = new Gp(gamepad1);
+        gp2 = new Gp(gamepad2);
         assign();
         registerSubsystems();
     }
