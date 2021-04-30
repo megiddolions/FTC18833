@@ -22,6 +22,7 @@ public class SaveVideoPipeLine extends OpenCvPipeline {
             Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2RGB);
             String filepath = "/sdcard/images/" + Util.getTime() + ".png";
             Imgcodecs.imwrite(filepath, out);
+            telemetry.addData("a", () -> 1);
         }
         return input;
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.function.DoubleFunction;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
@@ -10,6 +11,10 @@ public final class Constants {
     public final static class MotorConstants {
         public final static class REV_HD_HEX {
             public final static double ticks_per_revolution = 28;
+        }
+
+        public final static class REV_CORE_HEX {
+            public final static double ticks_per_revolution = 288;
         }
     }
     
@@ -23,6 +28,10 @@ public final class Constants {
                 new Translation2d(-0.28, 0.34),
                 new Translation2d(-0.28, -0.34)
         );
+
+        public final static double WheelRadios = 50;
+
+        public final static DoubleFunction<Double> mm_to_ticks = (double mm) -> mm / WheelRadios / 2 / Math.PI * ticks_per_revolution;
     }
 
     public final static class ShooterConstants {
@@ -39,6 +48,15 @@ public final class Constants {
         public static final String kLeftShooterName = "LeftShooter";
         public static final String kRightShooterName = "RightShooter";
         public static final String kIndexShooterName = "IndexMotor";
+    }
+
+    public final static class IndexConstants {
+        public final static double kTicks_per_revolution = MotorConstants.REV_CORE_HEX.ticks_per_revolution;
+
+        public final static double kWheelRadios = 15;
+
+        public final static DoubleFunction<Double> mm_to_ticks = (double mm) ->
+                mm / kWheelRadios / 2 / Math.PI * kTicks_per_revolution;
     }
 
     public final static class NetworkConstants {

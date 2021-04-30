@@ -89,7 +89,7 @@ public class ShooterSubsystem extends Subsystem {
 
     public void setLift(double position) {
         // Mechanical minimum and maximum of system
-        final double min = 0.20;
+        final double min = 0;
         final double max = 0.55;
         leftLift.setPosition(Util.clamp(position, max, min));
         rightLift.setPosition(Util.clamp(position, max, min));

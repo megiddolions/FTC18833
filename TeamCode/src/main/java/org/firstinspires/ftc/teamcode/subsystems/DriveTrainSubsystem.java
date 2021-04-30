@@ -9,8 +9,6 @@ import org.commandftc.Subsystem;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 
@@ -23,6 +21,8 @@ public class DriveTrainSubsystem extends Subsystem {
     private final DcMotorEx rearRight;
     private final DcMotorEx frontLeft;
     private final DcMotorEx frontRight;
+
+    public double drive_speed = 0.8;
 
 //    private double angler_drive_speed_modifier = 1;
 //    private double vertical_drive_speed_modifier = 1;
@@ -51,6 +51,10 @@ public class DriveTrainSubsystem extends Subsystem {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearLeft.setTargetPosition(0);
+        rearRight.setTargetPosition(0);
+        frontLeft.setTargetPosition(0);
+        frontRight.setTargetPosition(0);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 //        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -68,6 +72,18 @@ public class DriveTrainSubsystem extends Subsystem {
         resetAngle();
 
         odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
+    }
+
+    public void set_for_autonomous() {
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        drive_speed = 1;
+        setPower(1);
+    }
+
+    public void reset_encoders() {
+        DcMotor.RunMode mode = frontLeft.getMode();
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(mode);
     }
 
     @Override
@@ -110,15 +126,15 @@ public class DriveTrainSubsystem extends Subsystem {
     public void setMode(DcMotor.RunMode mode) {
         rearLeft.setMode(mode);
         rearRight.setMode(mode);
-        rearLeft.setMode(mode);
-        rearLeft.setMode(mode);
+        frontLeft.setMode(mode);
+        frontRight.setMode(mode);
     }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
         rearLeft.setZeroPowerBehavior(behavior);
         rearRight.setZeroPowerBehavior(behavior);
-        rearLeft.setZeroPowerBehavior(behavior);
-        rearLeft.setZeroPowerBehavior(behavior);
+        frontLeft.setZeroPowerBehavior(behavior);
+        frontRight.setZeroPowerBehavior(behavior);
     }
 
     public void stop() {
@@ -128,32 +144,39 @@ public class DriveTrainSubsystem extends Subsystem {
         frontRight.setPower(0);
     }
 
+    public void setPower(double power) {
+        rearLeft.setPower(power * drive_speed);
+        rearRight.setPower(power * drive_speed);
+        frontLeft.setPower(power * drive_speed);
+        frontRight.setPower(power * drive_speed);
+    }
+
     public void setPower(double left, double right) {
-        rearLeft.setPower(left);
-        rearRight.setPower(right);
-        frontLeft.setPower(left);
-        frontRight.setPower(right);
+        rearLeft.setPower(left * drive_speed);
+        rearRight.setPower(right * drive_speed);
+        frontLeft.setPower(left * drive_speed);
+        frontRight.setPower(right * drive_speed);
     }
 
     public void setPower(double RL, double FL, double RR, double FR) {
-        rearLeft.setPower(RL);
-        rearRight.setPower(FL);
-        frontLeft.setPower(RR);
-        frontRight.setPower(FR);
+        rearLeft.setPower(RL * drive_speed);
+        rearRight.setPower(FL * drive_speed);
+        frontLeft.setPower(RR * drive_speed);
+        frontRight.setPower(FR * drive_speed);
     }
 
     public void driveLeft(double speed) {
-        rearLeft.setPower(speed);
-        rearRight.setPower(-speed);
-        frontLeft.setPower(-speed);
-        frontRight.setPower(speed);
+        rearLeft.setPower(speed * drive_speed);
+        rearRight.setPower(-speed * drive_speed);
+        frontLeft.setPower(-speed * drive_speed);
+        frontRight.setPower(speed * drive_speed);
     }
 
     public void driveRight(double speed) {
-        rearLeft.setPower(-speed);
-        rearRight.setPower(speed);
-        frontLeft.setPower(speed);
-        frontRight.setPower(-speed);
+        rearLeft.setPower(-speed * drive_speed);
+        rearRight.setPower(speed * drive_speed);
+        frontLeft.setPower(speed * drive_speed);
+        frontRight.setPower(-speed * drive_speed);
     }
 
     public int getRearLeftEncoder() {
@@ -170,6 +193,22 @@ public class DriveTrainSubsystem extends Subsystem {
 
     public int getFrontRightEncoder() {
         return frontRight.getCurrentPosition();
+    }
+
+    public int getRearLeftTarget() {
+        return rearLeft.getTargetPosition();
+    }
+
+    public int getRearRightTarget() {
+        return rearRight.getTargetPosition();
+    }
+
+    public int getFrontLeftTarget() {
+        return frontLeft.getTargetPosition();
+    }
+
+    public int getFrontRightTarget() {
+        return frontRight.getTargetPosition();
     }
 
 //    public void setAnglerSpeed(double modifier) {
@@ -198,4 +237,43 @@ public class DriveTrainSubsystem extends Subsystem {
 //        frontRight.setPower(raw_spin+raw_y-raw_x);
 //        rearRight.setPower(raw_spin+raw_y+raw_x);
 //    }
+
+    public boolean isBusy() {
+        return frontLeft.isBusy() || frontRight.isBusy() || rearRight.isBusy() || rearLeft.isBusy();
+    }
+
+    public void driveForwardDistance(double mm) {
+        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+    }
+
+    public void spinLeftDistance(double spin) {
+        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
+        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
+        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
+        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
+    }
+
+    public void driveLeftDistance(double mm) {
+        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(7*mm)));
+        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(7*mm)));
+        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(7*mm)));
+        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(7*mm)));
+    }
+
+    public void driveDiagonalLeft(double mm) {
+        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
+//        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+//        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
+    }
+
+    public void driveDiagonalRight(double mm) {
+//        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
+        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
+//        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(mm)));
+    }
 }

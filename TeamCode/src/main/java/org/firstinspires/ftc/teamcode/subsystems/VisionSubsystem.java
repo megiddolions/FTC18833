@@ -17,7 +17,6 @@ public class VisionSubsystem extends Subsystem {
     public OpenCvCamera camera;
 
     public VisionSubsystem() {
-//        driveSubsystem = (DriveSubsystem) Robot.subsystems.get(DriveSubsystem.class.getSimpleName());
 
         int camera_id = hardwareMap.appContext.getResources()
                 .getIdentifier("cameraMonitorViewId",
@@ -26,14 +25,13 @@ public class VisionSubsystem extends Subsystem {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"), camera_id);
 
-        camera.setPipeline(new SaveVideoPipeLine());
+        camera.setPipeline(new RingPipeLine());
 
         camera.openCameraDeviceAsync(() -> camera.startStreaming(VisionConstants.camera_width, VisionConstants.camera_height, OpenCvCameraRotation.UPRIGHT));
 
         server.setSource(camera);
-//        server.onOpModePreInit(Robot.opMode);
         server.onOpModePreStart(opMode);
-
+        telemetry.addData("opMode", () -> opMode);
 
     }
 }

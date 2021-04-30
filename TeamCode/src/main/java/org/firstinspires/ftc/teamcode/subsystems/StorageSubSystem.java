@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.commandftc.Subsystem;
+import org.firstinspires.ftc.teamcode.Constants.IndexConstants;
 
 import static org.commandftc.RobotUniversal.*;
 
@@ -22,7 +23,13 @@ public class StorageSubSystem extends Subsystem {
 //        distanceSensor = Robot.opMode.hardwareMap.get(DistanceSensor.class, "StorageSensor");
         indexer.setDirection(DcMotorSimple.Direction.REVERSE);
         indexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        indexer.setTargetPosition(0);
         indexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void set_for_autonomous() {
+        indexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        indexer.setPower(1);
     }
 
     public void index(double power) {
@@ -31,14 +38,6 @@ public class StorageSubSystem extends Subsystem {
 
     public double getIndex() {
         return indexer.getPower();
-    }
-
-    @Override
-    public void periodic() {
-//        telemetry.addData("Red", colorSensor.red());
-//        telemetry.addData("Green", colorSensor.green());
-//        telemetry.addData("Blue", colorSensor.blue());
-        telemetry.addData("has ring", seeing_ring());
     }
 
     private class ColorRange {
@@ -89,7 +88,16 @@ public class StorageSubSystem extends Subsystem {
 //        return distanceSensor.getDistance(DistanceUnit.MM) < 40;
     }
 
-    private void storeRing(){
-        //the movement amount of the motor for entering one ring
+    public void index_distance(double mm) {
+//        indexer.setTargetPosition((int)(indexer.getCurrentPosition() + IndexConstants.mm_to_ticks.apply(125)));
+        indexer.setTargetPosition((int)(indexer.getCurrentPosition() + IndexConstants.mm_to_ticks.apply(mm)));
+    }
+
+    public boolean isBusy() {
+        return indexer.isBusy();
+    }
+    
+    public int getEncoder() {
+        return indexer.getCurrentPosition(); 
     }
 }

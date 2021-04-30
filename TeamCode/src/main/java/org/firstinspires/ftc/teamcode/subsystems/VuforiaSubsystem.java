@@ -139,7 +139,10 @@ public class VuforiaSubsystem extends Subsystem {
     }
 
     public double heading() {
-        return rotation.thirdAngle;
+        if (translation != null)
+            return rotation.thirdAngle;
+        else
+            return Double.POSITIVE_INFINITY;
     }
 
     public double distance() {
