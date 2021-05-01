@@ -57,17 +57,17 @@ public class Drive extends CommandBasedTeleOp {
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
         wobellSubsystem = new WobellSubsystem();
-        vision = new VisionSubsystem();
         vuforia = new VuforiaSubsystem();
+//        vision = new VisionSubsystem();
 
 //        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision, vuforia);
+        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vuforia);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
-        alignRobotCommand = new AlignRobotVuforiaCommand(driveTrain, vuforia);
+//        alignRobotCommand = new AlignRobotVuforiaCommand(driveTrain, vuforia);
 
         startIntakeCommand = new StartIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
@@ -87,7 +87,7 @@ public class Drive extends CommandBasedTeleOp {
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y));
         gp1.right_stick_button().whenHeld(
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.left_stick_y));
-        gp1.x().whileHeld(alignRobotCommand);
+//        gp1.x().whileHeld(alignRobotCommand);
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> 1));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -1));
         gp1.y().whenPressed(new InstantCommand(() -> driveTrain.reset_encoders()));
@@ -121,7 +121,7 @@ public class Drive extends CommandBasedTeleOp {
         gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
 
         telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
+//        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
 //        telemetry.addData("Distance", vuforia::distance);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);

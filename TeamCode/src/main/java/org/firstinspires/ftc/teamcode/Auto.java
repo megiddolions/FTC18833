@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.commandftc.RobotUniversal;
-import org.firstinspires.ftc.teamcode.lib.PIDController;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.VuforiaSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
 @Autonomous(name = "Auto")
@@ -21,9 +20,9 @@ public class Auto extends LinearOpMode {
     protected StorageSubSystem storage;
     protected WobellSubsystem wobellSubsystem;
     protected VisionSubsystem vision;
-    protected VuforiaSubsystem vuforia;
 
     private long state;
+    private int rings;
 
     @Override
     public void runOpMode() {
@@ -37,8 +36,7 @@ public class Auto extends LinearOpMode {
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
         wobellSubsystem = new WobellSubsystem();
-//        vision = new VisionSubsystem();
-//        vuforia = new VuforiaSubsystem();
+        vision = new VisionSubsystem();
 
         wobellSubsystem.close();
         shooter.setLift(0.20);
@@ -60,6 +58,10 @@ public class Auto extends LinearOpMode {
 
         waitForStart();
 
+        rings = vision.count_rings();
+        telemetry.addData("rings", () -> rings);
+        telemetry.update();
+
         shooter.setPower(0.55);
         driveTrain.setPower(0.7);
         driveForward(-2000);
@@ -71,13 +73,76 @@ public class Auto extends LinearOpMode {
         shoot_ring();
         driveLeft(-45);
         shoot_ring();
-        driveLeft(-45);
+        driveLeft(-55);
         shoot_ring();
         shooter.setPower(0);
 //        while (opModeIsActive()) {
 //            telemetry.update();
 //        }
-        wobell_C();
+
+        switch (rings) {
+            case 0:
+                wobell_A();
+                break;
+            case 1:
+                wobell_B();
+                break;
+            case 4:
+                wobell_C();
+                break;
+        }
+    }
+
+    private void wobell_A() {
+        spin(-610);
+        driveForward(-1300);
+        wobellSubsystem.setLift(-1);
+        sleep(1300);
+        wobellSubsystem.open();
+        sleep(100);
+        wobellSubsystem.setLift(1);
+        sleep(350);
+        wobellSubsystem.setLift(0);
+        driveForward(200);
+        driveTrain.setPower(0.7);
+        spin(-690);
+        driveForward(-1450);
+        wobellSubsystem.close();
+        sleep(500);
+        wobellSubsystem.setLift(0.4);
+        driveForward(1550);
+        wobellSubsystem.setLift(0);
+        spin(700);
+        wobellSubsystem.setLift(-0.7);
+        sleep(700);
+        wobellSubsystem.open();
+        wobellSubsystem.setLift(0);
+        sleep(300);
+        driveForward(300);
+    }
+
+    private void wobell_B() {
+        spin(-300);
+        driveForward(-1000);
+        wobellSubsystem.setLift(-1);
+        sleep(1300);
+        wobellSubsystem.open();
+        sleep(100);
+        wobellSubsystem.setLift(1);
+        sleep(1000);
+        wobellSubsystem.setLift(0);
+    }
+
+    private void wobell_C() {
+        spin(-320);
+        driveForward(-2100);
+        wobellSubsystem.setLift(-1);
+        sleep(1300);
+        wobellSubsystem.open();
+        sleep(100);
+        wobellSubsystem.setLift(1);
+        sleep(1000);
+        wobellSubsystem.setLift(0);
     }
 
     private void driveForward(double mm) {
@@ -133,41 +198,5 @@ public class Auto extends LinearOpMode {
         while (shooter.getLeftVelocity() <= velocity && opModeIsActive())
             telemetry.update();
         sleep(1000);
-    }
-
-    private void wobell_A() {
-        spin(-610);
-        driveForward(-1300);
-        wobellSubsystem.setLift(-1);
-        sleep(1300);
-        wobellSubsystem.open();
-        sleep(100);
-        wobellSubsystem.setLift(1);
-        sleep(1000);
-        wobellSubsystem.setLift(0);
-    }
-
-    private void wobell_B() {
-        spin(-300);
-        driveForward(-1000);
-        wobellSubsystem.setLift(-1);
-        sleep(1300);
-        wobellSubsystem.open();
-        sleep(100);
-        wobellSubsystem.setLift(1);
-        sleep(1000);
-        wobellSubsystem.setLift(0);
-    }
-
-    private void wobell_C() {
-        spin(-320);
-        driveForward(-2100);
-        wobellSubsystem.setLift(-1);
-        sleep(1300);
-        wobellSubsystem.open();
-        sleep(100);
-        wobellSubsystem.setLift(1);
-        sleep(1000);
-        wobellSubsystem.setLift(0);
     }
 }

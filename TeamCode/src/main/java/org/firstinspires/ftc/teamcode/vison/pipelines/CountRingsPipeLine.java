@@ -1,25 +1,34 @@
-package org.firstinspires.ftc.teamcode.vison;
+package org.firstinspires.ftc.teamcode.vison.pipelines;
 
+import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class RingPipeLine extends OpenCvPipeline {
-    
-    public double[] hsvThresholdHue = {0.0, 180.0};
-    public double[] hsvThresholdSaturation = {110.07193916564364, 255.0};
-    public double[] hsvThresholdValue = {0.0, 255.0};
+import java.util.ArrayList;
+import java.util.List;
+
+public class CountRingsPipeLine extends OpenCvPipeline {
+//    public double[] hsvThresholdHue = {8, 52};
+//    public double[] hsvThresholdSaturation = {110.07193916564364, 255.0};
+//    public double[] hsvThresholdValue = {171, 255.0};
+    public double[] hsvThresholdHue = {0, 180};
+    public double[] hsvThresholdSaturation = {0, 255.0};
+    public double[] hsvThresholdValue = {0, 255.0};
 
     public Mat cvErodeKernel = new Mat();
     public Point cvErodeAnchor = new Point(-1, -1);
     public double cvErodeIterations = 1;
     public int cvErodeBordertype = Core.BORDER_CONSTANT;
     public Scalar cvErodeBordervalue = new Scalar(-1);
-    
+
+    public int nonzero = 0;
+
     @Override
     public Mat processFrame(Mat input) {
         Mat hsvThresholdOutput = new Mat();
@@ -28,12 +37,13 @@ public class RingPipeLine extends OpenCvPipeline {
 
         Mat cvErodeOutput = new Mat();
         cvErode(hsvThresholdOutput, cvErodeKernel, cvErodeAnchor, cvErodeIterations, cvErodeBordertype, cvErodeBordervalue, cvErodeOutput);
+//
+//        Mat output = new Mat();
+//        mask(input, cvErodeOutput, output);
 
-        Mat output = new Mat();
-        mask(input, cvErodeOutput, output);
+//        nonzero = Core.countNonZero(input);
 
-        return output;
-//        return input;
+        return input;
     }
 
     /**
