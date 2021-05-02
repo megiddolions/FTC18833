@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,6 +17,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import org.firstinspires.ftc.teamcode.vison.pipelines.*;
 
+@Disabled
 @TeleOp(name="Test")
 public class Test extends OpMode {
     OpenCvCamera webcam;

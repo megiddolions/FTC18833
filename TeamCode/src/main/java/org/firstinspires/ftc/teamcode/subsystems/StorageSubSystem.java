@@ -28,8 +28,14 @@ public class StorageSubSystem extends Subsystem {
     }
 
     public void set_for_autonomous() {
+        indexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         indexer.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         indexer.setPower(1);
+    }
+
+    public void set_for_commands() {
+        indexer.setPower(0);
+        indexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void index(double power) {

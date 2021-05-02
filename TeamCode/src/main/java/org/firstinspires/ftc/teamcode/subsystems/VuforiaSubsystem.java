@@ -135,7 +135,7 @@ public class VuforiaSubsystem extends Subsystem {
     }
 
     public boolean has_target() {
-        return !allTrackballs.isEmpty() && rotation != null && translation != null;
+        return !visible_Target.equals("none") && rotation != null && translation != null;
     }
 
     public double heading() {
@@ -150,5 +150,9 @@ public class VuforiaSubsystem extends Subsystem {
         return translation.get(0);
         else
             return -1;
+    }
+
+    public double vertical_error() {
+        return distance() * Math.sin(Math.toRadians(heading())) / 50;
     }
 }

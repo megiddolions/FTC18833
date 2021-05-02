@@ -47,8 +47,8 @@ public class RingPipeLine extends OpenCvPipeline {
                         500),
                 new Scalar(0, 255, 0), 4);
 
-
-
+        ring_area.release();
+        output.release();
         return input;
     }
 

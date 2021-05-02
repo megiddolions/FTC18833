@@ -11,7 +11,8 @@ public class AlignRobotVuforiaCommand extends Command {
     private final VuforiaSubsystem vuforia;
     private final DriveTrainSubsystem driveTrain;
     private final PIDController pid;
-    private double target = -Double.MAX_VALUE;
+    double last = 0;
+    double time = 0;
 
     public AlignRobotVuforiaCommand(DriveTrainSubsystem driveTrain, VuforiaSubsystem vuforia) {
         this.driveTrain = driveTrain;
@@ -22,24 +23,29 @@ public class AlignRobotVuforiaCommand extends Command {
     }
 
     @Override
+    public void init() {
+    }
+
+    @Override
     public void execute() {
+        last = time;
+        time = opMode.getRuntime();
         if (vuforia.has_target()) {
-            double spin = pid.output(vuforia.heading() - 4, 0);
-            driveTrain.setPower(spin, -spin);
+            driveTrain.driveLeft(-vuforia.vertical_error());
+
         } else {
             driveTrain.stop();
         }
-        telemetry.addData("target", target);
     }
 
     @Override
     protected void end() {
         pid.clear();
-        target = -Double.MAX_VALUE;
+        driveTrain.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return target != -Double.MAX_VALUE && Math.abs(target - driveTrain.getHeading().getDegrees()) <= 2;
+        return Math.abs(vuforia.vertical_error()) <= 0.2;
     }
 }

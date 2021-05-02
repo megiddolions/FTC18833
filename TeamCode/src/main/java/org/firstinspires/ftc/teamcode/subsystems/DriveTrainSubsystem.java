@@ -71,6 +71,9 @@ public class DriveTrainSubsystem extends Subsystem {
 
         resetAngle();
 
+        while (!imu.isGyroCalibrated())
+            ;
+
         odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
     }
 
@@ -78,6 +81,12 @@ public class DriveTrainSubsystem extends Subsystem {
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
         drive_speed = 1;
         setPower(1);
+    }
+
+    public void set_for_commands() {
+        drive_speed = 0.7;
+        setPower(0);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void reset_encoders() {
@@ -250,10 +259,10 @@ public class DriveTrainSubsystem extends Subsystem {
     }
 
     public void spinLeftDistance(double spin) {
-        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
-        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
-        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
-        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
+        rearLeft.setTargetPosition((int)(rearLeft.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
+        rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
+        frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() - DriveTrainConstants.mm_to_ticks.apply(spin)));
+        frontRight.setTargetPosition((int)(frontRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(spin)));
     }
 
     public void driveLeftDistance(double mm) {

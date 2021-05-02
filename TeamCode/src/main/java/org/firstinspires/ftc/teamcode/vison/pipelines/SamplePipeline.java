@@ -33,11 +33,11 @@ public class SamplePipeline extends OpenCvPipeline {
         /*
          * Draw a simple box around the middle 1/2 of the entire frame
          */
-        Imgproc.rectangle(
-                input,
-                new Point(0, 300),
-                new Point(200, 500),
-                new Scalar(0, 255, 0), 4);
+//        Imgproc.rectangle(
+//                input,
+//                new Point(0, 300),
+//                new Point(200, 500),
+//                new Scalar(0, 255, 0), 4);
 
         /**
          * NOTE: to see how to get data from your pipeline to your OpMode as well as how

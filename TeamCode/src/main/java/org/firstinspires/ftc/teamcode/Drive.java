@@ -3,11 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.commandftc.Command;
 import org.commandftc.InstantCommand;
 import org.commandftc.Trigger;
 import org.commandftc.opModes.CommandBasedTeleOp;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVuforiaCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
@@ -24,7 +23,6 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.VuforiaSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
 @TeleOp(name="drive")
@@ -35,11 +33,10 @@ public class Drive extends CommandBasedTeleOp {
     protected StorageSubSystem storage;
     protected WobellSubsystem wobellSubsystem;
     protected VisionSubsystem vision;
-    protected VuforiaSubsystem vuforia;
 
     protected TankDriveCommand tankDriveCommand;
     protected DriveSideWaysCommand driveSideWaysCommandCommand;
-    protected Command alignRobotCommand; // method of aligning could changed
+    protected AlignRobotVisionCommand alignRobotCommand;
 
     protected StartIntakeCommand startIntakeCommand;
 
@@ -57,24 +54,25 @@ public class Drive extends CommandBasedTeleOp {
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
         wobellSubsystem = new WobellSubsystem();
-        vuforia = new VuforiaSubsystem();
-//        vision = new VisionSubsystem();
+        vision = new VisionSubsystem();
 
-//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vuforia);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter.setLift(0.35);
+
+        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
-//        alignRobotCommand = new AlignRobotVuforiaCommand(driveTrain, vuforia);
+        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
 
         startIntakeCommand = new StartIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
         automaticStorageCommand = new AutomaticStorageCommand(storage);
         manualStorageCommand = new ManualStorageCommand(storage, () -> gamepad2.right_stick_y);
 
-        startShooterCommand = new SetShooterSpeedCommand(shooter, storage, 0.65);
+        startShooterCommand = new SetShooterSpeedCommand(shooter, storage, 0.70);
         raiseShooterCommand = new SetShooterLiftCommand(shooter, 0.05);
         lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.05);
 
@@ -87,10 +85,10 @@ public class Drive extends CommandBasedTeleOp {
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y));
         gp1.right_stick_button().whenHeld(
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.left_stick_y));
-//        gp1.x().whileHeld(alignRobotCommand);
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> 1));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -1));
         gp1.y().whenPressed(new InstantCommand(() -> driveTrain.reset_encoders()));
+        gp1.x().whenHeld(alignRobotCommand);
 
         new Trigger(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 0.5, driveTrain))
@@ -108,7 +106,6 @@ public class Drive extends CommandBasedTeleOp {
         new Trigger(() -> Math.abs(gamepad2.right_stick_y) > 0.1).whileHeld(manualStorageCommand);
 
         // Shooter
-//        gp2.x().whenHeld(startShooterCommand);
         gp2.left_bumper().whenPressed(new InstantCommand(() -> shooter.setPower(0.5), shooter))
                         .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
         // Shooter lift
@@ -126,15 +123,15 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
-//        telemetry.addData("Visible Target", vuforia::Visible_Target);
-//        telemetry.addData("Angle", vuforia::heading);
+        telemetry.addData("gyro", driveTrain::getHeading);
+
 //        telemetry.addData("Storage", storage::getEncoder);
 //        telemetry.addData("has ring", storage::seeing_ring);
 
-        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
-        telemetry.addData("RR", driveTrain::getRearRightEncoder);
-        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
-        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
+//        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
+//        telemetry.addData("RR", driveTrain::getRearRightEncoder);
+//        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
+//        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
 
 
         /*
