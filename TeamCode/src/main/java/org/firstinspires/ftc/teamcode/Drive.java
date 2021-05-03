@@ -142,6 +142,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
 //        telemetry.addData("Distance", vuforia::distance);
         telemetry.addData("Lift", shooter::getLift);
+//        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);

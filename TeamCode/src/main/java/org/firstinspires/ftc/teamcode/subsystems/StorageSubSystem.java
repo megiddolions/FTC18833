@@ -12,6 +12,7 @@ import static org.commandftc.RobotUniversal.*;
 public class StorageSubSystem extends Subsystem {
     private final DcMotor indexer;
     private final ColorSensor colorSensor;
+
 //    private final DistanceSensor distanceSensor;
 
     private final ColorRange ringColor = new ColorRange()
@@ -20,8 +21,6 @@ public class StorageSubSystem extends Subsystem {
     public StorageSubSystem() {
         indexer = hardwareMap.dcMotor.get("IndexMotor");
         colorSensor = hardwareMap.get(ColorSensor.class, "StorageSensor");
-//        distanceSensor = Robot.opMode.hardwareMap.get(DistanceSensor.class, "StorageSensor");
-        indexer.setDirection(DcMotorSimple.Direction.REVERSE);
         indexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         indexer.setTargetPosition(0);
         indexer.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

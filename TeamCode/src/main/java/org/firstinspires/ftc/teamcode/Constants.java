@@ -51,12 +51,13 @@ public final class Constants {
     }
 
     public final static class IndexConstants {
-        public final static double kTicks_per_revolution = MotorConstants.REV_CORE_HEX.ticks_per_revolution;
+        public final static double kTicks_per_revolution = MotorConstants.REV_HD_HEX.ticks_per_revolution;
+        public final static double gear_ratio = 45 / 1.5;
 
         public final static double kWheelRadios = 15;
 
         public final static DoubleFunction<Double> mm_to_ticks = (double mm) ->
-                mm / kWheelRadios / 2 / Math.PI * kTicks_per_revolution;
+                mm / kWheelRadios / 2 / Math.PI * kTicks_per_revolution * gear_ratio;
     }
 
     public final static class NetworkConstants {

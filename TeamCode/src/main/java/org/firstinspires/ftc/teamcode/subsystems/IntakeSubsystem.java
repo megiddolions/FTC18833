@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.commandftc.Subsystem;
 
+import java.util.function.DoubleSupplier;
+
 import static org.commandftc.RobotUniversal.hardwareMap;
 
 public class IntakeSubsystem extends Subsystem {
@@ -12,7 +14,6 @@ public class IntakeSubsystem extends Subsystem {
 
     public IntakeSubsystem() {
         intake_motor = hardwareMap.dcMotor.get("IntakeMotor");
-        intake_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake_motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 

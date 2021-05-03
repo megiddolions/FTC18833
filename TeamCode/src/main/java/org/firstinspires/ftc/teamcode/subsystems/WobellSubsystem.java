@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.commandftc.Subsystem;
+import org.opencv.core.Mat;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 import static org.commandftc.RobotUniversal.*;
 
@@ -11,16 +16,44 @@ public class WobellSubsystem extends Subsystem {
     private final CRServo leftLift;
     private final CRServo rightLift;
     private final Servo middle;
+    private final IntSupplier encoder;
+    private int target_position;
 
     public WobellSubsystem() {
         leftLift = hardwareMap.crservo.get("LeftWobellLift");
         rightLift = hardwareMap.crservo.get("RightWobellLift");
         middle = hardwareMap.servo.get("WobellServo");
 
+        DcMotor encoder = hardwareMap.dcMotor.get("IntakeMotor");
+        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        encoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.encoder = encoder::getCurrentPosition;
+
         rightLift.setDirection(CRServo.Direction.REVERSE);
         leftLift.setDirection(CRServo.Direction.FORWARD);
 
 //        setLift(0.5);
+    }
+
+    @Override
+    public void periodic() {
+        setLift((getTargetPosition() - getCurrentPosition()) / -2000.0);
+    }
+
+    public boolean isBusy() {
+        return Math.abs(getTargetPosition() - getCurrentPosition()) >= 100;
+    }
+
+    public int getCurrentPosition() {
+        return encoder.getAsInt();
+    }
+
+    public int getTargetPosition() {
+        return target_position;
+    }
+
+    public void setTargetPosition(int target_position) {
+        this.target_position = target_position;
     }
 
     public void open() {

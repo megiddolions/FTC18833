@@ -42,7 +42,7 @@ public class VisionSubsystem extends Subsystem {
 
     public int count_rings() {
         int orange_pixels = ringPipeLine.orange_pixels;
-        if (orange_pixels < 1000) {
+        if (orange_pixels < 700) {
             return 0;
         } else if (orange_pixels < 3000) {
             return 1;

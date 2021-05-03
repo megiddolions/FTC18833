@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.commandftc.Command;
 import org.commandftc.RobotUniversal;
+import org.commandftc.Subsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
@@ -12,6 +14,9 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 
 @Autonomous(name="Test Auto™")
@@ -23,11 +28,21 @@ public class TestAuto extends LinearOpMode {
     protected WobellSubsystem wobellSubsystem;
     protected VisionSubsystem vision;
 
-    private long state;
-    boolean b = false;
+    private Set<Subsystem> subsystems = new HashSet<>();
+
+    private void addSubsystems(Subsystem... subsystems) {
+        Collections.addAll(this.subsystems, subsystems);
+    }
+
+    private void update() {
+        for (Subsystem subsystem : subsystems) {
+            subsystem.periodic();
+        }
+        telemetry.update();
+    }
     @Override
     public void runOpMode() {
-        state = 0;
+        subsystems.clear();
         RobotUniversal.telemetry = telemetry;
         RobotUniversal.opMode = this;
         RobotUniversal.hardwareMap = hardwareMap;
@@ -39,35 +54,18 @@ public class TestAuto extends LinearOpMode {
         wobellSubsystem = new WobellSubsystem();
         vision = new VisionSubsystem();
 
-        vision.set_for_drive();
+        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+        wobellSubsystem.close();
+
+        telemetry.addData("wobell", wobellSubsystem::getCurrentPosition);
 
         waitForStart();
 
-        while (vision.getError() != Constants.VisionConstants.camera_width/2.0 && opModeIsActive())
-            ;
+        wobellSubsystem.setTargetPosition(3000);
 
-        align_robot_left(300);
-
-//        while (opModeIsActive()) {
-//            double error = -(-vision.getError());
-//            telemetry.addData("error", error);
-//            telemetry.update();
-//        }
-    }
-
-    private void align_robot_left(double offset) {
-        driveTrain.set_for_commands();
         while (opModeIsActive()) {
-            double error = -(-vision.getError()+offset);
-            driveTrain.driveLeft(-error/500);
-            telemetry.addData("error", error);
-            telemetry.update();
-            if (Math.abs(error) <= 2) {
-                driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                driveTrain.stop();
-                break;
-            }
+            update();
         }
-        driveTrain.set_for_autonomous();
+
     }
 }
