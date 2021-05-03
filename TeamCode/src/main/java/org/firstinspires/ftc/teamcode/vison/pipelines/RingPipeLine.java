@@ -17,6 +17,10 @@ public class RingPipeLine extends OpenCvPipeline {
 
 //    public Mat cvErodeKernel = new Mat();
     public int orange_pixels = 0;
+
+    private static final Rect ring_area_rect = new Rect(
+            new Point(0,300),
+            new Point(50,430));
     
     @Override
     public Mat processFrame(Mat input) {
@@ -27,28 +31,22 @@ public class RingPipeLine extends OpenCvPipeline {
 //        Mat cvErodeOutput = new Mat();
 //        cvErode(hsvThresholdOutput, cvErodeKernel, cvErodeAnchor, cvErodeIterations, cvErodeBordertype, cvErodeBordervalue, cvErodeOutput);
 
-        Mat output = new Mat();
-        mask(input, hsvThresholdOutput, output);
+//        Mat output = new Mat();
+//        mask(input, hsvThresholdOutput, output);
 
-        Mat ring_area = output.submat(new Rect(
-                new Point(0,300),
-                new Point(200,500)));
+        Mat ring_area = hsvThresholdOutput.submat(ring_area_rect);
 
-        Imgproc.cvtColor(ring_area, ring_area, Imgproc.COLOR_BGR2GRAY);
+//        Imgproc.cvtColor(ring_area, ring_area, Imgproc.COLOR_BGR2GRAY);
         orange_pixels = Core.countNonZero(ring_area);
 
         Imgproc.rectangle(
                 input,
-                new Point(
-                        0,
-                        300),
-                new Point(
-                        200,
-                        500),
+                ring_area_rect,
                 new Scalar(0, 255, 0), 4);
 
+        hsvThresholdOutput.release();
         ring_area.release();
-        output.release();
+//        output.release();
         return input;
     }
 

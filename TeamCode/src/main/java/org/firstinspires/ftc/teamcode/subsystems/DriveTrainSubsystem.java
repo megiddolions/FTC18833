@@ -31,7 +31,7 @@ public class DriveTrainSubsystem extends Subsystem {
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public MecanumDriveOdometry odometry;
+//    public MecanumDriveOdometry odometry;
 
     public DriveTrainSubsystem() {
         rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
@@ -74,7 +74,7 @@ public class DriveTrainSubsystem extends Subsystem {
         while (!imu.isGyroCalibrated())
             ;
 
-        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
+//        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
     }
 
     public void set_for_autonomous() {
@@ -84,7 +84,7 @@ public class DriveTrainSubsystem extends Subsystem {
     }
 
     public void set_for_commands() {
-        drive_speed = 0.7;
+        drive_speed = 1;
         setPower(0);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -98,7 +98,7 @@ public class DriveTrainSubsystem extends Subsystem {
     @Override
     public void periodic() {
 
-        odometry.update(getHeading(), getWheelSpeeds());
+//        odometry.update(getHeading(), getWheelSpeeds());
     }
 
     public MecanumDriveWheelSpeeds getWheelSpeeds() {

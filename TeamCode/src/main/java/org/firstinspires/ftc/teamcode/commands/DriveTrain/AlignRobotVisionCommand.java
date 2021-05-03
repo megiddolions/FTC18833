@@ -1,30 +1,33 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
 import org.commandftc.Command;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-
-import static org.commandftc.RobotUniversal.*;
 
 public class AlignRobotVisionCommand extends Command {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
+    private final double offset;
 
     public AlignRobotVisionCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
         this.vision = vision;
+        this.offset = 0;
 
-//        telemetry.addData("error", () -> vision.getError() / 500);
+        addRequirements(driveTrain, vision);
+    }
+
+    public AlignRobotVisionCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision, double offset) {
+        this.driveTrain = driveTrain;
+        this.vision = vision;
+        this.offset = offset;
 
         addRequirements(driveTrain, vision);
     }
 
     @Override
     public void execute() {
-        driveTrain.driveLeft(-vision.getError() / 500);
-        telemetry.addData("error", vision.getError() / 500);
-        telemetry.update();
+        driveTrain.driveLeft((-vision.getError()+offset) / 500);
     }
 
     @Override
@@ -34,6 +37,6 @@ public class AlignRobotVisionCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(vision.getError()) <= 2;
+        return Math.abs(vision.getError()+offset) <= 2;
     }
 }

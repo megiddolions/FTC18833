@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Path;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.commandftc.RobotUniversal;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.vison.pipelines.TowerPipeLine;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -12,32 +16,24 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(name="Text Vision")
 public class TestVision extends LinearOpMode {
-    private OpenCvCamera camera;
-    TowerPipeLine pipeLine;
+    private VisionSubsystem visionSubsystem;
 
     @Override
     public void runOpMode() {
         RobotUniversal.telemetry = telemetry;
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        RobotUniversal.hardwareMap = hardwareMap;
 
-        pipeLine = new TowerPipeLine();
-        camera.setPipeline(pipeLine);
-
-        telemetry.addData("error", this::getError);
-        telemetry.update();
-
-        camera.openCameraDeviceAsync(() -> camera.startStreaming(Constants.VisionConstants.camera_width, Constants.VisionConstants.camera_height, OpenCvCameraRotation.UPRIGHT));
-
-
+        VisionSubsystem vision = new VisionSubsystem();
+        vision.set_for_autonomous();
 
         while(opModeIsActive())
             telemetry.update();
 
         waitForStart();
-    }
-
-    public double getError() {
-        return (Constants.VisionConstants.camera_width) / 2.0 - (pipeLine.right - pipeLine.left) / 2.0;
+        telemetry.addData("orange pixels", vision::getOrangePixels);
+        telemetry.addData("rings", vision::count_rings);
+        while (opModeIsActive()) {
+            telemetry.update();
+        }
     }
 }

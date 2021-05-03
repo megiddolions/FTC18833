@@ -45,11 +45,12 @@ public class Auto extends LinearOpMode {
         wobellSubsystem = new WobellSubsystem();
         vision = new VisionSubsystem();
 
-        wobellSubsystem.close();
-        shooter.setLift(0.20);
-
         driveTrain.set_for_autonomous();
         storage.set_for_autonomous();
+        vision.set_for_autonomous();
+
+        wobellSubsystem.close();
+        shooter.setLift(0.20);
 
         telemetry.addData("time", this::getRuntime);
         telemetry.addData("state", () -> state);
@@ -61,6 +62,7 @@ public class Auto extends LinearOpMode {
 //        telemetry.addData("RR", driveTrain::getRearRightEncoder);
 //        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
 //        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
+        telemetry.addData("orange pixels", vision::getOrangePixels);
         telemetry.update();
 
         waitForStart();
@@ -69,15 +71,16 @@ public class Auto extends LinearOpMode {
         rings = vision.count_rings();
         telemetry.addData("rings", () -> rings);
         telemetry.update();
+
+        vision.set_for_drive();
+
         // Move to position to shoot power shoots
         shooter.setPower(0.55);
-        driveTrain.setPower(0.5);
+        driveTrain.setPower(0.7);
         driveForward(-2000);
-        sleep(200);
         driveTrain.setPower(1);
         driveLeft(20);
         wait_for_shooter(2500);
-        spinAbsoluteGyro(0);
         // Shoot all rings
         shoot_ring();
         driveLeft(-45);
@@ -100,30 +103,38 @@ public class Auto extends LinearOpMode {
     }
 
     private void wobell_A() {
-        spinLeft(610);
-        driveForward(-1500);
+        // Drive to A
+        spinLeft(590);
+        driveForward(-1400);
+        // Unload wobell
         wobellSubsystem.setLift(-1);
-        sleep(1300);
+        sleep(1400);
         wobellSubsystem.open();
         sleep(100);
-        wobellSubsystem.setLift(1);
-        sleep(350);
-        wobellSubsystem.setLift(0);
+        wobellSubsystem.setLift(0.23);
+        // drive backward
         driveForward(400);
+        wobellSubsystem.setLift(0);
+        // Drive to pickup second
         driveTrain.setPower(0.7);
-        spinLeft(710);
-        driveForward(-1500);
+        spinLeft(670);
+        driveForward(-1450);
+        // Pickup second wobell
         wobellSubsystem.close();
         sleep(500);
-        wobellSubsystem.setLift(0.35);
+        wobellSubsystem.setLift(0.15);
+        // Drive to A again
         driveForward(1550);
+        // Drop the second wobell
         wobellSubsystem.setLift(0);
         spinLeft(-700);
-        wobellSubsystem.setLift(-0.7);
-        sleep(700);
+        driveForward(-300);
+//        wobellSubsystem.setLift(-0.7);
+//        sleep(700);
         wobellSubsystem.open();
-        wobellSubsystem.setLift(0);
+//        wobellSubsystem.setLift(0);
         sleep(300);
+        // Go back
         driveForward(300);
     }
 
@@ -162,7 +173,7 @@ public class Auto extends LinearOpMode {
         wait_for_shooter(2500);
         // Start shooter wheels
         shooter.setPower(0.55);
-        //
+
 
         // Collect rings
         driveTrain.setPower(0.4);
@@ -203,29 +214,6 @@ public class Auto extends LinearOpMode {
             telemetry.update();
     }
 
-    private void spinLeftGyro(double angle) {
-        double target = driveTrain.getHeading().getDegrees() + angle;
-        driveTrain.set_for_commands();
-        double error = target - driveTrain.getHeading().getDegrees();
-        while (Math.abs(error) <= 3) {
-            driveTrain.setPower(error / 50, -error / 50);
-            error = target - driveTrain.getHeading().getDegrees();
-            telemetry.update();
-        }
-        driveTrain.set_for_autonomous();
-    }
-    private void spinAbsoluteGyro(double angle) {
-        driveTrain.set_for_commands();
-        double error = angle - driveTrain.getHeading().getDegrees();
-        while (Math.abs(error) <= 3) {
-            driveTrain.setPower(error / 20, -error / 20);
-            error = angle - driveTrain.getHeading().getDegrees();
-            telemetry.update();
-        }
-        driveTrain.setPower(0);
-        driveTrain.set_for_autonomous();
-    }
-
     private void driveLeft(double mm) {
         state++;
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -262,5 +250,31 @@ public class Auto extends LinearOpMode {
         while (shooter.getLeftVelocity() <= velocity && opModeIsActive())
             telemetry.update();
 //        sleep(1000);
+    }
+
+    private void align_robot_left(double offset) {
+        driveTrain.set_for_commands();
+        while (opModeIsActive()) {
+            double error = -(-vision.getError()+offset);
+            driveTrain.driveLeft(error/500);
+            telemetry.addData("error", error);
+            telemetry.update();
+            if (Math.abs(error) <= 2)
+                break;
+        }
+        driveTrain.stop();
+        driveTrain.set_for_autonomous();
+    }
+
+    private void align_robot_spin(double offset) {
+        double error;
+        driveTrain.set_for_commands();
+        do {
+            error = -(-vision.getError()-offset);
+            driveTrain.setPower(error/500, -error/500);
+            telemetry.addData("error", error);
+            telemetry.update();
+        } while (opModeIsActive() && Math.abs(error) <= 2);
+        driveTrain.set_for_autonomous();
     }
 }
