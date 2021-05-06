@@ -2,9 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.commandftc.Command;
 import org.commandftc.RobotUniversal;
 import org.commandftc.Subsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
@@ -17,9 +15,9 @@ import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
 
-@Autonomous(name="Test Auto™")
+//@Disabled
+@Autonomous(name="Test Auto")
 public class TestAuto extends LinearOpMode {
     protected DriveTrainSubsystem driveTrain;
     protected ShooterSubsystem shooter;

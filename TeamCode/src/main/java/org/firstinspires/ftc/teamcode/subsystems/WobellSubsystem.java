@@ -5,9 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.commandftc.Subsystem;
-import org.opencv.core.Mat;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 import static org.commandftc.RobotUniversal.*;
@@ -32,16 +30,18 @@ public class WobellSubsystem extends Subsystem {
         rightLift.setDirection(CRServo.Direction.REVERSE);
         leftLift.setDirection(CRServo.Direction.FORWARD);
 
-//        setLift(0.5);
+        setTargetPosition(getTargetPosition());
     }
 
-    @Override
-    public void periodic() {
-        setLift((getTargetPosition() - getCurrentPosition()) / -2000.0);
-    }
+//    @Override
+//    public void periodic() {
+//        if (auto) {
+//            setLift((getTargetPosition() - getCurrentPosition()) / -2000.0);
+//        }
+//    }
 
     public boolean isBusy() {
-        return Math.abs(getTargetPosition() - getCurrentPosition()) >= 100;
+        return Math.abs(getTargetPosition() - getCurrentPosition()) >= 200;
     }
 
     public int getCurrentPosition() {

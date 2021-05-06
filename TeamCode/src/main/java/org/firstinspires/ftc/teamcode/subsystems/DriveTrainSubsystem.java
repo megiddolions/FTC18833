@@ -71,13 +71,18 @@ public class DriveTrainSubsystem extends Subsystem {
 
         resetAngle();
 
-        while (!imu.isGyroCalibrated())
-            ;
-
 //        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
     }
 
+    public boolean isGyroCalibrated() {
+        return imu.isGyroCalibrated();
+    }
+
     public void set_for_autonomous() {
+        rearLeft.setTargetPosition(rearLeft.getCurrentPosition());
+        rearRight.setTargetPosition(rearRight.getCurrentPosition());
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition());
+        frontRight.setTargetPosition(frontRight.getCurrentPosition());
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
         drive_speed = 1;
         setPower(1);
@@ -93,12 +98,6 @@ public class DriveTrainSubsystem extends Subsystem {
         DcMotor.RunMode mode = frontLeft.getMode();
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(mode);
-    }
-
-    @Override
-    public void periodic() {
-
-//        odometry.update(getHeading(), getWheelSpeeds());
     }
 
     public MecanumDriveWheelSpeeds getWheelSpeeds() {

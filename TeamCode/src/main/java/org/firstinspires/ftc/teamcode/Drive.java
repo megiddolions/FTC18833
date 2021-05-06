@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.commandftc.CommandScheduler;
 import org.commandftc.InstantCommand;
 import org.commandftc.Trigger;
 import org.commandftc.opModes.CommandBasedTeleOp;
@@ -10,7 +11,6 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionComman
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.autonomus.DriveLeftDistanceCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
@@ -52,19 +52,25 @@ public class Drive extends CommandBasedTeleOp {
 
     @Override
     public void assign() {
+        CommandScheduler.setOpModeActive(false);
+        CommandScheduler.unscheduleAll();
+        CommandScheduler.unregisterAllSubsystems();
+        CommandScheduler.unregisterAllButtons();
+
         driveTrain = new DriveTrainSubsystem();
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
         wobellSubsystem = new WobellSubsystem();
-        vision = new VisionSubsystem();
+//        vision = new VisionSubsystem();
 
 //        vision.set_for_drive();
 
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter.setLift(0.35);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setLift(0.375);
 
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
+//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
@@ -94,7 +100,7 @@ public class Drive extends CommandBasedTeleOp {
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> 1));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -1));
         gp1.y().whenPressed(new InstantCommand(() -> driveTrain.reset_encoders()));
-        gp1.x().whenHeld(alignRobotCommand);
+//        gp1.x().whenHeld(alignRobotCommand);
 //        gp1.dpad_left().whenHeld(new DriveLeftDistanceCommand(driveTrain, 45));
 //        gp1.dpad_right().whenHeld(new DriveLeftDistanceCommand(driveTrain,-45));
 
@@ -125,7 +131,10 @@ public class Drive extends CommandBasedTeleOp {
 //        new Trigger(() -> -gamepad2.right_stick_y > 0.5).whenPressed(new InstantCommand(() -> constStorageCommand.power = 0, storage));
 
         // Shooter
-        gp2.left_bumper().whenPressed(new InstantCommand(() -> shooter.setPower(0.5), shooter))
+        gp2.left_bumper().whenPressed(new InstantCommand(() -> {
+                manualIntakeCommand.setConstIntake(false);
+                shooter.setPower(0.55);
+        }, shooter))
                         .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
         // Shooter lift
         gp2.dpad_up().whenPressed(raiseShooterCommand);
@@ -136,7 +145,7 @@ public class Drive extends CommandBasedTeleOp {
         new Trigger(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger));
         gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
 
-        gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.35 ? 0.2 : 0.35), shooter));
+        gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.375 ? 0.2 : 0.375), shooter));
 
         telemetry.addData("Runtime", this::getRuntime);
 //        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
