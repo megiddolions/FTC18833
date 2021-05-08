@@ -3,10 +3,6 @@ package org.commandftc.opModes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.commandftc.RobotUniversal;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 

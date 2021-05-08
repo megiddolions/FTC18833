@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
-import org.firstinspires.ftc.teamcode.lib.PIDController;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VuforiaSubsystem;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import static org.commandftc.RobotUniversal.*;
@@ -12,8 +12,6 @@ public class AlignRobotVuforiaCommand extends CommandBase {
     private final VuforiaSubsystem vuforia;
     private final DriveTrainSubsystem driveTrain;
     private final PIDController pid;
-    double last = 0;
-    double time = 0;
 
     public AlignRobotVuforiaCommand(DriveTrainSubsystem driveTrain, VuforiaSubsystem vuforia) {
         this.driveTrain = driveTrain;
@@ -25,8 +23,6 @@ public class AlignRobotVuforiaCommand extends CommandBase {
 
     @Override
     public void execute() {
-        last = time;
-        time = opMode.getRuntime();
         if (vuforia.has_target()) {
             driveTrain.driveLeft(-vuforia.vertical_error());
 
@@ -37,7 +33,7 @@ public class AlignRobotVuforiaCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        pid.clear();
+        pid.close();
         driveTrain.stop();
     }
 

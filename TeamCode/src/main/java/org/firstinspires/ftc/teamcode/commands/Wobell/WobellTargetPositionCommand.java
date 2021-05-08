@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.Constants.WobellConstants;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-public class WobellTargetPositionCommand extends CommandBase {
-    private final WobellSubsystem wobellSubsystem;
+public class WobellTargetPositionCommand extends PIDCommand {
 
     public WobellTargetPositionCommand(WobellSubsystem wobellSubsystem) {
-        this.wobellSubsystem = wobellSubsystem;
-
-        addRequirements(wobellSubsystem);
-    }
-
-    @Override
-    public void execute() {
-        wobellSubsystem.setLift(
-                (wobellSubsystem.getTargetPosition() - wobellSubsystem.getCurrentPosition()) / -2000.0);
+        super(WobellConstants.kPid,
+                wobellSubsystem::getTargetPosition,
+                wobellSubsystem::getCurrentPosition,
+                wobellSubsystem::setLift,
+                wobellSubsystem);
     }
 }

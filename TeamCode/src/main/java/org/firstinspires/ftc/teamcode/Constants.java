@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import java.util.function.DoubleFunction;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 
@@ -58,6 +59,10 @@ public final class Constants {
 
         public final static DoubleFunction<Double> mm_to_ticks = (double mm) ->
                 mm / kWheelRadios / 2 / Math.PI * kTicks_per_revolution * gear_ratio;
+    }
+
+    public final static class WobellConstants {
+        public static final PIDController kPid = new PIDController(0.0005, 0, 0);
     }
 
     public final static class NetworkConstants {

@@ -27,8 +27,10 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
 @TeleOp(name="drive")
@@ -56,6 +58,9 @@ public class Drive extends CommandBasedTeleOp {
     protected WaitForShooterCommand waitForShooterCommand;
     protected SetShooterLiftCommand raiseShooterCommand;
     protected SetShooterLiftCommand lowerShooterCommand;
+
+    protected SequentialCommandGroup startShooterSequenceCommand;
+    protected Command stopShooterSequenceCommand;
 
     @Override
     public void assign() {
@@ -88,10 +93,19 @@ public class Drive extends CommandBasedTeleOp {
         constStorageCommand = new ConstStorageCommand(storage);
         startStorageCommand = new SetStorageIndexCommand(storage, 1);
 
-        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.70);
+        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.55);
         stopShooterCommand = new SetShooterSpeedCommand(shooter, 0);
-
         waitForShooterCommand = new WaitForShooterCommand(shooter, 2500);
+
+        startShooterSequenceCommand = new SequentialCommandGroup(
+                startShooterCommand,
+                waitForShooterCommand,
+                startStorageCommand,
+                new WaitCommand(5),
+                stopShooterCommand
+        );
+
+        stopShooterSequenceCommand = stopShooterCommand;
 
         raiseShooterCommand = new SetShooterLiftCommand(shooter, 0.025);
         lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.025);
@@ -144,13 +158,8 @@ public class Drive extends CommandBasedTeleOp {
 //                shooter.setPower(0.55);
 //        }, shooter))
 //                        .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
-        gp2.left_bumper().whenPressed(new SequentialCommandGroup(
-                new InstantCommand(() -> shooter.setPower(0.55), shooter)
-//                waitForShooterCommand,
-//                new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake),
-//                startStorageCommand,
-//                new WaitCommand(4000)
-        )).whenReleased(stopShooterCommand);
+        gp2.left_bumper().whenPressed(startShooterSequenceCommand
+        ).whenReleased(stopShooterSequenceCommand);
         
         // Shooter lift
         gp2.dpad_up().whenPressed(raiseShooterCommand);

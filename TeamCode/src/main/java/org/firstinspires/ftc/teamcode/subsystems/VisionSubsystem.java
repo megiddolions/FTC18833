@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants.VisionConstants;
-import org.firstinspires.ftc.teamcode.vison.pipelines.DrivePipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.AlignPipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.BlueTowerAlignPipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.RedWobellAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.RingPipeLine;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -13,13 +15,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.commandftc.RobotUniversal.hardwareMap;
 
 public class VisionSubsystem extends SubsystemBase {
-//    public final CameraStreamServer server = CameraStreamServer.getInstance();
     public final OpenCvCamera camera;
-    public final DrivePipeLine align_pipeLine;
+    private final AlignPipeLine align_pipeLine;
     private final RingPipeLine ringPipeLine;
 
     public VisionSubsystem() {
-        align_pipeLine = new DrivePipeLine();
+        align_pipeLine = new BlueTowerAlignPipeLine();
         ringPipeLine = new RingPipeLine();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -48,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public double getError() {
-        return (VisionConstants.camera_width) / 2.0 - (align_pipeLine.left() + align_pipeLine.right()) / 2.0;
+        return align_pipeLine.getError();
     }
 
     public int getOrangePixels() {
