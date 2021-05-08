@@ -74,11 +74,8 @@ public class Drive extends CommandBasedTeleOp {
 
         vision.set_for_drive();
 
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setLift(0.375);
-
-//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
-//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
@@ -102,7 +99,7 @@ public class Drive extends CommandBasedTeleOp {
                 waitForShooterCommand,
                 startStorageCommand,
                 new WaitCommand(5),
-                stopShooterCommand
+                new InstantCommand(() -> shooter.setPower(0))
         );
 
         stopShooterSequenceCommand = stopShooterCommand;
@@ -112,9 +109,6 @@ public class Drive extends CommandBasedTeleOp {
 
         // DriveTrain
         driveTrain.setDefaultCommand(tankDriveCommand);
-//        new Trigger(() -> Math.abs(Util.maxAbs(gamepad1.left_stick_x, gamepad1.right_stick_x)) >
-//                Math.abs(Util.maxAbs(gamepad1.left_stick_y, gamepad1.right_stick_y)))
-//                .whileHeld(driveSideWaysCommandCommand);
         gp1.left_stick_button().whenHeld(
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y));
         gp1.right_stick_button().whenHeld(
@@ -122,9 +116,7 @@ public class Drive extends CommandBasedTeleOp {
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> 1));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -1));
         gp1.y().whenPressed(new InstantCommand(() -> driveTrain.reset_encoders()));
-//        gp1.x().whenHeld(alignRobotCommand);
-//        gp1.dpad_left().whenHeld(new DriveLeftDistanceCommand(driveTrain, 45));
-//        gp1.dpad_right().whenHeld(new DriveLeftDistanceCommand(driveTrain,-45));
+        gp1.x().whenHeld(alignRobotCommand);
 
         new Button(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 0.5))
@@ -145,19 +137,8 @@ public class Drive extends CommandBasedTeleOp {
                 .whenPressed(new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake));
 
         // Storage
-//        storage.setDefaultCommand(automaticStorageCommand);
         storage.setDefaultCommand(manualStorageCommand);
-//        new Trigger(() -> -gamepad1.right_stick_y < -0.2 && gamepad1.right_stick_button).whenPressed(
-//                new InstantCommand(() -> constStorageCommand.power = --gamepad1.right_stick_y, storage)
-//                        .andThen(constStorageCommand));
-//        new Trigger(() -> -gamepad2.right_stick_y > 0.5).whenPressed(new InstantCommand(() -> constStorageCommand.power = 0, storage));
-
         // Shooter
-//        gp2.left_bumper().whenPressed(new InstantCommand(() -> {
-//                manualIntakeCommand.setConstIntake(false);
-//                shooter.setPower(0.55);
-//        }, shooter))
-//                        .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
         gp2.left_bumper().whenPressed(startShooterSequenceCommand
         ).whenReleased(stopShooterSequenceCommand);
         
@@ -177,12 +158,12 @@ public class Drive extends CommandBasedTeleOp {
 
         telemetry.addData("Runtime", this::getRuntime);
 //        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
-//        telemetry.addData("Distance", vuforia::distance);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
-//        telemetry.addData("Shooter", shooter::getLeftVelocity);
+        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
+//        telemetry.addData("Vision error", vision::getError);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);
@@ -194,13 +175,5 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("RR", driveTrain::getRearRightEncoder);
 //        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
 //        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
-
-        /*
-        constIntake = (0.9 < gamepad2.right_stick_y && gamepad2.right_stick_button) || constIntake;
-        //Disable constant intake if right_stick_y is under -0.5
-        constIntake = (!(gamepad2.right_stick_y < -0.5)) && constIntake;
-        //Sets motor based on constant intake or right_stick_y
-        intakeMotor.setPower((constIntake) ? 1 : gamepad2.right_stick_y);
-         */
     }
 }

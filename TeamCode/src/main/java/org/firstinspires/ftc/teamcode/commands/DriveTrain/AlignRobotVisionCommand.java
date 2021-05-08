@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AlignRobotVisionCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
+    private final PIDController pid = new PIDController(0.002,0,0);
     private final double offset;
 
     public AlignRobotVisionCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision) {
@@ -28,12 +30,14 @@ public class AlignRobotVisionCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveTrain.driveLeft((-vision.getError()+offset) / 500);
+        double out = pid.calculate(vision.getError()+offset);
+        driveTrain.setPower(out, -out);
     }
 
     @Override
     public void end(boolean interrupted) {
         driveTrain.stop();
+        pid.reset();
     }
 
     @Override

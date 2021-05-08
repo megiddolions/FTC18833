@@ -62,7 +62,7 @@ public final class Constants {
     }
 
     public final static class WobellConstants {
-        public static final PIDController kPid = new PIDController(0.0005, 0, 0);
+        public static final PIDController kPid = new PIDController(0.001, 0, 0.00001);
     }
 
     public final static class NetworkConstants {

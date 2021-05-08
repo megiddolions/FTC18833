@@ -124,6 +124,7 @@ repositories {
     flatDir {
         dirs rootProject.file('libs')
     }
+    //noinspection JcenterRepositoryObsolete
     jcenter()
 }
 

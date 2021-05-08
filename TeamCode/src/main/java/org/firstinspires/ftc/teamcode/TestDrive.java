@@ -5,12 +5,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
+import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
+import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 @TeleOp(name="TestDrive")
 public class TestDrive extends CommandBasedTeleOp {
@@ -32,11 +36,19 @@ public class TestDrive extends CommandBasedTeleOp {
 
 //        vision.set_for_drive();
 
+        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setLift(0.375);
 
-//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
-
         new LoopTimeCommand().schedule();
+
+        gp1.dpad_up().whenPressed(new InstantCommand(() -> wobellSubsystem.setTargetPosition(wobellSubsystem.getTargetPosition() - 500)));
+        gp1.dpad_down().whenPressed(new InstantCommand(() -> wobellSubsystem.setTargetPosition(wobellSubsystem.getTargetPosition() + 500)));
+
+        gp1.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
+
+        telemetry.addData("target", wobellSubsystem::getTargetPosition);
+        telemetry.addData("current", wobellSubsystem::getCurrentPosition);
     }
 }

@@ -26,7 +26,7 @@ public class DriveForwardAutoCommand extends CommandBase {
 
     @Override
     public void execute() {
-        telemetry.addData("Command", this.getClass().getSimpleName());
+
     }
 
     @Override
