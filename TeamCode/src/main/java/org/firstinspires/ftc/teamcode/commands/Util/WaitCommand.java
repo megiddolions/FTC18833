@@ -10,18 +10,13 @@ public class WaitCommand extends Command {
     private final double time;
     private double start = Double.MAX_VALUE;
 
-    public WaitCommand(double time) {
-        this.time = time;
+    public WaitCommand(double ms) {
+        this.time = ms * 1000;
     }
 
     @Override
     public void init() {
         start = opMode.getRuntime();
-    }
-
-    @Override
-    public void execute() {
-        telemetry.addData("Command", this.getClass().getSimpleName());
     }
 
     @Override

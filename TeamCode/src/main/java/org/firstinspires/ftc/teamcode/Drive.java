@@ -3,8 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.commandftc.Command;
 import org.commandftc.CommandScheduler;
 import org.commandftc.InstantCommand;
+import org.commandftc.ParallelCommand;
+import org.commandftc.SequentialCommand;
 import org.commandftc.Trigger;
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
@@ -12,8 +15,11 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.SetStorageIndexCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
+import org.firstinspires.ftc.teamcode.commands.Util.WaitCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
@@ -46,8 +52,11 @@ public class Drive extends CommandBasedTeleOp {
     protected AutomaticStorageCommand automaticStorageCommand;
     protected ManualStorageCommand manualStorageCommand;
     protected ConstStorageCommand constStorageCommand;
+    protected SetStorageIndexCommand startStorageCommand;
 
     protected SetShooterSpeedCommand startShooterCommand;
+    protected SetShooterSpeedCommand stopShooterCommand;
+    protected WaitForShooterCommand waitForShooterCommand;
     protected SetShooterLiftCommand raiseShooterCommand;
     protected SetShooterLiftCommand lowerShooterCommand;
 
@@ -80,8 +89,13 @@ public class Drive extends CommandBasedTeleOp {
         automaticStorageCommand = new AutomaticStorageCommand(storage);
         manualStorageCommand = new ManualStorageCommand(storage, () -> gamepad2.right_stick_y);
         constStorageCommand = new ConstStorageCommand(storage);
+        startStorageCommand = new SetStorageIndexCommand(storage, 1);
 
-        startShooterCommand = new SetShooterSpeedCommand(shooter, storage, 0.70);
+        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.70);
+        stopShooterCommand = new SetShooterSpeedCommand(shooter, 0);
+
+        waitForShooterCommand = new WaitForShooterCommand(shooter, 2500);
+
         raiseShooterCommand = new SetShooterLiftCommand(shooter, 0.025);
         lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.025);
 
@@ -128,11 +142,19 @@ public class Drive extends CommandBasedTeleOp {
 //        new Trigger(() -> -gamepad2.right_stick_y > 0.5).whenPressed(new InstantCommand(() -> constStorageCommand.power = 0, storage));
 
         // Shooter
-        gp2.left_bumper().whenPressed(new InstantCommand(() -> {
-                manualIntakeCommand.setConstIntake(false);
-                shooter.setPower(0.55);
-        }, shooter))
-                        .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
+//        gp2.left_bumper().whenPressed(new InstantCommand(() -> {
+//                manualIntakeCommand.setConstIntake(false);
+//                shooter.setPower(0.55);
+//        }, shooter))
+//                        .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
+        gp2.left_bumper().whenPressed(new SequentialCommand(
+                new InstantCommand(() -> shooter.setPower(0.55), shooter)
+//                waitForShooterCommand,
+//                new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake),
+//                startStorageCommand,
+//                new WaitCommand(4000)
+        )).whenReleased(stopShooterCommand);
+        
         // Shooter lift
         gp2.dpad_up().whenPressed(raiseShooterCommand);
         gp2.dpad_down().whenPressed(lowerShooterCommand);

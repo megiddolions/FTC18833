@@ -16,7 +16,7 @@ public class SequentialCommand extends Command {
     }
     public static final SCAccessToken accessToken = new SCAccessToken();
 
-    private LinkedList<Command> commands;
+    private final LinkedList<Command> commands;
 
     public SequentialCommand() {
         this.commands = new LinkedList<>();
@@ -26,10 +26,11 @@ public class SequentialCommand extends Command {
         this.commands = new LinkedList<>();
         for(Command cmd : commands) {
             addCommand(cmd);
-            for(Subsystem ss : cmd.getRequirements()) {
+            for (Subsystem ss : cmd.getRequirements()) {
                 addRequirements(ss);
             }
         }
+        RobotUniversal.telemetry.addData("commands", () -> commands);
     }
 
     public void addCommand(Command cmd) {
