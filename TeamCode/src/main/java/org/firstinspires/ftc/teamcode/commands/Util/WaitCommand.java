@@ -9,7 +9,6 @@ import static org.commandftc.RobotUniversal.*;
 public class WaitCommand extends Command {
     private final double time;
     private double start = Double.MAX_VALUE;
-    private boolean has_started = true;
 
     public WaitCommand(double time) {
         this.time = time;
@@ -18,7 +17,6 @@ public class WaitCommand extends Command {
     @Override
     public void init() {
         start = opMode.getRuntime();
-//        has_started = true;
     }
 
     @Override
@@ -28,12 +26,11 @@ public class WaitCommand extends Command {
 
     @Override
     protected void end() {
-//        has_started = false;
         start = Double.MAX_VALUE;
     }
 
     @Override
     public boolean isFinished() {
-        return has_started && start <= opMode.getRuntime() - time;
+        return start <= opMode.getRuntime() - time;
     }
 }

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
+import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
@@ -52,25 +53,21 @@ public class Drive extends CommandBasedTeleOp {
 
     @Override
     public void assign() {
-        CommandScheduler.setOpModeActive(false);
-        CommandScheduler.unscheduleAll();
-        CommandScheduler.unregisterAllSubsystems();
-        CommandScheduler.unregisterAllButtons();
 
         driveTrain = new DriveTrainSubsystem();
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
         wobellSubsystem = new WobellSubsystem();
-//        vision = new VisionSubsystem();
+        vision = new VisionSubsystem();
 
-//        vision.set_for_drive();
+        vision.set_for_drive();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setLift(0.375);
 
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
-//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
+        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
@@ -147,6 +144,9 @@ public class Drive extends CommandBasedTeleOp {
 
         gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.375 ? 0.2 : 0.375), shooter));
 
+        // Show time to make each loop
+        CommandScheduler.scheduleCommand(new LoopTimeCommand());
+
         telemetry.addData("Runtime", this::getRuntime);
 //        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
 //        telemetry.addData("Distance", vuforia::distance);
@@ -166,7 +166,6 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("RR", driveTrain::getRearRightEncoder);
 //        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
 //        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
-
 
         /*
         constIntake = (0.9 < gamepad2.right_stick_y && gamepad2.right_stick_button) || constIntake;

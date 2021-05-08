@@ -68,6 +68,8 @@ public class SequentialCommand extends Command {
         if(commands.isEmpty()) return;
         // switch command
         currCmd = commands.getFirst();
+        // init command
+        currCmd.init();
         // run it if the new command is not finished.
         // if it's already finished, the next loop will handle it.
         if(!currCmd.isFinished()) {

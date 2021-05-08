@@ -8,6 +8,7 @@ import org.commandftc.Command;
 import org.commandftc.CommandScheduler;
 import org.commandftc.RobotUniversal;
 import org.commandftc.Subsystem;
+import org.commandftc.opModes.LinearOpModeWithCommands;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -22,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Autonomous(name = "ÂùŤő")
-public class Auto extends LinearOpMode {
+public class Auto extends LinearOpModeWithCommands {
     protected DriveTrainSubsystem driveTrain;
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
@@ -33,32 +34,8 @@ public class Auto extends LinearOpMode {
     private long state;
     private int rings;
 
-    private final Set<Subsystem> subsystems = new HashSet<>();
-
-    protected final void addSubsystems(Subsystem ... sss) {
-        Collections.addAll(subsystems, sss);
-    }
-
-    private void registerSubsystems() {
-        for(Subsystem ss : subsystems) {
-            CommandScheduler.registerSubsystem(ss);
-        }
-    }
-
-    private void update() {
-        CommandScheduler.setOpModeActive(true);
-        CommandScheduler.runOnce();
-        telemetry.update();
-    }
-
     @Override
-    public void runOpMode() {
-        registerSubsystems();
-        state = 0;
-        RobotUniversal.telemetry = telemetry;
-        RobotUniversal.opMode = this;
-        RobotUniversal.hardwareMap = hardwareMap;
-
+    public void init_subsystems() {
         driveTrain = new DriveTrainSubsystem();
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
@@ -67,6 +44,14 @@ public class Auto extends LinearOpMode {
         vision = new VisionSubsystem();
 
         addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+    }
+
+    @Override
+    public void runOpMode() {
+        state = 0;
+        RobotUniversal.telemetry = telemetry;
+        RobotUniversal.opMode = this;
+        RobotUniversal.hardwareMap = hardwareMap;
 
         wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
 
@@ -143,7 +128,7 @@ public class Auto extends LinearOpMode {
         driveForward(-1400);
         // Unload wobell
         while (wobellSubsystem.isBusy() && opModeIsActive())
-            update();
+            ;
         wobellSubsystem.open();
         wobellSubsystem.setTargetPosition(3500);
         // drive backward
@@ -173,7 +158,7 @@ public class Auto extends LinearOpMode {
         driveForward(-1000);
         // Drop first wobell
         while (wobellSubsystem.isBusy() && opModeIsActive())
-            update();
+            ;
         wobellSubsystem.open();
         wobellSubsystem.setTargetPosition(3500);
         // Go to pick up the ring
@@ -254,9 +239,8 @@ public class Auto extends LinearOpMode {
         state++;
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         driveTrain.driveForwardDistance(mm);
-        while (driveTrain.isBusy() && opModeIsActive()) {
-            update();
-        }
+        while (driveTrain.isBusy() && opModeIsActive())
+            ;
     }
 
     private void driveForward(double mm, @NotNull Command command) {
@@ -265,7 +249,6 @@ public class Auto extends LinearOpMode {
         driveTrain.driveForwardDistance(mm);
         while (driveTrain.isBusy() && opModeIsActive()) {
             command.execute();
-            update();
         }
     }
 
@@ -274,7 +257,7 @@ public class Auto extends LinearOpMode {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         driveTrain.spinLeftDistance(spin);
         while (driveTrain.isBusy() && opModeIsActive())
-            update();
+            ;
     }
 
     private void driveLeft(double mm) {
@@ -282,7 +265,7 @@ public class Auto extends LinearOpMode {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         driveTrain.driveLeftDistance(mm);
         while (driveTrain.isBusy() && opModeIsActive())
-            update();
+            ;
     }
 
     private void driveDiagonalLeft(double mm) {
@@ -290,7 +273,7 @@ public class Auto extends LinearOpMode {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         driveTrain.driveDiagonalLeft(mm);
         while (driveTrain.isBusy() && opModeIsActive())
-            update();
+            ;
     }
 
     private void driveDiagonalRight(double mm) {
@@ -298,20 +281,20 @@ public class Auto extends LinearOpMode {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         driveTrain.driveDiagonalRight(mm);
         while (driveTrain.isBusy() && opModeIsActive())
-            update();
+            ;
     }
 
     private void shoot_ring() {
         state++;
         storage.index_distance(105);
         while (storage.isBusy() && opModeIsActive())
-            update();
+            ;
     }
 
     private void wait_for_shooter(double velocity) {
         state++;
         while (shooter.getLeftVelocity() <= velocity && opModeIsActive())
-            update();
+            ;
 //        sleep(1000);
     }
 
@@ -321,7 +304,6 @@ public class Auto extends LinearOpMode {
             double error = -(-vision.getError()+offset);
             driveTrain.driveLeft(error/500);
             telemetry.addData("error", error);
-            update();
             if (Math.abs(error) <= 2)
                 break;
         }
