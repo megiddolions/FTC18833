@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.Shooter;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 
-import static org.commandftc.RobotUniversal.*;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class SetShooterSpeedCommand extends Command {
+public class SetShooterSpeedCommand extends CommandBase {
     private final ShooterSubsystem shooter;
     private final double power;
     private double time;
@@ -18,7 +16,7 @@ public class SetShooterSpeedCommand extends Command {
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         shooter.setPower(power);
     }
 

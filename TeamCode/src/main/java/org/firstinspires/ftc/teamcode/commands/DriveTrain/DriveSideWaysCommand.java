@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class DriveSideWaysCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class DriveSideWaysCommand extends CommandBase {
     DriveTrainSubsystem driveTrain;
     DoubleSupplier speedSupplier;
 

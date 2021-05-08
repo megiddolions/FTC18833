@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
-public class AlignRobotVisionCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class AlignRobotVisionCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
     private final double offset;
@@ -31,7 +32,7 @@ public class AlignRobotVisionCommand extends Command {
     }
 
     @Override
-    protected void end() {
+    public void end(boolean interrupted) {
         driveTrain.stop();
     }
 

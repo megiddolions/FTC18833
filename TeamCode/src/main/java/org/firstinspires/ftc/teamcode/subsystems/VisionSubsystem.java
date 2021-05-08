@@ -1,22 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.commandftc.Subsystem;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants.VisionConstants;
-import org.firstinspires.ftc.teamcode.Drive;
 import org.firstinspires.ftc.teamcode.vison.pipelines.DrivePipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.RingPipeLine;
-import org.firstinspires.ftc.teamcode.vison.pipelines.SamplePipeline;
-import org.firstinspires.ftc.teamcode.vison.pipelines.TowerPipeLine;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import static org.commandftc.RobotUniversal.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class VisionSubsystem extends Subsystem {
+import static org.commandftc.RobotUniversal.hardwareMap;
+
+public class VisionSubsystem extends SubsystemBase {
 //    public final CameraStreamServer server = CameraStreamServer.getInstance();
     public final OpenCvCamera camera;
     public final DrivePipeLine align_pipeLine;

@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.commandftc.Command;
-import org.commandftc.CommandScheduler;
 import org.commandftc.RobotUniversal;
-import org.commandftc.Subsystem;
 import org.commandftc.opModes.LinearOpModeWithCommands;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
@@ -17,10 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 @Autonomous(name = "ÂùŤő")
 public class Auto extends LinearOpModeWithCommands {
@@ -43,7 +35,7 @@ public class Auto extends LinearOpModeWithCommands {
         wobellSubsystem = new WobellSubsystem();
         vision = new VisionSubsystem();
 
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
     }
 
     @Override
@@ -241,15 +233,6 @@ public class Auto extends LinearOpModeWithCommands {
         driveTrain.driveForwardDistance(mm);
         while (driveTrain.isBusy() && opModeIsActive())
             ;
-    }
-
-    private void driveForward(double mm, @NotNull Command command) {
-        state++;
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        driveTrain.driveForwardDistance(mm);
-        while (driveTrain.isBusy() && opModeIsActive()) {
-            command.execute();
-        }
     }
 
     private void spinLeft(double spin) {

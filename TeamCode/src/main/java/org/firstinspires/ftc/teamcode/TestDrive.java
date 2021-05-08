@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.commandftc.CommandScheduler;
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
@@ -36,8 +35,8 @@ public class TestDrive extends CommandBasedTeleOp {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setLift(0.375);
 
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
+//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
 
-        CommandScheduler.scheduleCommand(new LoopTimeCommand());
+        new LoopTimeCommand().schedule();
     }
 }

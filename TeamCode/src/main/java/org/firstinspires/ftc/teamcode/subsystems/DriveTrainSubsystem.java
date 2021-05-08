@@ -5,18 +5,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.commandftc.Subsystem;
-
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
-
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 
-import static org.commandftc.RobotUniversal.*;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveTrainSubsystem extends Subsystem {
+import static org.commandftc.RobotUniversal.hardwareMap;
+
+public class DriveTrainSubsystem extends SubsystemBase {
     private final DcMotorEx rearLeft;
     private final DcMotorEx rearRight;
     private final DcMotorEx frontLeft;

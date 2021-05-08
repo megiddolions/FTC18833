@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode.commands.Util;
 
-import org.commandftc.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import static org.commandftc.RobotUniversal.*;
 
-public class LoopTimeCommand extends Command {
+public class LoopTimeCommand extends CommandBase {
     private double last_time;
     private double dt = 0;
+
     @Override
-    public void init() {
+    public void initialize() {
         last_time = opMode.getRuntime();
         telemetry.addData("dt", () -> dt);
     }

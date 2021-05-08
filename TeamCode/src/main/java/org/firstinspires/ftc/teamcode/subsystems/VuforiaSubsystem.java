@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import org.commandftc.Subsystem;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -16,15 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import static org.commandftc.RobotUniversal.hardwareMap;
-import static org.commandftc.RobotUniversal.telemetry;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.mmPerInch;
 
-public class VuforiaSubsystem extends Subsystem {
+public class VuforiaSubsystem extends SubsystemBase {
     private final List<VuforiaTrackable> allTrackballs = new ArrayList<>();
     private Orientation rotation;
     private VectorF translation;

@@ -4,13 +4,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.commandftc.Subsystem;
-
 import java.util.function.IntSupplier;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.*;
 
-public class WobellSubsystem extends Subsystem {
+public class WobellSubsystem extends SubsystemBase {
     private final CRServo leftLift;
     private final CRServo rightLift;
     private final Servo middle;

@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain.autonomus;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 
-public class DriveLeftDistanceCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class DriveLeftDistanceCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final double distance;
 
@@ -15,13 +16,13 @@ public class DriveLeftDistanceCommand extends Command {
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         driveTrain.set_for_autonomous();
         driveTrain.driveLeftDistance(distance);
     }
 
     @Override
-    protected void end() {
+    public void end(boolean interrupted) {
         driveTrain.set_for_commands();
     }
 

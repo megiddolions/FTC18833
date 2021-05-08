@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands.Storage;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 
 import java.util.function.DoubleSupplier;
 
-public class ManualStorageCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class ManualStorageCommand extends CommandBase {
     private final StorageSubSystem storage;
     private final DoubleSupplier supplier;
 
@@ -22,7 +23,7 @@ public class ManualStorageCommand extends Command {
     }
 
     @Override
-    public void end() {
+    public void end(boolean interrupted) {
         storage.index(0);
     }
 }

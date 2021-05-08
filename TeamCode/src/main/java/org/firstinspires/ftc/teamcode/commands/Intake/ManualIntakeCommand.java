@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands.Intake;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class ManualIntakeCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class ManualIntakeCommand extends CommandBase {
     private final IntakeSubsystem intake;
     private final DoubleSupplier supplier;
     private boolean constIntake = false;
@@ -35,7 +36,7 @@ public class ManualIntakeCommand extends Command {
     }
 
     @Override
-    public void end() {
+    public void end(boolean interrupted) {
         intake.intake(0);
     }
 

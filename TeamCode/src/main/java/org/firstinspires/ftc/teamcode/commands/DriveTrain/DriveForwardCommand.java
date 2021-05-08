@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class DriveForwardCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class DriveForwardCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final DoubleSupplier supplier;
 
@@ -22,7 +23,7 @@ public class DriveForwardCommand extends Command {
     }
 
     @Override
-    protected void end() {
+    public void end(boolean interrupted) {
         driveTrain.stop();
     }
 }

@@ -3,13 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.commandftc.Subsystem;
-
-import java.util.function.DoubleSupplier;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class IntakeSubsystem extends Subsystem {
+public class IntakeSubsystem extends SubsystemBase {
     DcMotor intake_motor;
 
     public IntakeSubsystem() {

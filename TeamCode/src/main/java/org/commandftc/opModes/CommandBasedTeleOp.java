@@ -2,32 +2,15 @@ package org.commandftc.opModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.commandftc.CommandScheduler;
 import org.commandftc.Gp;
 import org.commandftc.RobotUniversal;
-import org.commandftc.Subsystem;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public abstract class CommandBasedTeleOp extends OpMode {
 
-    private Set<Subsystem> subsystems = new HashSet<>();
-
     protected Gp gp1;
     protected Gp gp2;
-
-
-    protected final void addSubsystems(Subsystem ... sss) {
-        Collections.addAll(subsystems, sss);
-    }
-
-    private void registerSubsystems() {
-        for(Subsystem ss : subsystems) {
-            CommandScheduler.registerSubsystem(ss);
-        }
-    }
 
     /**
      * DON'T OVERRIDE THIS! IT CALLS init_impl() (WHICH YOU SHOULD INSTEAD OVERRIDE)
@@ -42,23 +25,18 @@ public abstract class CommandBasedTeleOp extends OpMode {
         gp1 = new Gp(gamepad1);
         gp2 = new Gp(gamepad2);
         assign();
-        registerSubsystems();
     }
 
     public abstract void assign();
 
     @Override
     public final void loop() {
-        CommandScheduler.setOpModeActive(true);
-        CommandScheduler.runOnce();
+        CommandScheduler.getInstance().run();
         telemetry.update();
     }
 
     @Override
     public final void stop() {
-        CommandScheduler.setOpModeActive(false);
-        CommandScheduler.unscheduleAll();
-        CommandScheduler.unregisterAllButtons();
-        CommandScheduler.unregisterAllSubsystems();
+        CommandScheduler.getInstance().close();
     }
 }

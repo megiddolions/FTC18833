@@ -1,35 +1,17 @@
 package org.commandftc.opModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import org.commandftc.Command;
-import org.commandftc.CommandScheduler;
 import org.commandftc.RobotUniversal;
-import org.commandftc.Subsystem;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 public abstract class CommandBasedAuto extends OpMode {
-
-    private Set<Subsystem> subsystems = new HashSet<>();
-    private Command autoCmd;
-
-    protected final void addSubsystems(Subsystem ... sss) {
-        Collections.addAll(subsystems, sss);
-    }
-
-    protected final void setAutoCmd(Command command) {
-        this.autoCmd = command;
-    }
-
-    private void registerSubsystems() {
-        for(Subsystem ss : subsystems) {
-            CommandScheduler.registerSubsystem(ss);
-        }
-    }
-
+    private Command autonomousCommand;
     /**
      * DON'T OVERRIDE THIS! IT CALLS init_impl() (WHICH YOU SHOULD INSTEAD OVERRIDE)
      * AND DOES SOMETHING ELSE!!!!!
@@ -40,29 +22,27 @@ public abstract class CommandBasedAuto extends OpMode {
         RobotUniversal.telemetry = telemetry;
         RobotUniversal.opMode = this;
         plan();
-        registerSubsystems();
-        CommandScheduler.unregisterAllButtons();
+    }
+
+    public final void setAutonomousCommand(Command command) {
+        this.autonomousCommand = command;
     }
 
     @Override
     public final void start() {
-        CommandScheduler.scheduleCommand(autoCmd);
+        autonomousCommand.schedule();
     }
 
     public abstract void plan();
 
     @Override
     public final void loop() {
-        CommandScheduler.setOpModeActive(true);
-        CommandScheduler.runOnce();
+        CommandScheduler.getInstance().run();
         telemetry.update();
     }
 
     @Override
     public final void stop() {
-        CommandScheduler.setOpModeActive(false);
-        CommandScheduler.unscheduleAll();
-        CommandScheduler.unregisterAllButtons();
-        CommandScheduler.unregisterAllSubsystems();
+        CommandScheduler.getInstance().close();
     }
 }

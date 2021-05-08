@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
-public class SetLiftPositionCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class SetLiftPositionCommand extends CommandBase {
     private final WobellSubsystem wobellSubsystem;
     private final int target_position;
 
@@ -15,7 +16,7 @@ public class SetLiftPositionCommand extends Command {
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         wobellSubsystem.setTargetPosition(target_position);
     }
 
@@ -25,7 +26,7 @@ public class SetLiftPositionCommand extends Command {
     }
 
     @Override
-    protected void end() {
+    public void end(boolean interrupted) {
         wobellSubsystem.setLift(0);
     }
 }

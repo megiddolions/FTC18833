@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
-import android.os.Build;
-
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class TankDriveCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class TankDriveCommand extends CommandBase {
     DriveTrainSubsystem driveTrain;
     DoubleSupplier leftSupplier;
     DoubleSupplier rightSupplier;
@@ -26,7 +25,7 @@ public class TankDriveCommand extends Command {
     }
 
     @Override
-    public void end() {
+    public void end(boolean interrupted) {
         driveTrain.stop();
     }
 }

@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.Shooter;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
-public class SetShooterLiftCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class SetShooterLiftCommand extends CommandBase {
     private final ShooterSubsystem shooter;
     private final double change;
 
@@ -15,7 +16,7 @@ public class SetShooterLiftCommand extends Command {
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         shooter.setLift(shooter.getLift() + change);
     }
 

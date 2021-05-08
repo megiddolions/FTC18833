@@ -3,12 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.commandftc.Command;
-import org.commandftc.CommandScheduler;
-import org.commandftc.InstantCommand;
-import org.commandftc.ParallelCommand;
-import org.commandftc.SequentialCommand;
-import org.commandftc.Trigger;
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
@@ -19,7 +13,6 @@ import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.SetStorageIndexCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
-import org.firstinspires.ftc.teamcode.commands.Util.WaitCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
@@ -33,6 +26,10 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.Button;
 
 @TeleOp(name="drive")
 public class Drive extends CommandBasedTeleOp {
@@ -76,7 +73,7 @@ public class Drive extends CommandBasedTeleOp {
         shooter.setLift(0.375);
 
 //        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem);
-        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
+//        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
@@ -115,22 +112,22 @@ public class Drive extends CommandBasedTeleOp {
 //        gp1.dpad_left().whenHeld(new DriveLeftDistanceCommand(driveTrain, 45));
 //        gp1.dpad_right().whenHeld(new DriveLeftDistanceCommand(driveTrain,-45));
 
-        new Trigger(() -> gamepad1.left_trigger > 0.1)
+        new Button(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 0.5))
                 .whenReleased(new InstantCommand(() -> driveTrain.drive_speed = 0.8));
 
-        new Trigger(() -> gamepad1.right_trigger > 0.1)
+        new Button(() -> gamepad1.right_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 1))
                 .whenReleased(new InstantCommand(() -> driveTrain.drive_speed = 0.8));
 
         // Intake
         intake.setDefaultCommand(manualIntakeCommand);
-        new Trigger(() -> gamepad2.left_stick_button).whenPressed(
+        new Button(() -> gamepad2.left_stick_button).whenPressed(
                 new InstantCommand(() -> {
                     manualIntakeCommand.toggleConstIntake();
                     manualIntakeCommand.setConstIntakePower(gamepad2.left_stick_y);
                 }));
-        new Trigger(() -> gamepad2.left_stick_y < -0.5)
+        new Button(() -> gamepad2.left_stick_y < -0.5)
                 .whenPressed(new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake));
 
         // Storage
@@ -147,7 +144,7 @@ public class Drive extends CommandBasedTeleOp {
 //                shooter.setPower(0.55);
 //        }, shooter))
 //                        .whenReleased(new InstantCommand(() -> shooter.setPower(0)));
-        gp2.left_bumper().whenPressed(new SequentialCommand(
+        gp2.left_bumper().whenPressed(new SequentialCommandGroup(
                 new InstantCommand(() -> shooter.setPower(0.55), shooter)
 //                waitForShooterCommand,
 //                new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake),
@@ -160,14 +157,14 @@ public class Drive extends CommandBasedTeleOp {
         gp2.dpad_down().whenPressed(lowerShooterCommand);
 
         // wobell
-        new Trigger(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> gamepad2.left_trigger));
-        new Trigger(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger));
+        new Button(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> gamepad2.left_trigger));
+        new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger));
         gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
 
         gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.375 ? 0.2 : 0.375), shooter));
 
         // Show time to make each loop
-        CommandScheduler.scheduleCommand(new LoopTimeCommand());
+        new LoopTimeCommand().schedule();
 
         telemetry.addData("Runtime", this::getRuntime);
 //        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);

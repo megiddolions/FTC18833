@@ -5,21 +5,15 @@ import com.qualcomm.robotcore.hardware.TimestampedI2cData;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.ThreadPool;
 
-import org.commandftc.Command;
-import org.commandftc.CommandScheduler;
 import org.commandftc.RobotUniversal;
-import org.commandftc.Subsystem;
-import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.robotcore.internal.ui.UILocation;
+import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * Base class for user defined linear operation modes (op modes).
@@ -27,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  * This class derives from OpMode, but you should not override the methods from
  * OpMode.
  */
-@SuppressWarnings("unused")
 public abstract class LinearOpModeWithCommands extends OpMode {
 
     //------------------------------------------------------------------------------------------------
@@ -40,18 +33,6 @@ public abstract class LinearOpModeWithCommands extends OpMode {
     private volatile boolean   stopRequested   = false;
     private boolean            userMonitoredForStart = false;
     private final Object       runningNotifier = new Object();
-
-    private Set<Subsystem> subsystems = new HashSet<>();
-
-    protected final void addSubsystems(Subsystem ... sss) {
-        Collections.addAll(subsystems, sss);
-    }
-
-    private void registerSubsystems() {
-        for(Subsystem ss : subsystems) {
-            CommandScheduler.registerSubsystem(ss);
-        }
-    }
 
     //------------------------------------------------------------------------------------------------
     // Construction
@@ -69,7 +50,6 @@ public abstract class LinearOpModeWithCommands extends OpMode {
      * <p>
      * Please do not swallow the InterruptedException, as it is used in cases
      * where the op mode needs to be terminated early.
-     * @throws InterruptedException
      */
     abstract public void runOpMode() throws InterruptedException;
 
@@ -181,7 +161,6 @@ public abstract class LinearOpModeWithCommands extends OpMode {
         RobotUniversal.telemetry = telemetry;
         RobotUniversal.opMode = this;
         init_subsystems();
-        registerSubsystems();
 
         this.executorService = ThreadPool.newSingleThreadExecutor("LinearOpMode");
         this.helper          = new LinearOpModeHelper();
@@ -217,8 +196,7 @@ public abstract class LinearOpModeWithCommands extends OpMode {
     @Override
     final public void loop() {
         handleLoop();
-        CommandScheduler.setOpModeActive(true);
-        CommandScheduler.runOnce();
+        CommandScheduler.getInstance().run();
         telemetry.update();
     }
 
@@ -227,10 +205,7 @@ public abstract class LinearOpModeWithCommands extends OpMode {
      */
     @Override
     final public void stop() {
-        CommandScheduler.setOpModeActive(false);
-        CommandScheduler.unscheduleAll();
-        CommandScheduler.unregisterAllButtons();
-        CommandScheduler.unregisterAllSubsystems();
+        CommandScheduler.getInstance().close();
 
         /*
          * Get out of dodge. Been here, done this.
@@ -264,7 +239,7 @@ public abstract class LinearOpModeWithCommands extends OpMode {
             // interrupt the linear opMode and shutdown it's service thread
             executorService.shutdownNow();
 
-            /** Wait, forever, for the OpMode to stop. If this takes too long, then
+            /* Wait, forever, for the OpMode to stop. If this takes too long, then
              * {@link OpModeManagerImpl#callActiveOpModeStop()} will catch that and take action */
             try {
                 String serviceName = "user linear op mode";
@@ -298,7 +273,7 @@ public abstract class LinearOpModeWithCommands extends OpMode {
 
         @Override
         public void run() {
-            ThreadPool.logThreadLifeCycle("LinearOpMode main", new Runnable() { @Override public void run() {
+            ThreadPool.logThreadLifeCycle("LinearOpMode main", () -> {
                 exception = null;
                 isShutdown = false;
 
@@ -322,18 +297,16 @@ public abstract class LinearOpModeWithCommands extends OpMode {
                     // If the user has given us a telemetry.update() that hasn't get gone out, then
                     // push it out now. However, any NEW device health warning should be suppressed while
                     // doing so, since required state might have been cleaned up by now and thus generate errors.
-                    TimestampedI2cData.suppressNewHealthWarningsWhile(new Runnable() {
-                        @Override public void run() {
-                            if (telemetry instanceof TelemetryInternal) {
-                                telemetry.setMsTransmissionInterval(0); // will be reset the next time the opmode runs
-                                ((TelemetryInternal) telemetry).tryUpdateIfDirty();
-                            }
+                    TimestampedI2cData.suppressNewHealthWarningsWhile(() -> {
+                        if (telemetry instanceof TelemetryInternal) {
+                            telemetry.setMsTransmissionInterval(0); // will be reset the next time the opmode runs
+                            ((TelemetryInternal) telemetry).tryUpdateIfDirty();
                         }
                     });
                     // Do the necessary bookkeeping
                     isShutdown = true;
                 }
-            }});
+            });
         }
 
         public boolean hasRuntimeException() {

@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
-public class WobellTargetPositionCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class WobellTargetPositionCommand extends CommandBase {
     private final WobellSubsystem wobellSubsystem;
 
     public WobellTargetPositionCommand(WobellSubsystem wobellSubsystem) {

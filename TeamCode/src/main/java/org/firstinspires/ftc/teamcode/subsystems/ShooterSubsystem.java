@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.commandftc.Subsystem;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.lib.Util;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class ShooterSubsystem extends Subsystem {
+public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx left;
     private final DcMotorEx right;
     private final Servo leftLift;

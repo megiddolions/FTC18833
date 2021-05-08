@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands.Storage;
 
-import org.commandftc.Command;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 
-public class AutomaticStorageCommand extends Command {
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class AutomaticStorageCommand extends CommandBase {
     private enum StorageState {
         Waiting(false, true),
         Start(true, false),
@@ -57,7 +58,8 @@ public class AutomaticStorageCommand extends Command {
         }
     }
 
-    protected void end() {
+    @Override
+    public void end(boolean interrupted) {
         storage.index(0);
         // reset storage state
         storageState = StorageState.Waiting;

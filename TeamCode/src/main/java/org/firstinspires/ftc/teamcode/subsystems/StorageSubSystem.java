@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.commandftc.Subsystem;
 import org.firstinspires.ftc.teamcode.Constants.IndexConstants;
 
-import static org.commandftc.RobotUniversal.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class StorageSubSystem extends Subsystem {
+import static org.commandftc.RobotUniversal.hardwareMap;
+
+public class StorageSubSystem extends SubsystemBase {
     private final DcMotor indexer;
     private final ColorSensor colorSensor;
 
