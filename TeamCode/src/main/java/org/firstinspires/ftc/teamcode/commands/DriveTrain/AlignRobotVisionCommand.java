@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AlignRobotVisionCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
-    private final PIDController pid = new PIDController(0.002,0,0);
+    private final PIDController pid = new PIDController(0.001,0,0.00001);
     private final VisionTarget target;
     private final double offset;
 
@@ -51,6 +51,6 @@ public class AlignRobotVisionCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(vision.getError()+offset) <= 2;
+        return Math.abs(vision.getError()+offset) <= 10;
     }
 }

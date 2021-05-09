@@ -171,7 +171,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
         telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-//        telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("Vision error", vision::getError);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);
