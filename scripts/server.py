@@ -27,6 +27,7 @@ if __name__ == '__main__':
         while True:
             # accept connection
             client_socket, client_address = listen_socket.accept()
+            print(f"address: {client_address}")
             # reset time and data buffers
             data_list = []
             time_list = []
@@ -40,6 +41,7 @@ if __name__ == '__main__':
                 try:
                     # get data as binary
                     data = client_socket.recv(packet_size)
+                    print(data)
                     # if data length is 0 there is error
                     if not data:
                         break

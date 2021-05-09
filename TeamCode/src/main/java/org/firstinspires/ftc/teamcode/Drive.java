@@ -64,14 +64,20 @@ public class Drive extends CommandBasedTeleOp {
 
     @Override
     public void assign() {
-
+        telemetry.addData("state", "DriveTrain");telemetry.update();
         driveTrain = new DriveTrainSubsystem();
+        telemetry.addData("state", "shooter");telemetry.update();
         shooter = new ShooterSubsystem();
+        telemetry.addData("state", "intake");telemetry.update();
         intake = new IntakeSubsystem();
+        telemetry.addData("state", "storage");telemetry.update();
         storage = new StorageSubSystem();
+        telemetry.addData("state", "wobellSubsystem");telemetry.update();
         wobellSubsystem = new WobellSubsystem();
+        telemetry.addData("state", "vision");telemetry.update();
         vision = new VisionSubsystem();
 
+        telemetry.addData("state", "vision for drive");telemetry.update();
         vision.set_for_drive();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -98,8 +104,8 @@ public class Drive extends CommandBasedTeleOp {
                 startShooterCommand,
                 waitForShooterCommand,
                 startStorageCommand,
-                new WaitCommand(5),
-                new InstantCommand(() -> shooter.setPower(0))
+                new WaitCommand(5)
+//                new InstantCommand(() -> shooter.setPower(0))
         );
 
         stopShooterSequenceCommand = stopShooterCommand;

@@ -6,12 +6,20 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.lib.Util;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
+import static org.commandftc.RobotUniversal.opMode;
+import static org.commandftc.RobotUniversal.telemetry;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx left;
@@ -19,6 +27,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Servo leftLift;
     private final Servo rightLift;
     public PIDFCoefficients pid;
+    private DataOutputStream outputStream = null;
+    private double last = 0;
 
     public ShooterSubsystem() {
         left = hardwareMap.get(DcMotorEx.class, ShooterConstants.kLeftShooterName);
@@ -39,7 +49,31 @@ public class ShooterSubsystem extends SubsystemBase {
         left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        pid = left.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+//        try {
+//            Socket server = new Socket(Constants.NetworkConstants.computer_ip, Constants.NetworkConstants.server_port);
+//            outputStream = new DataOutputStream(server.getOutputStream());
+//
+//            outputStream.write(ByteBuffer.allocate(4).putInt(2).array());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+    }
+
+    @Override
+    public void periodic() {
+//        if (opMode.getRuntime() - last >= 0.2) {
+//            last = opMode.getRuntime();
+//            try {
+//                outputStream.write(ByteBuffer.allocate(8 + 8 * 2)
+//                        .putDouble(opMode.getRuntime())
+//                        .putDouble(getLeftVelocity())
+//                        .putDouble(getRightVelocity())
+//                        .array());
+//            } catch (IOException e) {
+//                telemetry.addData("error", e.toString());
+//            }
+//        }
     }
 
     public void setPower(double power) {
