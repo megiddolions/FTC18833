@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.vison.VisionTarget;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -78,7 +79,8 @@ public class Drive extends CommandBasedTeleOp {
         vision = new VisionSubsystem();
 
         telemetry.addData("state", "vision for drive");telemetry.update();
-        vision.set_for_drive();
+        vision.setTarget(VisionTarget.BlueWobell);
+        vision.update_align_pipeline();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setLift(0.375);
@@ -87,7 +89,7 @@ public class Drive extends CommandBasedTeleOp {
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
-        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
+        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision, VisionTarget.BlueWobell);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
 

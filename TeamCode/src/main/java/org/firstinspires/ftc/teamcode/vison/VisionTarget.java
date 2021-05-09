@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.vison;
 
-public enum VisionTargets {
+public enum VisionTarget {
     RedTower,
     BlueTower,
     RedWobell,
     BlueWobell,
-    Ring
+    Ring,
+    None
 }
