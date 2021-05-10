@@ -58,13 +58,13 @@ public class BlueWobellAlignPipeLine extends AlignPipeLine {
 
         Imgproc.line(input, new Point(Constants.VisionConstants.camera_width / 2.0, 0),
                 new Point(Constants.VisionConstants.camera_width / 2.0, Constants.VisionConstants.camera_height),
-                new Scalar(75, 75, 75),
+                new Scalar(255, 255, 255),
                 6
         );
 
         Imgproc.line(input, new Point(target.x + target.width / 2.0, 0),
                 new Point(target.x + target.width / 2.0, Constants.VisionConstants.camera_height),
-                new Scalar(255, 255, 255),
+                new Scalar(75, 75, 75),
                 6
         );
 

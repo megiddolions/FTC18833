@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.vison.pipelines.align.RedWobellAlignPipeLi
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         align_pipeLines = new HashMap<>();
         align_pipeLines.put(VisionTarget.BlueTower, new BlueTowerAlignPipeLine());
-//        align_pipeLines.put(VisionTarget.RedTower, new REDTowerAlignPipeLine());
+//        align_pipeLines.put(VisionTarget.RedTower, new RedTowerAlignPipeLine());
         align_pipeLines.put(VisionTarget.BlueWobell, new BlueWobellAlignPipeLine());
         align_pipeLines.put(VisionTarget.RedWobell, new RedWobellAlignPipeLine());
         align_pipeLines.put(VisionTarget.None, new NonePipeLine());
@@ -49,6 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public void setTarget(VisionTarget target) {
         this.target  = target;
+        update_align_pipeline();
     }
 
     public VisionTarget getTarget() {

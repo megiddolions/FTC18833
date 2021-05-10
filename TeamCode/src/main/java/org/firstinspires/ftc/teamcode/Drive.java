@@ -63,6 +63,8 @@ public class Drive extends CommandBasedTeleOp {
     protected SequentialCommandGroup startShooterSequenceCommand;
     protected Command stopShooterSequenceCommand;
 
+    private final VisionTarget visionTarget = VisionTarget.BlueTower;
+
     @Override
     public void assign() {
         telemetry.addData("state", "DriveTrain");telemetry.update();
@@ -79,7 +81,7 @@ public class Drive extends CommandBasedTeleOp {
         vision = new VisionSubsystem();
 
         telemetry.addData("state", "vision for drive");telemetry.update();
-        vision.setTarget(VisionTarget.BlueWobell);
+        vision.setTarget(visionTarget);
         vision.update_align_pipeline();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -89,7 +91,7 @@ public class Drive extends CommandBasedTeleOp {
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
-        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision, VisionTarget.BlueWobell);
+        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision, visionTarget);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
@@ -172,6 +174,8 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
         telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("Vision target", vision::getTarget);
+        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);

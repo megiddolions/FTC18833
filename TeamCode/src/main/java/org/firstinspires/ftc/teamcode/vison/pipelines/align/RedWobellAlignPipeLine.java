@@ -34,7 +34,7 @@ public class RedWobellAlignPipeLine extends AlignPipeLine {
     private final ArrayList<MatOfPoint> findContoursOutput = new ArrayList<>();
     private final ArrayList<MatOfPoint> filterContoursOutput = new ArrayList<>();
 
-    private Rect position = new Rect();
+    private Rect target = new Rect();
 
     @Override
     public Mat processFrame(Mat input) {
@@ -70,16 +70,16 @@ public class RedWobellAlignPipeLine extends AlignPipeLine {
                 new Point(Constants.VisionConstants.camera_width, 200),
                 new Scalar(0, 150, 0), 4);
 
-        Imgproc.line(output,
-                new Point(Constants.VisionConstants.camera_width/2.0,0),
-                new Point(Constants.VisionConstants.camera_width/2.0, Constants.VisionConstants.camera_height),
-                new Scalar(255, 255, 255), 4
+        Imgproc.line(input, new Point(Constants.VisionConstants.camera_width / 2.0, 0),
+                new Point(Constants.VisionConstants.camera_width / 2.0, Constants.VisionConstants.camera_height),
+                new Scalar(255, 255, 255),
+                6
         );
 
-        Imgproc.line(output,
-                new Point(position.x + (position.width)/2.0,0),
-                new Point(position.x + (position.width)/2.0, Constants.VisionConstants.camera_height),
-                new Scalar(40, 255, 40), 4
+        Imgproc.line(input, new Point(target.x + target.width / 2.0, 0),
+                new Point(target.x + target.width / 2.0, Constants.VisionConstants.camera_height),
+                new Scalar(75, 75, 75),
+                6
         );
 
         output.assignTo(input);
@@ -92,12 +92,12 @@ public class RedWobellAlignPipeLine extends AlignPipeLine {
         for (MatOfPoint object : filterContoursOutput) {
             Rect object_rect = Imgproc.boundingRect(object);
             Imgproc.rectangle(overlay, object_rect, new Scalar(100, 100, 255), 4);
-            position = object_rect;
+            target = object_rect;
         }
     }
 
     @Override
     public double getError() {
-        return Constants.VisionConstants.camera_width / 2.0 - (position.x + position.width / 2.0);
+        return Constants.VisionConstants.camera_width / 2.0 - (target.x + target.width / 2.0);
     }
 }
