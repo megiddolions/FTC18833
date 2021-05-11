@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.RobotUniversal;
@@ -14,6 +15,8 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
+@Disabled
 @Autonomous(name = "ÂùŤő")
 public class Auto extends LinearOpModeWithCommands {
     protected DriveTrainSubsystem driveTrain;

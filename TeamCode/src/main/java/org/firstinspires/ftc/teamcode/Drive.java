@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
-@TeleOp(name="drive")
+@TeleOp(name="Drive for Robotosh")
 public class Drive extends CommandBasedTeleOp {
     protected DriveTrainSubsystem driveTrain;
     protected ShooterSubsystem shooter;
@@ -167,7 +167,7 @@ public class Drive extends CommandBasedTeleOp {
         new LoopTimeCommand().schedule();
 
         telemetry.addData("Runtime", this::getRuntime);
-//        telemetry.addData("Odometry", driveTrain.odometry::getPoseMeters);
+        telemetry.addData("Odometry", driveTrain.odometry::getPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
@@ -183,9 +183,9 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Storage", storage::getEncoder);
 //        telemetry.addData("has ring", storage::seeing_ring);
 
-//        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
-//        telemetry.addData("RR", driveTrain::getRearRightEncoder);
-//        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
-//        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
+        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
+        telemetry.addData("RR", driveTrain::getRearRightEncoder);
+        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
+        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
     }
 }

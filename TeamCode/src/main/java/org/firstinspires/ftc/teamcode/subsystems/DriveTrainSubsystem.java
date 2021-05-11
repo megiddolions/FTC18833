@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
+import org.firstinspires.ftc.teamcode.lib.kinematics.Odometry;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
@@ -14,10 +15,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.commandftc.RobotUniversal.hardwareMap;
 
 public class DriveTrainSubsystem extends SubsystemBase {
-    private final DcMotorEx rearLeft;
-    private final DcMotorEx rearRight;
-    private final DcMotorEx frontLeft;
-    private final DcMotorEx frontRight;
+    private final DcMotor rearLeft;
+    private final DcMotor rearRight;
+    private final DcMotor frontLeft;
+    private final DcMotor frontRight;
 
     public double drive_speed = 0.8;
 
@@ -29,12 +30,13 @@ public class DriveTrainSubsystem extends SubsystemBase {
     private double imu_angle_offset;
 
 //    public MecanumDriveOdometry odometry;
+    public Odometry odometry;
 
     public DriveTrainSubsystem() {
-        rearLeft = hardwareMap.get(DcMotorEx.class, "RearLeft");
-        rearRight = hardwareMap.get(DcMotorEx.class, "RearRight");
-        frontLeft = hardwareMap.get(DcMotorEx.class, "FrontLeft");
-        frontRight = hardwareMap.get(DcMotorEx.class, "FrontRight");
+        rearLeft = hardwareMap.dcMotor.get("RearLeft");
+        rearRight = hardwareMap.dcMotor.get( "RearRight");
+        frontLeft = hardwareMap.dcMotor.get("FrontLeft");
+        frontRight = hardwareMap.dcMotor.get("FrontRight");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -52,9 +54,10 @@ public class DriveTrainSubsystem extends SubsystemBase {
         rearRight.setTargetPosition(0);
         frontLeft.setTargetPosition(0);
         frontRight.setTargetPosition(0);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -69,12 +72,33 @@ public class DriveTrainSubsystem extends SubsystemBase {
         resetAngle();
 
 //        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
+        odometry = new Odometry(DriveTrainConstants.kOdometryConstants,
+                this::getLeftOdometryWheel,
+                this::getRightOdometryWheel,
+                this::getHorizontalOdometryWheel);
+    }
+
+    @Override
+    public void periodic() {
+        odometry.update();
+    }
+
+    private double getLeftOdometryWheel() {
+        return rearRight.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
+    }
+
+    private double getRightOdometryWheel() {
+        return rearLeft.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
+    }
+
+    private double getHorizontalOdometryWheel() {
+        return -frontRight.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
     }
 
     public boolean isGyroCalibrated() {
         return imu.isGyroCalibrated();
     }
-
+    @Deprecated
     public void set_for_autonomous() {
         rearLeft.setTargetPosition(rearLeft.getCurrentPosition());
         rearRight.setTargetPosition(rearRight.getCurrentPosition());
@@ -84,45 +108,45 @@ public class DriveTrainSubsystem extends SubsystemBase {
         drive_speed = 1;
         setPower(1);
     }
-
+    @Deprecated
     public void set_for_commands() {
         drive_speed = 1;
         setPower(0);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
+    @Deprecated
     public void reset_encoders() {
         DcMotor.RunMode mode = frontLeft.getMode();
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(mode);
     }
 
-    public MecanumDriveWheelSpeeds getWheelSpeeds() {
-        return new MecanumDriveWheelSpeeds(
-                frontLeft_getRate(), frontRight_getRate(),
-                rearLeft_getRate(), rearRight_getRate());
-    }
+//    public MecanumDriveWheelSpeeds getWheelSpeeds() {
+//        return new MecanumDriveWheelSpeeds(
+//                frontLeft_getRate(), frontRight_getRate(),
+//                rearLeft_getRate(), rearRight_getRate());
+//    }
 
     public Rotation2d getHeading() {
         return new Rotation2d((imu.getAngularOrientation().firstAngle - imu_angle_offset)
                 / 180 * Math.PI); // Convert to radians
     }
 
-    public double frontLeft_getRate() {
-        return frontLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
-    }
-
-    public double frontRight_getRate() {
-        return frontRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
-    }
-
-    public double rearLeft_getRate() {
-        return rearLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
-    }
-
-    public double rearRight_getRate() {
-        return rearRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
-    }
+//    public double frontLeft_getRate() {
+//        return frontLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+//    }
+//
+//    public double frontRight_getRate() {
+//        return frontRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+//    }
+//
+//    public double rearLeft_getRate() {
+//        return rearLeft.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+//    }
+//
+//    public double rearRight_getRate() {
+//        return rearRight.getVelocity() / DriveTrainConstants.ticks_per_revolution;
+//    }
 
     public void resetAngle() {
         imu_angle_offset = imu.getAngularOrientation().firstAngle;

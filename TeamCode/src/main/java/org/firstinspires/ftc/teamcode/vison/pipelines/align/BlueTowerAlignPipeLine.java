@@ -114,6 +114,8 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
 
         if (target1 != null) {
             filterContoursOutput.remove(index-1);
+        } else {
+            return;
         }
         index = 0;
         // Get second real target if visible

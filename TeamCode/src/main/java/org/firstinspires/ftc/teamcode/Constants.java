@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
+
 import java.util.function.DoubleFunction;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 
@@ -33,6 +36,12 @@ public final class Constants {
         public final static double WheelRadios = 50;
 
         public final static DoubleFunction<Double> mm_to_ticks = (double mm) -> mm / WheelRadios / 2 / Math.PI * ticks_per_revolution;
+
+        public static final OdometryConstants kOdometryConstants = new OdometryConstants(
+            new Translation2d(-96.5, -107.5),
+            new Translation2d(96.5, -107.5),
+            new Translation2d(0, 7.5)
+        );
     }
 
     public final static class ShooterConstants {
@@ -81,12 +90,12 @@ public final class Constants {
         public final static int camera_height = 800;
     }
     
-    public final static class OdometryConstants {
-        public final static double left_wheel_x = 0;
-        public final static double right_wheel_x = 0;
-        public final static double vertical_wheel_y = 0;
-        public final static double horizontal_wheel_y = 0;
-        
-        public final static double vertical_wheels_difference = Math.abs(left_wheel_x - right_wheel_x);
-    }
+//    public final static class OdometryConstants {
+//        public final static double left_wheel_x = 0;
+//        public final static double right_wheel_x = 0;
+//        public final static double vertical_wheel_y = 0;
+//        public final static double horizontal_wheel_y = 0;
+//
+//        public final static double vertical_wheels_difference = Math.abs(left_wheel_x - right_wheel_x);
+//    }
 }
