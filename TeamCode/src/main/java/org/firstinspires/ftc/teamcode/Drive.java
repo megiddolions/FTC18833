@@ -167,14 +167,14 @@ public class Drive extends CommandBasedTeleOp {
         new LoopTimeCommand().schedule();
 
         telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Odometry", driveTrain.odometry::getPosition);
+//        telemetry.addData("Odometry", driveTrain.odometry::getPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
-        telemetry.addData("Shooter", shooter::getLeftVelocity);
+//        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-        telemetry.addData("Vision error", vision::getError);
-        telemetry.addData("Vision target", vision::getTarget);
+//        telemetry.addData("Vision error", vision::getError);
+//        telemetry.addData("Vision target", vision::getTarget);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
@@ -187,5 +187,9 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("RR", driveTrain::getRearRightEncoder);
         telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
         telemetry.addData("FR", driveTrain::getFrontRightEncoder);
+
+//        telemetry.addData("Left", driveTrain::getLeftOdometryWheel);
+//        telemetry.addData("Right", driveTrain::getRightOdometryWheel);
+//        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryWheel);
     }
 }

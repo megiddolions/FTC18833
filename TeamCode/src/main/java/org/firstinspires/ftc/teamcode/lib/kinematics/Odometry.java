@@ -11,29 +11,29 @@ public class Odometry {
     private final OdometryConstants constants;
     private final DoubleSupplier leftEncoder;
     private final DoubleSupplier rightEncoder;
-    private final DoubleSupplier verticalEncoder;
+    private final DoubleSupplier horizontalEncoder;
     private double lastLeftPosition;
     private double lastRightPosition;
     private double lastVerticalPosition;
 
     private Pose2d position;
 
-    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier verticalEncoder) {
+    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder) {
         this.constants = constants;
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
-        this.verticalEncoder = verticalEncoder;
+        this.horizontalEncoder = horizontalEncoder;
 
         this.position = new Pose2d();
 
         updateLastPositions();
     }
 
-    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier verticalEncoder, Pose2d position) {
+    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder, Pose2d position) {
         this.constants = constants;
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
-        this.verticalEncoder = verticalEncoder;
+        this.horizontalEncoder = horizontalEncoder;
 
         this.position = position;
 
@@ -43,7 +43,7 @@ public class Odometry {
     void updateLastPositions() {
         lastLeftPosition = leftEncoder.getAsDouble();
         lastRightPosition = rightEncoder.getAsDouble();
-        lastVerticalPosition = verticalEncoder.getAsDouble();
+        lastVerticalPosition = horizontalEncoder.getAsDouble();
     }
 
     public Pose2d getPosition() {
@@ -53,22 +53,22 @@ public class Odometry {
     public void update() {
         double deltaLeft = leftEncoder.getAsDouble() - lastLeftPosition;
         double deltaRight = rightEncoder.getAsDouble() - lastRightPosition;
-        double deltaVertical = verticalEncoder.getAsDouble() - lastVerticalPosition;
+        double deltaHorizontal = horizontalEncoder.getAsDouble() - lastVerticalPosition;
 
-        double deltaAngle = (deltaLeft - deltaRight) / constants.getHorizontalWheelsDistance();
+        double deltaAngle = (deltaLeft - deltaRight) / constants.getVerticalWheelsDistance();
 
-        double totalLeft = lastLeftPosition;
-        double totalRight = lastRightPosition;
+        double totalLeft = lastLeftPosition + deltaLeft;
+        double totalRight = lastRightPosition + deltaRight;
 
-        double lastAngle = (totalLeft - totalRight) / constants.getHorizontalWheelsDistance();
+        double lastAngle = (lastLeftPosition - lastRightPosition) / constants.getVerticalWheelsDistance();
 
         double currentAngle = lastAngle + deltaAngle;
 
         Translation2d delta_position = new Translation2d(
                 (deltaRight + deltaLeft) / 2.0,
-                deltaVertical - deltaAngle);
+                deltaHorizontal - deltaAngle);
 
-        position = position.plus(new Transform2d(delta_position.rotateBy(new Rotation2d(currentAngle)), new Rotation2d(currentAngle)));
+        position = position.plus(new Transform2d(delta_position.rotateBy(new Rotation2d(currentAngle)), new Rotation2d(deltaAngle)));
 
         updateLastPositions();
     }

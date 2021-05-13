@@ -13,7 +13,7 @@ public class OdometryConstants {
         this.horizontalWheel = horizontalWheel;
     }
 
-    public double getHorizontalWheelsDistance() {
+    public double getVerticalWheelsDistance() {
         return leftWheel.getDistance(rightWheel);
     }
 }

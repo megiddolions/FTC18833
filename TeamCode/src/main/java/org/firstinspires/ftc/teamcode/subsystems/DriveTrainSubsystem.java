@@ -30,7 +30,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     private double imu_angle_offset;
 
 //    public MecanumDriveOdometry odometry;
-    public Odometry odometry;
+//    public Odometry odometry;
 
     public DriveTrainSubsystem() {
         rearLeft = hardwareMap.dcMotor.get("RearLeft");
@@ -72,27 +72,27 @@ public class DriveTrainSubsystem extends SubsystemBase {
         resetAngle();
 
 //        odometry = new MecanumDriveOdometry(DriveTrainConstants.kinematics, getHeading(), new Pose2d(0, 0, new Rotation2d()));
-        odometry = new Odometry(DriveTrainConstants.kOdometryConstants,
-                this::getLeftOdometryWheel,
-                this::getRightOdometryWheel,
-                this::getHorizontalOdometryWheel);
+//        odometry = new Odometry(DriveTrainConstants.kOdometryConstants,
+//                this::getLeftOdometryWheel,
+//                this::getRightOdometryWheel,
+//                this::getHorizontalOdometryWheel);
     }
 
     @Override
     public void periodic() {
-        odometry.update();
+//        odometry.update();
     }
 
-    private double getLeftOdometryWheel() {
+    public double getLeftOdometryWheel() {
         return rearRight.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
     }
 
-    private double getRightOdometryWheel() {
-        return rearLeft.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
+    public double getRightOdometryWheel() {
+        return frontLeft.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
     }
 
-    private double getHorizontalOdometryWheel() {
-        return -frontRight.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
+    public double getHorizontalOdometryWheel() {
+        return frontRight.getCurrentPosition() / 8192.0 * 60 * 2 * Math.PI;
     }
 
     public boolean isGyroCalibrated() {
