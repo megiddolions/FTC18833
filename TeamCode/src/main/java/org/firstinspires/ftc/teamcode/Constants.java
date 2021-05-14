@@ -20,6 +20,10 @@ public final class Constants {
         public final static class REV_CORE_HEX {
             public final static double ticks_per_revolution = 288;
         }
+
+        public final static class REV_THROUGH_BORE_ENCODER {
+            public final static double ticks_per_revolution = 8192;
+        }
     }
     
     public final static class  DriveTrainConstants {
