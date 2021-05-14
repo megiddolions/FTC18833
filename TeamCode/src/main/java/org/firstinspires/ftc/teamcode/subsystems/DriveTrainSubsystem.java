@@ -7,8 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
-import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
-import org.firstinspires.ftc.teamcode.lib.kinematics.PathDrive;
 import org.jetbrains.annotations.NotNull;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -19,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive, PathDrive {
+public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
     private final DcMotor rearLeft;
     private final DcMotor rearRight;
     private final DcMotor frontLeft;
@@ -284,7 +282,15 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive, 
 
 
     /// Odometry stuff ///
-    private Pose2d current_position;
+    private Pose2d current_position = new Pose2d();
+
+    public Pose2d getPosition() {
+        return current_position;
+    }
+
+    public void setPosition(Pose2d position) {
+        current_position = position;
+    }
 
     private int last_left = 0;
     private int last_right = 0;
@@ -316,19 +322,20 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive, 
                         new Translation2d(
                                 left_movement,
                                 forward_movement
-                        ).rotateBy(new Rotation2d(
-                                (right - left)
-                                        / DriveTrainConstants.robot_diameter
-                                        * DriveTrainConstants.kOdometryConstants.meters_per_tick)
-                        ),
+                        ).rotateBy(current_position.getRotation().plus(new Rotation2d(delta_angle))),
                         // Add change in angle to current angle
                         new Rotation2d(delta_angle)
                 )
         );
+
+        last_left = left;
+        last_right = right;
+        last_horizontal = horizontal;
     }
 
-    @Override
-    public void moveTo(Pose2d position, double speed) {
+    public void moveTo(@NotNull Pose2d target, double speed) {
+        double distance = current_position.getTranslation().getDistance(target.getTranslation());
+
 
     }
 }
