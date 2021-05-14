@@ -12,28 +12,31 @@ public class Odometry {
     private final DoubleSupplier leftEncoder;
     private final DoubleSupplier rightEncoder;
     private final DoubleSupplier horizontalEncoder;
+    private final DoubleSupplier angleSupplier;
     private double lastLeftPosition;
     private double lastRightPosition;
     private double lastVerticalPosition;
 
     private Pose2d position;
 
-    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder) {
+    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder, DoubleSupplier angleSupplier) {
         this.constants = constants;
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
         this.horizontalEncoder = horizontalEncoder;
+        this.angleSupplier = angleSupplier;
 
         this.position = new Pose2d();
 
         updateLastPositions();
     }
 
-    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder, Pose2d position) {
+    public Odometry(OdometryConstants constants, DoubleSupplier leftEncoder, DoubleSupplier rightEncoder, DoubleSupplier horizontalEncoder, DoubleSupplier angleSupplier, Pose2d position) {
         this.constants = constants;
         this.leftEncoder = leftEncoder;
         this.rightEncoder = rightEncoder;
         this.horizontalEncoder = horizontalEncoder;
+        this.angleSupplier = angleSupplier;
 
         this.position = position;
 
@@ -65,7 +68,7 @@ public class Odometry {
         double currentAngle = lastAngle + deltaAngle;
 
         Translation2d delta_position = new Translation2d(
-                (deltaRight + deltaLeft) / 2.0,
+                (deltaRight + deltaLeft) / 2d,
                 deltaHorizontal - deltaAngle);
 
         position = position.plus(new Transform2d(delta_position.rotateBy(new Rotation2d(currentAngle)), new Rotation2d(deltaAngle)));

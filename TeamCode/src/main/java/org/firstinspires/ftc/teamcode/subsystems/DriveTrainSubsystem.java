@@ -54,7 +54,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
         rearRight.setTargetPosition(0);
         frontLeft.setTargetPosition(0);
         frontRight.setTargetPosition(0);
-        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 //        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
@@ -98,7 +98,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     public boolean isGyroCalibrated() {
         return imu.isGyroCalibrated();
     }
-    @Deprecated
+//    @Deprecated
     public void set_for_autonomous() {
         rearLeft.setTargetPosition(rearLeft.getCurrentPosition());
         rearRight.setTargetPosition(rearRight.getCurrentPosition());
@@ -108,13 +108,13 @@ public class DriveTrainSubsystem extends SubsystemBase {
         drive_speed = 1;
         setPower(1);
     }
-    @Deprecated
-    public void set_for_commands() {
+
+    public void set_for_drive() {
         drive_speed = 1;
         setPower(0);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    @Deprecated
+
     public void reset_encoders() {
         DcMotor.RunMode mode = frontLeft.getMode();
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.vison.pipelines.align;
 
 import org.commandftc.RobotUniversal;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.vison.VisionTarget;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -51,7 +52,6 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
 
     @Override
     public Mat processFrame(Mat input) {
-
         Mat view = input.submat(view_rect);
         Mat hsv_out = new Mat();
         hsvThreshold(view, blue_hsvThresholdHue, blue_hsvThresholdSaturation, blue_hsvThresholdValue, hsv_out);

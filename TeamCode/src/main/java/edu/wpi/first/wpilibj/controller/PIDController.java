@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import org.commandftc.RobotUniversal;
+
 import edu.wpi.first.wpiutil.math.MathUtil;
 
 /** Implements a PID control loop. */
@@ -19,9 +21,6 @@ public class PIDController implements AutoCloseable {
 
   // Factor for "derivative" control
   private double m_kd;
-
-  // The period (in seconds) of the loop that calls the controller
-  private final double m_period;
 
   private double m_maximumIntegral = 1.0;
 
@@ -51,17 +50,7 @@ public class PIDController implements AutoCloseable {
   private double m_setpoint;
   private double m_measurement;
 
-  /**
-   * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
-   * 0.02 seconds.
-   *
-   * @param kp The proportional coefficient.
-   * @param ki The integral coefficient.
-   * @param kd The derivative coefficient.
-   */
-  public PIDController(double kp, double ki, double kd) {
-    this(kp, ki, kd, 0.02);
-  }
+  private double last_time = 0;
 
   /**
    * Allocates a PIDController with the given constants for kp, ki, and kd.
@@ -69,17 +58,11 @@ public class PIDController implements AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
-   * @param period The period between controller updates in seconds. Must be non-zero and positive.
    */
-  public PIDController(double kp, double ki, double kd, double period) {
+  public PIDController(double kp, double ki, double kd) {
     m_kp = kp;
     m_ki = ki;
     m_kd = kd;
-
-    if (period <= 0) {
-      throw new IllegalArgumentException("Controller period must be a non-zero positive number!");
-    }
-    m_period = period;
 
     instances++;
   }
@@ -159,15 +142,6 @@ public class PIDController implements AutoCloseable {
   }
 
   /**
-   * Returns the period of this controller.
-   *
-   * @return the period of the controller.
-   */
-  public double getPeriod() {
-    return m_period;
-  }
-
-  /**
    * Sets the setpoint for the PIDController.
    *
    * @param setpoint The desired setpoint.
@@ -201,7 +175,7 @@ public class PIDController implements AutoCloseable {
       positionError = m_setpoint - m_measurement;
     }
 
-    double velocityError = (positionError - m_prevError) / m_period;
+    double velocityError = (positionError - m_prevError) / (RobotUniversal.opMode.getRuntime() - last_time);
 
     return Math.abs(positionError) < m_positionTolerance
         && Math.abs(velocityError) < m_velocityTolerance;
@@ -300,6 +274,7 @@ public class PIDController implements AutoCloseable {
   public double calculate(double measurement) {
     m_measurement = measurement;
     m_prevError = m_positionError;
+    double period = get_period();
 
     if (m_continuous) {
       m_positionError =
@@ -308,12 +283,12 @@ public class PIDController implements AutoCloseable {
       m_positionError = m_setpoint - measurement;
     }
 
-    m_velocityError = (m_positionError - m_prevError) / m_period;
+    m_velocityError = (m_positionError - m_prevError) / period;
 
     if (m_ki != 0) {
       m_totalError =
           MathUtil.clamp(
-              m_totalError + m_positionError * m_period,
+              m_totalError + m_positionError * period,
               m_minimumIntegral / m_ki,
               m_maximumIntegral / m_ki);
     }
@@ -325,5 +300,12 @@ public class PIDController implements AutoCloseable {
   public void reset() {
     m_prevError = 0;
     m_totalError = 0;
+  }
+
+  private double get_period() {
+    double time = RobotUniversal.opMode.getRuntime();
+    time -= last_time;
+    last_time = time;
+    return time;
   }
 }

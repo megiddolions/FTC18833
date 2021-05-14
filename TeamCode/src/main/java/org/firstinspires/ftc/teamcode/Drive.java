@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -12,6 +14,7 @@ import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.SetStorageIndexCommand;
+import org.firstinspires.ftc.teamcode.commands.Util.LoggerCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
@@ -27,6 +30,14 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.firstinspires.ftc.teamcode.vison.VisionTarget;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -91,7 +102,7 @@ public class Drive extends CommandBasedTeleOp {
                 () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
-        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision, visionTarget);
+        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
@@ -165,17 +176,19 @@ public class Drive extends CommandBasedTeleOp {
 
         // Show time to make each loop
         new LoopTimeCommand().schedule();
+        getLogCommand().schedule();
 
         telemetry.addData("Runtime", this::getRuntime);
+        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
 //        telemetry.addData("Odometry", driveTrain.odometry::getPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-//        telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("Vision error", vision::getError);
 //        telemetry.addData("Vision target", vision::getTarget);
-        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+        telemetry.addData("align active", alignRobotCommand::isScheduled);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);
@@ -183,13 +196,56 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Storage", storage::getEncoder);
 //        telemetry.addData("has ring", storage::seeing_ring);
 
-        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
-        telemetry.addData("RR", driveTrain::getRearRightEncoder);
-        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
-        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
+//        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
+//        telemetry.addData("RR", driveTrain::getRearRightEncoder);
+//        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
+//        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
 
 //        telemetry.addData("Left", driveTrain::getLeftOdometryWheel);
 //        telemetry.addData("Right", driveTrain::getRightOdometryWheel);
 //        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryWheel);
+    }
+
+    private Command getLogCommand() {
+        Map<String, Supplier<Object>> map = new LinkedHashMap<>();
+
+        map.put("time", this::getRuntime);
+        map.put("shooter left", shooter::getLeftVelocity);
+        map.put("shooter right", shooter::getRightVelocity);
+        map.put("shooter lift", shooter::getLift);
+
+        map.put("index", storage::getIndex);
+        map.put("index(busy)", storage::isBusy);
+        map.put("index(current)", storage::getTarget);
+
+        map.put("wobell target", wobellSubsystem::getTargetPosition);
+        map.put("wobell current", wobellSubsystem::getCurrentPosition);
+        map.put("wobell power", wobellSubsystem::getPower);
+
+        map.put("FL(current)", driveTrain::getFrontLeftEncoder);
+        map.put("FR(current)", driveTrain::getFrontRightEncoder);
+        map.put("RL(current)", driveTrain::getRearLeftEncoder);
+        map.put("RR(current)", driveTrain::getRearRightEncoder);
+
+        map.put("FL(target)", driveTrain::getFrontLeftTarget);
+        map.put("FR(target)", driveTrain::getFrontRightTarget);
+        map.put("RL(target)", driveTrain::getRearLeftTarget);
+        map.put("RR(target)", driveTrain::getRearRightTarget);
+
+        map.put("driveTrain(isBusy)", driveTrain::isBusy);
+
+        map.put("Vision(error)", vision::getError);
+        map.put("Vision(target)", vision::getTarget);
+
+//        return map;
+        List<String> entries_name = new ArrayList<>();
+        List<Supplier<Object>> suppliers = new ArrayList<>();
+
+        for (Map.Entry<String, Supplier<Object>> entry : map.entrySet()) {
+            entries_name.add(entry.getKey());
+            suppliers.add(entry.getValue());
+        }
+
+        return new LoggerCommand(entries_name, suppliers);
     }
 }

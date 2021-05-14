@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old;
 
 import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Core;
@@ -13,6 +13,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class CountRingsPipeLine extends OpenCvPipeline {
 //    public double[] hsvThresholdHue = {8, 52};
 //    public double[] hsvThresholdSaturation = {110.07193916564364, 255.0};

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+@Deprecated
 public class SamplePipeline extends OpenCvPipeline {
     public Mat last_input;
 

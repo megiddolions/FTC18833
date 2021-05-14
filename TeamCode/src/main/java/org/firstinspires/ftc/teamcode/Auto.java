@@ -285,7 +285,7 @@ public class Auto extends LinearOpModeWithCommands {
     }
 
     private void align_robot_left(double offset) {
-        driveTrain.set_for_commands();
+        driveTrain.set_for_drive();
         while (opModeIsActive()) {
             double error = -(-vision.getError()+offset);
             driveTrain.driveLeft(error/500);
@@ -298,7 +298,7 @@ public class Auto extends LinearOpModeWithCommands {
     }
 
     private void align_gyro_to_zero(double offset) {
-        driveTrain.set_for_commands();
+        driveTrain.set_for_drive();
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         while (opModeIsActive()) {
             double error = -driveTrain.getHeading().getDegrees() + offset;

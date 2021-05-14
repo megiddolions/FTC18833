@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old;
 
 import android.annotation.SuppressLint;
 
@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import static org.commandftc.RobotUniversal.*;
 
+@Deprecated
 public class SaveVideoPipeLine extends OpenCvPipeline {
 
     @SuppressLint("SdCardPath")

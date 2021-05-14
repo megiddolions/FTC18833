@@ -68,4 +68,8 @@ public class WobellSubsystem extends SubsystemBase {
         leftLift.setPower(power);
         rightLift.setPower(power);
     }
+
+    public double getPower() {
+        return leftLift.getPower();
+    }
 }

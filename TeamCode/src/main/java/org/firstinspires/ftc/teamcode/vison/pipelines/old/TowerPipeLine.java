@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old;
 
 import org.commandftc.RobotUniversal;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.commandftc.RobotUniversal.*;
 
+@Deprecated
 public class TowerPipeLine extends OpenCvPipeline {
     public final static double[] hsvThresholdHue = {91.72662076332585, 130.8532423208191};
     public final static double[] hsvThresholdSaturation = {127, 200};

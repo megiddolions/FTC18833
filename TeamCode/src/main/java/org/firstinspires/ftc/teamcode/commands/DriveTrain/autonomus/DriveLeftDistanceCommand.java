@@ -22,11 +22,6 @@ public class DriveLeftDistanceCommand extends CommandBase {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        driveTrain.set_for_commands();
-    }
-
-    @Override
     public boolean isFinished() {
         return driveTrain.isBusy();
     }

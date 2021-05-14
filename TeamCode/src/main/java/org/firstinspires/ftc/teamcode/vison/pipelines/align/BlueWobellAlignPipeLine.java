@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.vison.pipelines.align;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.vison.VisionTarget;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -26,6 +27,8 @@ public class BlueWobellAlignPipeLine extends AlignPipeLine {
 
     @Override
     public double getError() {
+        if (target.equals(new Rect()))
+            return 0;
         return Constants.VisionConstants.camera_width / 2.0 - target.x - target.width / 2.0;
     }
 
@@ -39,6 +42,7 @@ public class BlueWobellAlignPipeLine extends AlignPipeLine {
         view.release();
 
         findContours(hsv_out, false, findContoursOutput);
+        hsv_out.release();
 
         target = new Rect();
 
@@ -51,8 +55,6 @@ public class BlueWobellAlignPipeLine extends AlignPipeLine {
                 Imgproc.rectangle(input, object_rect, new Scalar(255, 0, 0), 2);
             }
         }
-
-        view.release();
 
         Imgproc.rectangle(input, target, new Scalar(255, 0, 255), 4);
 

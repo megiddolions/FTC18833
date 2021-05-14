@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.TimestampedI2cData;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.ThreadPool;
 
+import org.commandftc.Gp;
 import org.commandftc.RobotUniversal;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
@@ -22,6 +23,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * OpMode.
  */
 public abstract class LinearOpModeWithCommands extends OpMode {
+
+    protected Gp gp1;
+    protected Gp gp2;
 
     //------------------------------------------------------------------------------------------------
     // State
@@ -160,6 +164,10 @@ public abstract class LinearOpModeWithCommands extends OpMode {
         RobotUniversal.hardwareMap = hardwareMap;
         RobotUniversal.telemetry = telemetry;
         RobotUniversal.opMode = this;
+
+        gp1 = new Gp(gamepad1);
+        gp2 = new Gp(gamepad2);
+
         init_subsystems();
 
         this.executorService = ThreadPool.newSingleThreadExecutor("LinearOpMode");

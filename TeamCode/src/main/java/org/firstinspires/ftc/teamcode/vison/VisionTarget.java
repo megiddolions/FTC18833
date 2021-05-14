@@ -5,6 +5,8 @@ public enum VisionTarget {
     BlueTower,
     RedWobell,
     BlueWobell,
+    BluePowerShoots,
+    RedPowerShoots,
     Ring,
     None
 }

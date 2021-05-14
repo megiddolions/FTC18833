@@ -105,4 +105,8 @@ public class StorageSubSystem extends SubsystemBase {
     public int getEncoder() {
         return indexer.getCurrentPosition(); 
     }
+
+    public int getTarget() {
+        return indexer.getTargetPosition();
+    }
 }
