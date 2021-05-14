@@ -7,14 +7,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
+import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
+import org.firstinspires.ftc.teamcode.lib.kinematics.PathDrive;
 import org.jetbrains.annotations.NotNull;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
+public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive, PathDrive {
     private final DcMotor rearLeft;
     private final DcMotor rearRight;
     private final DcMotor frontLeft;
@@ -63,16 +68,33 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         resetAngle();
     }
 
+    @Override
+    public void periodic() {
+        update_position();
+    }
+
+    public int getLeftOdometryEncoder() {
+        return -rearRight.getCurrentPosition();
+    }
+
+    public int getRightOdometryEncoder() {
+        return -frontLeft.getCurrentPosition();
+    }
+
+    public int getHorizontalOdometryEncoder() {
+        return frontRight.getCurrentPosition();
+    }
+
     public double getLeftOdometryWheel() {
-        return -rearRight.getCurrentPosition() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+        return getLeftOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
     }
 
     public double getRightOdometryWheel() {
-        return -frontLeft.getCurrentPosition() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+        return getRightOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
     }
 
     public double getHorizontalOdometryWheel() {
-        return frontRight.getCurrentPosition() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+        return getHorizontalOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
     }
 
     public boolean isGyroCalibrated() {
@@ -258,5 +280,55 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
     public void driveDiagonalRight(double mm) {
         rearRight.setTargetPosition((int)(rearRight.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
         frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
+    }
+
+
+    /// Odometry stuff ///
+    private Pose2d current_position;
+
+    private int last_left = 0;
+    private int last_right = 0;
+    private int last_horizontal = 0;
+
+    private void update_position() {
+        int left = getLeftOdometryEncoder();
+        int right = getRightOdometryEncoder();
+        int horizontal = getHorizontalOdometryEncoder();
+
+        int delta_left = left - last_left;
+        int delta_right = right - last_right;
+        int delta_horizontal = horizontal - last_horizontal;
+
+        double delta_angle = (delta_right - delta_left)
+                / DriveTrainConstants.robot_diameter
+                * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+
+        // The arc length of movement forward/backward
+        double forward_movement = (delta_left  + delta_right) / 2d * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+
+        // The arc length of movement left/right
+        double left_movement = (delta_horizontal) * DriveTrainConstants.kOdometryConstants.meters_per_tick
+                + delta_angle * DriveTrainConstants.kOdometryConstants.horizontalWheel.getDistance(new Translation2d(0, 0));
+
+        // Calculate the new angle of the robot using the difference between the left and right encoder
+        current_position = current_position.plus(
+                new Transform2d(
+                        new Translation2d(
+                                left_movement,
+                                forward_movement
+                        ).rotateBy(new Rotation2d(
+                                (right - left)
+                                        / DriveTrainConstants.robot_diameter
+                                        * DriveTrainConstants.kOdometryConstants.meters_per_tick)
+                        ),
+                        // Add change in angle to current angle
+                        new Rotation2d(delta_angle)
+                )
+        );
+    }
+
+    @Override
+    public void moveTo(Pose2d position, double speed) {
+
     }
 }

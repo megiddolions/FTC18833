@@ -3,10 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
 
 import java.util.function.DoubleFunction;
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 
@@ -30,6 +28,8 @@ public final class Constants {
         public final static double ticks_per_revolution =
                 15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
 
+        public final static double robot_diameter = 10;
+
         public final static MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
                 new Translation2d(0.28, 0.34),
                 new Translation2d(0.28, -0.34),
@@ -44,8 +44,9 @@ public final class Constants {
         public static final OdometryConstants kOdometryConstants = new OdometryConstants(
             new Translation2d(-96.5, -107.5),
             new Translation2d(96.5, -107.5),
-            new Translation2d(0, 7.5)
-        );
+            new Translation2d(0, 7.5),
+                0.06,
+                MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
     }
 
     public final static class ShooterConstants {
