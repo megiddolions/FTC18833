@@ -2,20 +2,19 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
-import org.firstinspires.ftc.teamcode.lib.kinematics.Odometry;
+import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
+import org.jetbrains.annotations.NotNull;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class DriveTrainSubsystem extends SubsystemBase {
+public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
     private final DcMotor rearLeft;
     private final DcMotor rearRight;
     private final DcMotor frontLeft;
@@ -140,7 +139,8 @@ public class DriveTrainSubsystem extends SubsystemBase {
         frontRight.setPower(power);
     }
 
-    public void setPower(double left, double right) {
+    @Override
+    public void tankDrive(double left, double right) {
         rearLeft.setPower(left);
         rearRight.setPower(right);
         frontLeft.setPower(left);
@@ -154,6 +154,14 @@ public class DriveTrainSubsystem extends SubsystemBase {
         frontRight.setPower(FR);
     }
 
+    public void setPower(@NotNull double[] values) {
+        rearLeft.setPower(values[0]);
+        rearRight.setPower(values[1]);
+        frontLeft.setPower(values[2]);
+        frontRight.setPower(values[3]);
+    }
+
+    @Override
     public void driveLeft(double speed) {
         rearLeft.setPower(speed);
         rearRight.setPower(-speed);
@@ -161,11 +169,28 @@ public class DriveTrainSubsystem extends SubsystemBase {
         frontRight.setPower(speed);
     }
 
+    @Override
     public void driveRight(double speed) {
         rearLeft.setPower(-speed);
         rearRight.setPower(speed);
         frontLeft.setPower(speed);
         frontRight.setPower(-speed);
+    }
+
+    @Override
+    public void driveDirection(double x, double y, double a, double power) {
+        double[] values = new double[]{-x + y + a, +x + y - a, +x + y + a, -x + y - a};
+        // Find max power
+        double max = Math.max(Math.max(Math.abs(values[0]),Math.abs(values[1])),Math.max(Math.abs(values[2]),Math.abs(values[3])));
+        // Keep all motor values in range
+        if (max > power) {
+            values[0] /= max * power;
+            values[1] /= max * power;
+            values[2] /= max * power;
+            values[3] /= max * power;
+        }
+
+        setPower(values);
     }
 
     public int getRearLeftEncoder() {

@@ -28,14 +28,9 @@ public class AlignRobotVisionCommand extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        driveTrain.set_for_drive();
-    }
-
-    @Override
     public void execute() {
         double out = pid.calculate(vision.getError()+offset);
-        driveTrain.setPower(out, -out);
+        driveTrain.tankDrive(out, -out);
     }
 
     @Override

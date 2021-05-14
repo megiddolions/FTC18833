@@ -19,7 +19,7 @@ public class DriveForwardCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveTrain.setPower(supplier.getAsDouble(), supplier.getAsDouble());
+        driveTrain.tankDrive(supplier.getAsDouble(), supplier.getAsDouble());
     }
 
     @Override

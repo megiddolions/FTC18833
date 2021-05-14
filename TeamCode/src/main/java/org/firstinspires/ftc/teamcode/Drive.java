@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.annotation.SuppressLint;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -9,6 +7,7 @@ import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToDirectionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
@@ -53,6 +52,7 @@ public class Drive extends CommandBasedTeleOp {
     protected VisionSubsystem vision;
 
     protected TankDriveCommand tankDriveCommand;
+    protected DriveToDirectionCommand driveCommand;
     protected DriveSideWaysCommand driveSideWaysCommandCommand;
     protected AlignRobotVisionCommand alignRobotCommand;
 
@@ -100,6 +100,8 @@ public class Drive extends CommandBasedTeleOp {
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
+        driveCommand = new DriveToDirectionCommand(driveTrain,
+                () -> -gamepad1.right_stick_y, () -> -gamepad1.right_stick_x, () -> -gamepad1.left_stick_x);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x * drive_speed_modifier, -gamepad1.right_stick_x * drive_speed_modifier));
         alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
@@ -129,7 +131,7 @@ public class Drive extends CommandBasedTeleOp {
         lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.025);
 
         // DriveTrain
-        driveTrain.setDefaultCommand(tankDriveCommand);
+        driveTrain.setDefaultCommand(driveCommand);
         gp1.left_stick_button().whenHeld(
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y * drive_speed_modifier));
         gp1.right_stick_button().whenHeld(

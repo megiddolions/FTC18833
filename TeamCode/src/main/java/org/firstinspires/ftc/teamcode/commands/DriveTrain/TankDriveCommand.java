@@ -21,7 +21,7 @@ public class TankDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveTrain.setPower(leftSupplier.getAsDouble(), rightSupplier.getAsDouble());
+        driveTrain.tankDrive(leftSupplier.getAsDouble(), rightSupplier.getAsDouble());
     }
 
     @Override

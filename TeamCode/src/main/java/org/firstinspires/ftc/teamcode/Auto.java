@@ -50,7 +50,7 @@ public class Auto extends LinearOpModeWithCommands {
 
         wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
 
-        driveTrain.set_for_autonomous();
+//        driveTrain.set_for_autonomous();
         storage.set_for_autonomous();
         vision.set_for_autonomous();
 
@@ -285,7 +285,7 @@ public class Auto extends LinearOpModeWithCommands {
     }
 
     private void align_robot_left(double offset) {
-        driveTrain.set_for_drive();
+//        driveTrain.set_for_drive();
         while (opModeIsActive()) {
             double error = -(-vision.getError()+offset);
             driveTrain.driveLeft(error/500);
@@ -294,15 +294,15 @@ public class Auto extends LinearOpModeWithCommands {
                 break;
         }
         driveTrain.stop();
-        driveTrain.set_for_autonomous();
+//        driveTrain.set_for_autonomous();
     }
 
     private void align_gyro_to_zero(double offset) {
-        driveTrain.set_for_drive();
+//        driveTrain.set_for_drive();
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         while (opModeIsActive()) {
             double error = -driveTrain.getHeading().getDegrees() + offset;
-            driveTrain.setPower(-error / 35, error / 35);
+            driveTrain.tankDrive(-error / 35, error / 35);
 
             if (Math.abs(error) <= 1) {
                 driveTrain.stop();
@@ -310,7 +310,7 @@ public class Auto extends LinearOpModeWithCommands {
             }
             telemetry.update();
         }
-        driveTrain.set_for_autonomous();
+//        driveTrain.set_for_autonomous();
     }
 
 
