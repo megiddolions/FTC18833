@@ -32,12 +32,10 @@ import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.firstinspires.ftc.teamcode.vison.VisionTarget;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -74,7 +72,9 @@ public class Drive extends CommandBasedTeleOp {
     protected SequentialCommandGroup startShooterSequenceCommand;
     protected Command stopShooterSequenceCommand;
 
-    private final VisionTarget visionTarget = VisionTarget.BlueTower;
+    protected final VisionTarget visionTarget = VisionTarget.BlueTower;
+
+    protected double drive_speed_modifier;
 
     @Override
     public void assign() {
@@ -99,9 +99,9 @@ public class Drive extends CommandBasedTeleOp {
         shooter.setLift(0.375);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
-                () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y);
+                () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
-                () -> Util.maxAbs(-gamepad1.left_stick_x, -gamepad1.right_stick_x));
+                () -> Util.maxAbs(-gamepad1.left_stick_x * drive_speed_modifier, -gamepad1.right_stick_x * drive_speed_modifier));
         alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
@@ -131,21 +131,21 @@ public class Drive extends CommandBasedTeleOp {
         // DriveTrain
         driveTrain.setDefaultCommand(tankDriveCommand);
         gp1.left_stick_button().whenHeld(
-                new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y));
+                new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y * drive_speed_modifier));
         gp1.right_stick_button().whenHeld(
-                new DriveForwardCommand(driveTrain, () -> -gamepad1.left_stick_y));
-        gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> 1));
-        gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -1));
-        gp1.y().whenPressed(new InstantCommand(() -> driveTrain.reset_encoders()));
+                new DriveForwardCommand(driveTrain, () -> -gamepad1.left_stick_y * drive_speed_modifier));
+        gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> drive_speed_modifier));
+        gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -drive_speed_modifier));
         gp1.x().whenHeld(alignRobotCommand);
 
         new Button(() -> gamepad1.left_trigger > 0.1)
-                .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 0.5))
-                .whenReleased(new InstantCommand(() -> driveTrain.drive_speed = 0.8));
+                .whenPressed(new InstantCommand(() -> drive_speed_modifier = 0.5))
+                .whenReleased(new InstantCommand(() -> drive_speed_modifier = 0.8));
 
         new Button(() -> gamepad1.right_trigger > 0.1)
-                .whenPressed(new InstantCommand(() -> driveTrain.drive_speed = 1))
-                .whenReleased(new InstantCommand(() -> driveTrain.drive_speed = 0.8));
+                .whenPressed(new InstantCommand(() -> drive_speed_modifier = 1))
+                .whenReleased(new InstantCommand(() -> drive_speed_modifier = 0.8));
+        drive_speed_modifier = 0.8;
 
         // Intake
         intake.setDefaultCommand(manualIntakeCommand);
