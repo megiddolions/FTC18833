@@ -199,7 +199,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
     @Override
     public void driveDirection(double x, double y, double a, double power) {
-        double[] values = new double[]{-x + y + a, +x + y - a, +x + y + a, -x + y - a};
+        double[] values = new double[]{+x + y + a, -x + y - a, -x + y + a, +x + y - a};
         // Find max power
         double max = Math.max(Math.max(Math.abs(values[0]),Math.abs(values[1])),Math.max(Math.abs(values[2]),Math.abs(values[3])));
         // Keep all motor values in range
