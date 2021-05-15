@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines.align;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old.align;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.vison.VisionTarget;
@@ -12,8 +12,8 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.*;
-
-public class BlueWobellAlignPipeLine extends AlignPipeLine {
+@Deprecated
+public class BlueWobellAlignPipeLine extends AlignPipeLine_OLD {
     public final static double[] blue_hsvThresholdHue = {75, 140};
     public final static double[] blue_hsvThresholdSaturation = {127, 255};
     public final static double[] blue_hsvThresholdValue = {0.0, 255};

@@ -8,5 +8,11 @@ public enum VisionTarget {
     BluePowerShoots,
     RedPowerShoots,
     Ring,
-    None
+    None;
+
+    public enum PowerShoot {
+        Left,
+        Center,
+        Right
+    }
 }

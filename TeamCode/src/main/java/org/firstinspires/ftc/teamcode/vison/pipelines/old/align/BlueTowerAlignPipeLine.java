@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines.align;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old.align;
 
 import org.commandftc.RobotUniversal;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -17,8 +17,8 @@ import static org.firstinspires.ftc.teamcode.lib.CvUtil.findContours;
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.hsvThreshold;
 
 // TODO: Add more filters for vision
-
-public class BlueTowerAlignPipeLine extends AlignPipeLine {
+@Deprecated
+public class BlueTowerAlignPipeLine extends AlignPipeLine_OLD {
     public final static double[] blue_hsvThresholdHue = {75, 140};
     public final static double[] blue_hsvThresholdSaturation = {127, 255};
     public final static double[] blue_hsvThresholdValue = {100, 255};
