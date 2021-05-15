@@ -41,7 +41,7 @@ public class Auto2 extends CommandBasedAuto {
 
         alignWobellCommand = new AlignRobotVisionCommand(driveTrain, vision);
 
-        vision.setTarget(VisionTarget.BlueWobell);
+        vision.setTarget(VisionTarget.BluePowerShoots);
 
         telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
@@ -53,8 +53,8 @@ public class Auto2 extends CommandBasedAuto {
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
                 alignWobellCommand,
-                new SetVisionTargetCommand(vision, VisionTarget.BlueTower),
-                new DriveForwardDistanceCommand(driveTrain, -800)
+                new SetVisionTargetCommand(vision, VisionTarget.BluePowerShoots),
+                new AlignRobotVisionCommand(driveTrain, vision)
         );
     }
 }

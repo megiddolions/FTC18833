@@ -196,12 +196,15 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("Vision error", vision::getError);
 //        telemetry.addData("Vision target", vision::getTarget);
         telemetry.addData("align active", alignRobotCommand::isScheduled);
+        telemetry.addData("color(red)", storage.getColorSensor()::red);
+        telemetry.addData("color(green)", storage.getColorSensor()::green);
+        telemetry.addData("color(blue)", storage.getColorSensor()::blue);
 
 //        telemetry.addData("left(h)", () -> vision.align_pipeLine.left_rect == null ? 0 : vision.align_pipeLine.left_rect.y + vision.align_pipeLine.left_rect.height);
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);
 
 //        telemetry.addData("Storage", storage::getEncoder);
-//        telemetry.addData("has ring", storage::seeing_ring);
+        telemetry.addData("has ring", storage::seeing_ring);
 
 //        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
 //        telemetry.addData("RR", driveTrain::getRearRightEncoder);
