@@ -9,6 +9,11 @@ public class NonePipeLine extends AlignPipeLine {
     }
 
     @Override
+    public double getDistance() {
+        return 0;
+    }
+
+    @Override
     public Mat processFrame(Mat input) {
         return input;
     }

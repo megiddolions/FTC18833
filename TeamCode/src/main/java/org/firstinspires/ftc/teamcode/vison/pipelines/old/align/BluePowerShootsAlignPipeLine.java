@@ -1,11 +1,5 @@
-package org.firstinspires.ftc.teamcode.vison.pipelines.align;
+package org.firstinspires.ftc.teamcode.vison.pipelines.old.align;
 
-import android.util.Pair;
-import android.util.Range;
-
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.vison.VisionTarget;
-import org.jetbrains.annotations.PropertyKey;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -13,18 +7,14 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.*;
 import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.*;
-
-public class BluePowerShootsAlignPipeLine extends AlignPipeLine {
+@Deprecated
+public class BluePowerShootsAlignPipeLine extends AlignPipeLine_OLD {
     public final static double[] blue_hsvThresholdHue = {75, 140};
     public final static double[] blue_hsvThresholdSaturation = {127, 255};
     public final static double[] blue_hsvThresholdValue = {100, 255};

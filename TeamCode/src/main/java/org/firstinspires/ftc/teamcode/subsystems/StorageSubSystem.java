@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Constants.IndexConstants;
+import org.jetbrains.annotations.NotNull;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -77,7 +78,7 @@ public class StorageSubSystem extends SubsystemBase {
             return this;
         }
 
-        public boolean in_range(ColorSensor sensor) {
+        public boolean in_range(@NotNull ColorSensor sensor) {
             return red.is_valid(sensor.red()) && green.is_valid(sensor.green())
                     && blue.is_valid(sensor.blue());
         }
@@ -87,9 +88,14 @@ public class StorageSubSystem extends SubsystemBase {
         }
     }
 
+    public ColorSensor getColorSensor() {
+        return colorSensor;
+    }
+
     public boolean seeing_ring() {
         //the red blue and green values we want
-        return ringColor.in_range(colorSensor);
+//        return ringColor.in_range(colorSensor);
+        return !(colorSensor.red() <= 100 && colorSensor.green() <= 100 && colorSensor.blue() <= 100);
 //        return distanceSensor.getDistance(DistanceUnit.MM) < 40;
     }
 

@@ -48,7 +48,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         rearRight.setTargetPosition(0);
         frontLeft.setTargetPosition(0);
         frontRight.setTargetPosition(0);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 

@@ -24,7 +24,7 @@ public class DriveToPositionCommand extends CommandBase {
 
     @Override
     public void execute() {
-        Pose2d difference = driveTrain.getPosition().relativeTo(target);
+        Pose2d difference = target.relativeTo(driveTrain.getPosition());
 
         driveTrain.driveDirection(difference.getX(), difference.getY(), difference.getRotation().getRadians(), speed);
 
