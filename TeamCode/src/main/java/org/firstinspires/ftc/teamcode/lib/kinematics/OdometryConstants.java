@@ -24,4 +24,8 @@ public class OdometryConstants {
     public double getVerticalWheelsDistance() {
         return leftWheel.getDistance(rightWheel);
     }
+
+    public double getHorizontalWheelOffset() {
+        return (leftWheel.plus(rightWheel).div(2)).getDistance(horizontalWheel);
+    }
 }
