@@ -18,7 +18,7 @@ public class OdometryConstants {
         this.wheel_diameter = wheel_diameter;
         this.ticks_per_revolution = ticks_per_revolution;
 
-        meters_per_tick = wheel_diameter / ticks_per_revolution * Math.PI;
+        meters_per_tick = wheel_diameter * Math.PI / ticks_per_revolution;
     }
 
     public double getVerticalWheelsDistance() {

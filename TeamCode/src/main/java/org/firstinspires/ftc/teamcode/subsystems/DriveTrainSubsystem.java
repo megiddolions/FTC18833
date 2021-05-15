@@ -48,7 +48,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         rearRight.setTargetPosition(0);
         frontLeft.setTargetPosition(0);
         frontRight.setTargetPosition(0);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
@@ -199,7 +199,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
     @Override
     public void driveDirection(double x, double y, double a, double power) {
-        double[] values = new double[]{-x + y + a, +x + y - a, +x + y + a, -x + y - a};
+        double[] values = new double[]{x + y + a, -x + y - a, -x + y + a, +x + y - a};
         // Find max power
         double max = Math.max(Math.max(Math.abs(values[0]),Math.abs(values[1])),Math.max(Math.abs(values[2]),Math.abs(values[3])));
         // Keep all motor values in range
@@ -288,6 +288,12 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         return current_position;
     }
 
+    public Pose2d getRobotCenterPosition() {
+        return current_position.plus(new Transform2d(
+                new Translation2d(0, 0.175).rotateBy(current_position.getRotation().unaryMinus()),
+                new Rotation2d()));
+    }
+
     public void setPosition(Pose2d position) {
         current_position = position;
     }
@@ -306,7 +312,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         int delta_horizontal = horizontal - last_horizontal;
 
         double delta_angle = (delta_right - delta_left)
-                / DriveTrainConstants.robot_diameter
+                / DriveTrainConstants.kOdometryConstants.getVerticalWheelsDistance()
                 * DriveTrainConstants.kOdometryConstants.meters_per_tick;
 
         // The arc length of movement forward/backward
@@ -314,7 +320,8 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
         // The arc length of movement left/right
         double left_movement = (delta_horizontal) * DriveTrainConstants.kOdometryConstants.meters_per_tick
-                + delta_angle * DriveTrainConstants.kOdometryConstants.horizontalWheel.getDistance(new Translation2d(0, 0));
+                + delta_angle * DriveTrainConstants.kOdometryConstants.horizontalWheel
+                .getDistance(new Translation2d(0, -0.175));
 
         // Calculate the new angle of the robot using the difference between the left and right encoder
         current_position = current_position.plus(
@@ -331,11 +338,5 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         last_left = left;
         last_right = right;
         last_horizontal = horizontal;
-    }
-
-    public void moveTo(@NotNull Pose2d target, double speed) {
-        double distance = current_position.getTranslation().getDistance(target.getTranslation());
-
-
     }
 }

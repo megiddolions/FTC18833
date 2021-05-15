@@ -42,9 +42,9 @@ public final class Constants {
         public final static DoubleFunction<Double> mm_to_ticks = (double mm) -> mm / WheelRadios / 2 / Math.PI * ticks_per_revolution;
 
         public static final OdometryConstants kOdometryConstants = new OdometryConstants(
-            new Translation2d(-96.5, -107.5),
-            new Translation2d(96.5, -107.5),
-            new Translation2d(0, 7.5),
+            new Translation2d(-0.0965, -0.175),
+            new Translation2d(0.0965, -0.175),
+            new Translation2d(0, 0.075),
                 0.06,
                 MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
     }

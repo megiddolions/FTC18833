@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionComman
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToDirectionCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToPositionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -131,7 +133,7 @@ public class Drive extends CommandBasedTeleOp {
         lowerShooterCommand = new SetShooterLiftCommand(shooter, -0.025);
 
         // DriveTrain
-        driveTrain.setDefaultCommand(driveCommand);
+        driveTrain.setDefaultCommand(tankDriveCommand);
         gp1.left_stick_button().whenHeld(
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.right_stick_y * drive_speed_modifier));
         gp1.right_stick_button().whenHeld(
@@ -139,6 +141,8 @@ public class Drive extends CommandBasedTeleOp {
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> drive_speed_modifier));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -drive_speed_modifier));
         gp1.x().whenHeld(alignRobotCommand);
+
+        gp1.y().whenHeld(new DriveToPositionCommand(driveTrain, new Pose2d()));
 
         new Button(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> drive_speed_modifier = 0.5))
@@ -183,6 +187,7 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
         telemetry.addData("Odometry", driveTrain::getPosition);
+        telemetry.addData("Robot", driveTrain::getRobotCenterPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
@@ -203,9 +208,9 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
 //        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
 
-//        telemetry.addData("Left", driveTrain::getLeftOdometryWheel);
-//        telemetry.addData("Right", driveTrain::getRightOdometryWheel);
-//        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryWheel);
+        telemetry.addData("Left", driveTrain::getLeftOdometryEncoder);
+        telemetry.addData("Right", driveTrain::getRightOdometryEncoder);
+        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryEncoder);
     }
 
     private Command getLogCommand() {
