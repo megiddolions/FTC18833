@@ -28,7 +28,7 @@ public final class Constants {
         public final static double ticks_per_revolution =
                 15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
 
-        public final static double robot_diameter = 10;
+        public final static double robot_diameter = 0.55;
 
         public final static MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
                 new Translation2d(0.28, 0.34),
