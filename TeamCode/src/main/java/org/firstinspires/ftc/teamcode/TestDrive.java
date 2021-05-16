@@ -130,10 +130,10 @@ public class TestDrive extends OpMode {
             // Calculate phi, or the delta of our angle
             double ph = (rd * METER_PER_COUNT - ld * METER_PER_COUNT) / ROBOT_DIAMETER;
 
-            // The arclength of movement forward/backward
+            // The arc length of movement forward/backward
             double dc = (rd * METER_PER_COUNT + ld * METER_PER_COUNT) / 2;
 
-            // The arclength of movement left/right
+            // The arc length of movement left/right
             double sc = (cd * METER_PER_COUNT) + (ph * CENTER_WHEEL_OFFSET);
 
             // Calculate the new angle of the robot using the difference between the left and right encoder
