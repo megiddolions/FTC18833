@@ -186,7 +186,7 @@ public class Drive extends CommandBasedTeleOp {
 
         telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
-//        telemetry.addData("Odometry", driveTrain::getPosition);
+        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
