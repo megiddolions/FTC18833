@@ -310,7 +310,8 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
                 * DriveTrainConstants.kOdometryConstants.meters_per_tick;
 
         // The arc length of movement forward/backward
-        double forward_movement = (delta_left  + delta_right) / 2d * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+        double forward_movement = (delta_left  + delta_right) / 2d
+                * DriveTrainConstants.kOdometryConstants.meters_per_tick;
 
         // The arc length of movement left/right
         double left_movement = (delta_horizontal) * DriveTrainConstants.kOdometryConstants.meters_per_tick

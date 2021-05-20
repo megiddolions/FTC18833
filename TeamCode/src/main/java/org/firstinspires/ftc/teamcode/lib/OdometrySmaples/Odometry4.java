@@ -7,9 +7,9 @@ import edu.wpi.first.wpilibj.geometry.Twist2d;
 import static org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants.kOdometryConstants;
 
 public class Odometry4 implements OdometryInterface {
-    private double prevLeftEncoder, prevRightEncoder, prevHorizontalEncoder;
-    private Rotation2d previousAngle;
-    Pose2d robotPose;
+    private double prevLeftEncoder = 0, prevRightEncoder = 0, prevHorizontalEncoder = 0;
+    private Rotation2d previousAngle = new Rotation2d();
+    Pose2d robotPose = new Pose2d();
 
     @Override
     public double getX() {
@@ -28,9 +28,9 @@ public class Odometry4 implements OdometryInterface {
 
     @Override
     public void update(double left, double right, double center) {
-        double deltaLeftEncoder = left - prevLeftEncoder;
-        double deltaRightEncoder = right - prevRightEncoder;
-        double deltaHorizontalEncoder = center - prevHorizontalEncoder;
+        double deltaLeftEncoder = (left - prevLeftEncoder) * kOdometryConstants.meters_per_tick;
+        double deltaRightEncoder = (right - prevRightEncoder) * kOdometryConstants.meters_per_tick;
+        double deltaHorizontalEncoder = (center - prevHorizontalEncoder) * kOdometryConstants.meters_per_tick;
 
         Rotation2d angle = previousAngle.plus(
                 new Rotation2d(

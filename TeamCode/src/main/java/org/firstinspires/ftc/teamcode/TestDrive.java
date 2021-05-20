@@ -18,6 +18,9 @@ import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry1;
+import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry2;
+import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry3;
+import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry4;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.OdometryInterface;
 import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
@@ -41,22 +44,12 @@ public class TestDrive extends OpMode {
 
     OdometryInterface odometry;
 
-    // Drive train moves according to these. Update them, it moves
-
-    // Right - 2
-    // Left - 1
-    // Horizontal - 3
-
     @Override
     public void init() {
         rearLeft = hardwareMap.dcMotor.get("RearLeft");
         rearRight = hardwareMap.dcMotor.get( "RearRight");
         frontLeft = hardwareMap.dcMotor.get("FrontLeft");
         frontRight = hardwareMap.dcMotor.get("FrontRight");
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -66,7 +59,7 @@ public class TestDrive extends OpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        odometry = new Odometry1();
+        odometry = new Odometry4();
     }
 
     @Override
@@ -76,7 +69,9 @@ public class TestDrive extends OpMode {
         frontRight.setPower(-gamepad1.right_stick_y);
         rearRight.setPower(-gamepad1.right_stick_y);
 
-        odometry.update(getLeftTicks(), getRightTicks(), getCenterTicks());
+        odometry.update(getLeftTicks(),
+                getRightTicks(),
+                -getCenterTicks());
 
         telemetry.addData("x", odometry.getX());
         telemetry.addData("y", odometry.getY());

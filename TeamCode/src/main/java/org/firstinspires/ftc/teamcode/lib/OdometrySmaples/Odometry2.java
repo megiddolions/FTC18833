@@ -59,7 +59,7 @@ public class Odometry2 implements OdometryInterface {
         }
 
         x += deltax;
-        x += deltay;
+        y += deltay;
     }
 
     public static double normalizeRadians(double angle){
