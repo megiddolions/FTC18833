@@ -1,37 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.commandftc.opModes.CommandBasedTeleOp;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
-import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
-import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
-import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
-import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
-
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import static org.commandftc.RobotUniversal.hardwareMap;
-
-@Disabled
+//@Disabled
 @TeleOp(name="Odometry LCS")
 public class TestDrive extends OpMode {
     private DcMotor frontLeft;
@@ -40,7 +15,7 @@ public class TestDrive extends OpMode {
     private DcMotor rearRight;
 
     // Drive train moves according to these. Update them, it moves
-    private LocalCoordinateSystem lcs = new LocalCoordinateSystem();
+    private final LocalCoordinateSystem lcs = new LocalCoordinateSystem();
 
     // Right - 2
     // Left - 1
@@ -52,10 +27,6 @@ public class TestDrive extends OpMode {
         rearRight = hardwareMap.dcMotor.get( "RearRight");
         frontLeft = hardwareMap.dcMotor.get("FrontLeft");
         frontRight = hardwareMap.dcMotor.get("FrontRight");
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -109,9 +80,9 @@ public class TestDrive extends OpMode {
         public double y = 0;    // The approximated y position of the robot relative to where it started
         public double a = 0;    // The approximated heading of the robot relative to its initial heading
 
-        public double prev_le;
-        public double prev_re;
-        public double prev_ce;
+        public double prev_le = 0;
+        public double prev_re = 0;
+        public double prev_ce = 0;
 
 
         private final double ENCODER_CPR          = Constants.DriveTrainConstants.kOdometryConstants.ticks_per_revolution;             // Counts per full rotation of an encoder

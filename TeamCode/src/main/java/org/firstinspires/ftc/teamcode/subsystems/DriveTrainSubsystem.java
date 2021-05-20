@@ -314,7 +314,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
         // The arc length of movement left/right
         double left_movement = (delta_horizontal) * DriveTrainConstants.kOdometryConstants.meters_per_tick
-                + delta_angle * DriveTrainConstants.kOdometryConstants.horizontalWheel.getDistance(new Translation2d(0, 0));
+                + delta_angle * DriveTrainConstants.kOdometryConstants.getHorizontalWheelOffset();
 
         // Calculate the new angle of the robot using the difference between the left and right encoder
         current_position = current_position.plus(
@@ -331,11 +331,5 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         last_left = left;
         last_right = right;
         last_horizontal = horizontal;
-    }
-
-    public void moveTo(@NotNull Pose2d target, double speed) {
-        double distance = current_position.getTranslation().getDistance(target.getTranslation());
-
-
     }
 }
