@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -30,7 +31,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-@TeleOp(name="Odometry")
+@Disabled
+@TeleOp(name="Odometry LCS")
 public class TestDrive extends OpMode {
     private DcMotor frontLeft;
     private DcMotor frontRight;

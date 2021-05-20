@@ -306,7 +306,7 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         int delta_horizontal = horizontal - last_horizontal;
 
         double delta_angle = (delta_right - delta_left)
-                / DriveTrainConstants.robot_diameter
+                / DriveTrainConstants.kOdometryConstants.getVerticalWheelsDistance()
                 * DriveTrainConstants.kOdometryConstants.meters_per_tick;
 
         // The arc length of movement forward/backward
