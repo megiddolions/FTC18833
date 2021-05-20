@@ -28,8 +28,6 @@ public final class Constants {
         public final static double ticks_per_revolution =
                 15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
 
-        public final static double robot_diameter = 0.55;
-
         public final static MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
                 new Translation2d(0.28, 0.34),
                 new Translation2d(0.28, -0.34),
@@ -42,9 +40,12 @@ public final class Constants {
         public final static DoubleFunction<Double> mm_to_ticks = (double mm) -> mm / WheelRadios / 2 / Math.PI * ticks_per_revolution;
 
         public static final OdometryConstants kOdometryConstants = new OdometryConstants(
-            new Translation2d(-0.0965, -0.175),
-            new Translation2d(0.0965, -0.175),
-            new Translation2d(0, 0.075),
+//            new Translation2d(-0.0965, -0.11),
+//            new Translation2d(0.0965, -0.11),
+//            new Translation2d(0, 0.075),
+            new Translation2d(0.095, 0),
+            new Translation2d(-0.095, 0),
+            new Translation2d(0, 0.127),
                 0.06,
                 MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
     }
