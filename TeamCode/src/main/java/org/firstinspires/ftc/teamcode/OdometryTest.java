@@ -1,22 +1,29 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.commandftc.opModes.CommandBasedTeleOp;
+import org.firstinspires.ftc.teamcode.lib.kinematics.HolonomicOdometry;
+import org.firstinspires.ftc.teamcode.lib.kinematics.Odometry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 
-@Disabled
 @TeleOp(name="Odometry Test")
 public class OdometryTest extends CommandBasedTeleOp {
+    Odometry odometry;
     DriveTrainSubsystem driveTrain;
 
     @Override
     public void assign() {
         driveTrain = new DriveTrainSubsystem();
 
-        telemetry.addData("position", driveTrain::getPosition);
-        telemetry.addData("left", driveTrain::getLeftOdometryEncoder);
-        telemetry.addData("right", driveTrain::getRightOdometryEncoder);
+        odometry = new HolonomicOdometry(
+                driveTrain::getLeftOdometryDistance,
+                driveTrain::getRightOdometryDistance,
+                driveTrain::getHorizontalOdometryDistance,
+                Constants.DriveTrainConstants.kOdometryConstants.getVerticalWheelsDistance(),
+                Constants.DriveTrainConstants.kOdometryConstants.getHorizontalWheelOffset()
+        );
+
+
     }
 }

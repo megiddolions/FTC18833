@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
 import org.jetbrains.annotations.NotNull;
@@ -83,16 +82,16 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         return frontRight.getCurrentPosition();
     }
 
-    public double getLeftOdometryWheel() {
-        return getLeftOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+    public double getLeftOdometryDistance() {
+        return getLeftOdometryEncoder() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
     }
 
-    public double getRightOdometryWheel() {
-        return getRightOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+    public double getRightOdometryDistance() {
+        return getRightOdometryEncoder() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
     }
 
-    public double getHorizontalOdometryWheel() {
-        return getHorizontalOdometryEncoder() / Constants.MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution * 60 * 2 * Math.PI;
+    public double getHorizontalOdometryDistance() {
+        return getHorizontalOdometryEncoder() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
     }
 
     public boolean isGyroCalibrated() {
