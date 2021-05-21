@@ -43,9 +43,9 @@ public final class Constants {
 //            new Translation2d(-0.0965, -0.11),
 //            new Translation2d(0.0965, -0.11),
 //            new Translation2d(0, 0.075),
-            new Translation2d(0.095, 0),
-            new Translation2d(-0.095, 0),
-            new Translation2d(0, 0.127),
+            new Translation2d(0.095, -0.122),
+            new Translation2d(-0.095, -0.122),
+            new Translation2d(0, 0.005),
                 0.06,
                 MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
     }

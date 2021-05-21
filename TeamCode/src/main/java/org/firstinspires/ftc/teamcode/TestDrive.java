@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry1;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry2;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry3;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry4;
+import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.Odometry5;
 import org.firstinspires.ftc.teamcode.lib.OdometrySmaples.OdometryInterface;
 import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
@@ -59,7 +60,7 @@ public class TestDrive extends OpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        odometry = new Odometry4();
+        odometry = new Odometry5();
     }
 
     @Override
@@ -69,9 +70,9 @@ public class TestDrive extends OpMode {
         frontRight.setPower(-gamepad1.right_stick_y);
         rearRight.setPower(-gamepad1.right_stick_y);
 
-        odometry.update(getLeftTicks(),
-                getRightTicks(),
-                -getCenterTicks());
+        odometry.update(getLeftTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick,
+                getRightTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick,
+                getCenterTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick);
 
         telemetry.addData("x", odometry.getX());
         telemetry.addData("y", odometry.getY());
