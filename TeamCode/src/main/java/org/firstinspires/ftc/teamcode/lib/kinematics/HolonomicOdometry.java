@@ -54,7 +54,7 @@ public class HolonomicOdometry extends Odometry {
 
         Rotation2d angle = previousAngle.plus(
                 new Rotation2d(
-                        (deltaLeftEncoder - deltaRightEncoder) / trackWidth
+                        -(deltaLeftEncoder - deltaRightEncoder) / trackWidth
                 )
         );
 
@@ -64,8 +64,8 @@ public class HolonomicOdometry extends Odometry {
 
         double dw = (angle.minus(previousAngle).getRadians());
 
-        double dx = (deltaLeftEncoder + deltaRightEncoder) / 2;
-        double dy = deltaHorizontalEncoder - (centerWheelOffset * dw);
+        double dx = deltaHorizontalEncoder - (centerWheelOffset * dw);
+        double dy = (deltaLeftEncoder + deltaRightEncoder) / 2;
 
         Twist2d twist2d = new Twist2d(dx, dy, dw);
 

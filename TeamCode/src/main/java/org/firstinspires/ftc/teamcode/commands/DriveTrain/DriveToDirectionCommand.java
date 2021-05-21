@@ -23,7 +23,7 @@ public class DriveToDirectionCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveTrain.driveDirection(horizontalSupplier.getAsDouble(), verticalSupplier.getAsDouble(), rotationSupplier.getAsDouble(), 1);
+        driveTrain.holonomicDrive(horizontalSupplier.getAsDouble(), verticalSupplier.getAsDouble(), rotationSupplier.getAsDouble(), 1);
     }
 
     @Override
