@@ -6,7 +6,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
+import org.firstinspires.ftc.teamcode.lib.kinematics.RoadRunnerOdometry;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -24,6 +27,8 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
     private final BNO055IMU imu;
     private double imu_angle_offset;
+
+    private final RoadRunnerOdometry odometry;
 
     public DriveTrainSubsystem() {
         rearLeft = hardwareMap.dcMotor.get("RearLeft");
@@ -63,11 +68,17 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         imu.initialize(parameters);
 
         resetAngle();
+
+        odometry = new RoadRunnerOdometry(
+                new DoubleSupplier[]{
+                        this::getLeftOdometryDistance,
+                        this::getRightOdometryDistance,
+                        this::getHorizontalOdometryDistance});
     }
 
     @Override
     public void periodic() {
-        update_position();
+        odometry.update();
     }
 
     public int getLeftOdometryEncoder() {
@@ -279,57 +290,8 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
     }
 
-
-    /// Odometry stuff ///
-    private Pose2d current_position = new Pose2d();
-
     public Pose2d getPosition() {
-        return current_position;
-    }
-
-    public void setPosition(Pose2d position) {
-        current_position = position;
-    }
-
-    private int last_left = 0;
-    private int last_right = 0;
-    private int last_horizontal = 0;
-
-    private void update_position() {
-        int left = getLeftOdometryEncoder();
-        int right = getRightOdometryEncoder();
-        int horizontal = getHorizontalOdometryEncoder();
-
-        int delta_left = left - last_left;
-        int delta_right = right - last_right;
-        int delta_horizontal = horizontal - last_horizontal;
-
-        double delta_angle = (delta_right - delta_left)
-                / DriveTrainConstants.kOdometryConstants.getVerticalWheelsDistance()
-                * DriveTrainConstants.kOdometryConstants.meters_per_tick;
-
-        // The arc length of movement forward/backward
-        double forward_movement = (delta_left  + delta_right) / 2d
-                * DriveTrainConstants.kOdometryConstants.meters_per_tick;
-
-        // The arc length of movement left/right
-        double left_movement = (delta_horizontal) * DriveTrainConstants.kOdometryConstants.meters_per_tick
-                + delta_angle * DriveTrainConstants.kOdometryConstants.getHorizontalWheelOffset();
-
-        // Calculate the new angle of the robot using the difference between the left and right encoder
-        current_position = current_position.plus(
-                new Transform2d(
-                        new Translation2d(
-                                left_movement,
-                                forward_movement
-                        ).rotateBy(current_position.getRotation().plus(new Rotation2d(delta_angle))),
-                        // Add change in angle to current angle
-                        new Rotation2d(delta_angle)
-                )
-        );
-
-        last_left = left;
-        last_right = right;
-        last_horizontal = horizontal;
+        com.acmerobotics.roadrunner.geometry.Pose2d pose = odometry.getPoseEstimate();
+        return new Pose2d(new Translation2d(pose.getX(), pose.getY()), new Rotation2d(pose.getHeading()));
     }
 }
