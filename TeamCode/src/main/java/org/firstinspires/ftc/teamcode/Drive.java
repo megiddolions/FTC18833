@@ -16,12 +16,14 @@ import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.SetStorageIndexCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoggerCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoopTimeCommand;
+import org.firstinspires.ftc.teamcode.commands.Wobell.KeepCurrentWobellPositionCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ManualStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellLiftCommand;
+import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.lib.Util;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -97,8 +99,8 @@ public class Drive extends CommandBasedTeleOp {
         vision.setTarget(visionTarget);
         vision.update_align_pipeline();
 
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter.setLift(0.375);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setLift(0.275);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
@@ -174,26 +176,28 @@ public class Drive extends CommandBasedTeleOp {
         gp2.dpad_down().whenPressed(lowerShooterCommand);
 
         // wobell
-        new Button(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> gamepad2.left_trigger));
-        new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger));
+        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+
+        new Button(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> gamepad2.left_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobellSubsystem));
+        new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobellSubsystem));
         gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
 
         gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.375 ? 0.2 : 0.375), shooter));
 
         // Show time to make each loop
-        new LoopTimeCommand().schedule();
-        getLogCommand().schedule();
+//        new LoopTimeCommand().schedule();
+//        getLogCommand().schedule();
 
         telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
-        telemetry.addData("Odometry", driveTrain::getPosition);
+//        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+//        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-        telemetry.addData("Vision error", vision::getError);
-        telemetry.addData("Vision target", vision::getTarget);
+//        telemetry.addData("Vision error", vision::getError);
+//        telemetry.addData("Vision target", vision::getTarget);
 //        telemetry.addData("align active", alignRobotCommand::isScheduled);
 //        telemetry.addData("color(red)", storage.getColorSensor()::red);
 //        telemetry.addData("color(green)", storage.getColorSensor()::green);

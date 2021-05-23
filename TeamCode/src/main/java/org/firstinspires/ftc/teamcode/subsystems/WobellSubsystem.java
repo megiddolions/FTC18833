@@ -13,14 +13,16 @@ import static org.commandftc.RobotUniversal.*;
 public class WobellSubsystem extends SubsystemBase {
     private final CRServo leftLift;
     private final CRServo rightLift;
-    private final Servo middle;
+    private final Servo leftGrab;
+    private final Servo rightGrab;
     private final IntSupplier encoder;
     private int target_position;
 
     public WobellSubsystem() {
         leftLift = hardwareMap.crservo.get("LeftWobellLift");
         rightLift = hardwareMap.crservo.get("RightWobellLift");
-        middle = hardwareMap.servo.get("WobellServo");
+        leftGrab = hardwareMap.servo.get("LeftWobellServo");
+        rightGrab = hardwareMap.servo.get("RightWobellServo");
 
         DcMotor encoder = hardwareMap.dcMotor.get("IntakeMotor");
         encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -57,11 +59,13 @@ public class WobellSubsystem extends SubsystemBase {
     }
 
     public void open() {
-        middle.setPosition(0);
+        leftGrab.setPosition(0);
+        rightGrab.setPosition(0);
     }
 
     public void close() {
-        middle.setPosition(1);
+        leftGrab.setPosition(1);
+        rightGrab.setPosition(1);
     }
 
     public void setLift(double power) {

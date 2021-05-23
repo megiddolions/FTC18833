@@ -4,22 +4,22 @@ import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class OpenWobellCommand extends CommandBase {
+public class KeepCurrentWobellPositionCommand extends CommandBase {
     private final WobellSubsystem wobellSubsystem;
 
-    public OpenWobellCommand(WobellSubsystem wobellSubsystem) {
+    public KeepCurrentWobellPositionCommand(WobellSubsystem wobellSubsystem) {
         this.wobellSubsystem = wobellSubsystem;
 
-//        addRequirements(wobellSubsystem);
+        addRequirements(wobellSubsystem);
     }
 
     @Override
     public void initialize() {
-        wobellSubsystem.open();
+        wobellSubsystem.setTargetPosition(wobellSubsystem.getCurrentPosition());
     }
 
     @Override
-    public void end(boolean interrupted) {
-        wobellSubsystem.close();
+    public boolean isFinished() {
+        return true;
     }
 }
