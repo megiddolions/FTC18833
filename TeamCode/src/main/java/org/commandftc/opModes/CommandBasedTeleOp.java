@@ -39,5 +39,8 @@ public abstract class CommandBasedTeleOp extends OpMode {
     public final void stop() {
         CommandScheduler.getInstance().cancelAll();
         CommandScheduler.getInstance().close();
+        end();
     }
+
+    public void end(){}
 }

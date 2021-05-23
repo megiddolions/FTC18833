@@ -21,7 +21,7 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
     public final static double filterContoursMinArea = 600;
     public final static double filterContoursMinPerimeter = 0;
     public final static double filterContoursMinWidth = 0;
-    public final static double filterContoursMaxWidth = 30;
+    public final static double filterContoursMaxWidth = 35;
     public final static double filterContoursMinHeight = 0;
     public final static double filterContoursMaxHeight = 200;
     public final static double[] filterContoursSolidity = {0, 100};
@@ -52,9 +52,9 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
                 filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices,
                 filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
         // Draw contours
-//        for (MatOfPoint object : filterContoursOutput) {
-//            Imgproc.rectangle(input, Imgproc.boundingRect(object), new Scalar(255, 255, 0), 4);
-//        }
+        for (MatOfPoint object : filterContoursOutput) {
+            Imgproc.rectangle(input, Imgproc.boundingRect(object), new Scalar(0, 150, 0), 4);
+        }
         cal_position(input);
         // Show view area on stream
         Imgproc.rectangle(input, view_rect, new Scalar(0, 255, 0), 2);
@@ -87,7 +87,7 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
         Rect[] sorted_objects = new Rect[map.values().size()];
         map.values().toArray(sorted_objects);
 
-        if (sorted_objects.length == 3) {
+        if (sorted_objects.length >= 3) {
             left = sorted_objects[0];
             right = new Rect(
                     Math.min(sorted_objects[1].x, sorted_objects[2].x),
@@ -97,6 +97,12 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
 
             Imgproc.rectangle(frame, left, new Scalar(255, 255, 0), 4);
             Imgproc.rectangle(frame, right, new Scalar(255, 150, 0), 4);
+        } else if (sorted_objects.length == 2) {
+            left = sorted_objects[0];
+            right = sorted_objects[1];
+        } else {
+            left = null;
+            right = null;
         }
     }
 }

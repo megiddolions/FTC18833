@@ -32,6 +32,8 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.firstinspires.ftc.teamcode.vison.VisionTarget;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -142,7 +144,7 @@ public class Drive extends CommandBasedTeleOp {
                 new DriveForwardCommand(driveTrain, () -> -gamepad1.left_stick_y * drive_speed_modifier));
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> drive_speed_modifier));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -drive_speed_modifier));
-        gp1.x().whenHeld(alignRobotCommand);
+        gp1.x().whileHeld(alignRobotCommand);
 
         gp1.y().whenHeld(new DriveToPositionCommand(driveTrain, new Pose2d()));
 
@@ -188,15 +190,16 @@ public class Drive extends CommandBasedTeleOp {
 //        new LoopTimeCommand().schedule();
 //        getLogCommand().schedule();
 
-        telemetry.addData("Runtime", this::getRuntime);
-//        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+//        telemetry.addData("Runtime", this::getRuntime);
+        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
 //        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
+//        telemetry.addData("pos", driveTrain::getPosition);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-//        telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("Vision error", vision::getError);
 //        telemetry.addData("Vision target", vision::getTarget);
 //        telemetry.addData("align active", alignRobotCommand::isScheduled);
 //        telemetry.addData("color(red)", storage.getColorSensor()::red);
@@ -219,6 +222,8 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryEncoder);
     }
 
+    @NotNull
+    @Contract(" -> new")
     private Command getLogCommand() {
         Map<String, Supplier<Object>> map = new LinkedHashMap<>();
 
@@ -261,4 +266,6 @@ public class Drive extends CommandBasedTeleOp {
 
         return new LoggerCommand(entries_name, suppliers);
     }
+
+
 }
