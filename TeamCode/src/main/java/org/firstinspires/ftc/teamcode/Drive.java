@@ -78,7 +78,7 @@ public class Drive extends CommandBasedTeleOp {
     protected SequentialCommandGroup startShooterSequenceCommand;
     protected Command stopShooterSequenceCommand;
 
-    protected final VisionTarget visionTarget = VisionTarget.BlueTower;
+    protected final VisionTarget visionTarget = VisionTarget.RedTower;
 
     protected double drive_speed_modifier;
 

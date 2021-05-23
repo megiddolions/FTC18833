@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.vison.pipelines.align.AlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.RingPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BlueTowerAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.NonePipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.RedTowerAlignPipeLine;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -34,7 +35,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         align_pipeLines = new HashMap<>();
         align_pipeLines.put(VisionTarget.BlueTower, new BlueTowerAlignPipeLine());
-//        align_pipeLines.put(VisionTarget.RedTower, new RedTowerAlignPipeLine());
+        align_pipeLines.put(VisionTarget.RedTower, new RedTowerAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.BlueWobell, new BlueWobellAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.RedWobell, new RedWobellAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.BluePowerShoots, new BluePowerShootsAlignPipeLine());
