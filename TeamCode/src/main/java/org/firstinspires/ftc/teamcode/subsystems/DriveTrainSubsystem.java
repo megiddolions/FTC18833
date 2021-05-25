@@ -1,25 +1,32 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
 import org.firstinspires.ftc.teamcode.lib.kinematics.RoadRunnerOdometry;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
+public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.MecanumDrive implements MecanumDrive, Subsystem {
     private final DcMotor rearLeft;
     private final DcMotor rearRight;
     private final DcMotor frontLeft;
@@ -27,10 +34,13 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
 
     private final BNO055IMU imu;
     private double imu_angle_offset;
-
-    private final RoadRunnerOdometry odometry;
-
     public DriveTrainSubsystem() {
+        super(2770, 0, 0.187, 0.187, 1);
+        setLocalizer(new RoadRunnerOdometry(
+                new DoubleSupplier[]{
+                        this::getLeftOdometryDistance,
+                        this::getRightOdometryDistance,
+                        this::getHorizontalOdometryDistance}));
         rearLeft = hardwareMap.dcMotor.get("RearLeft");
         rearRight = hardwareMap.dcMotor.get( "RearRight");
         frontLeft = hardwareMap.dcMotor.get("FrontLeft");
@@ -68,17 +78,11 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
         imu.initialize(parameters);
 
         resetAngle();
-
-        odometry = new RoadRunnerOdometry(
-                new DoubleSupplier[]{
-                        this::getLeftOdometryDistance,
-                        this::getRightOdometryDistance,
-                        this::getHorizontalOdometryDistance});
     }
 
     @Override
     public void periodic() {
-        odometry.update();
+        updatePoseEstimate();
     }
 
     public int getLeftOdometryEncoder() {
@@ -291,7 +295,131 @@ public class DriveTrainSubsystem extends SubsystemBase implements MecanumDrive {
     }
 
     public Pose2d getPosition() {
-        com.acmerobotics.roadrunner.geometry.Pose2d pose = odometry.getPoseEstimate();
+        com.acmerobotics.roadrunner.geometry.Pose2d pose = getPoseEstimate();
         return new Pose2d(new Translation2d(pose.getX(), pose.getY()), new Rotation2d(pose.getHeading()));
+    }
+
+    @NotNull
+    @Override
+    public List<Double> getWheelPositions() {
+        return Arrays.asList(getLeftOdometryDistance(), getRightOdometryDistance(), getHorizontalOdometryDistance());
+    }
+
+    @Override
+    public void setMotorPowers(double v, double v1, double v2, double v3) {
+        setPower(v, v1, v2, v3);
+    }
+
+    @Override
+    protected double getRawExternalHeading() {
+        return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+    }
+
+    public Translation2d[] getRobotCorners() {
+        Translation2d[] corners = new Translation2d[4];
+
+        corners[0] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.2125, .205).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[1] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(-.2125, .205).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[2] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(-.2125, -.205).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[3] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.2125, -.205).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        return corners;
+    }
+
+    public Translation2d[] getIntakeCorners() {
+        Translation2d[] corners = new Translation2d[4];
+
+        corners[0] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.26, .1835).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[1] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.31, .1835).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[2] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.31, -.1835).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        corners[3] = getPosition().plus(
+                new Transform2d(
+                        new Translation2d(.26, -.1835).rotateBy(getPosition().getRotation()),
+                        new Rotation2d())).getTranslation();
+
+        return corners;
+    }
+
+    private void draw_robot_base(Canvas canvas) {
+        Translation2d[] corners = getRobotCorners();
+
+        double[] raw_x = new double[]{corners[0].getX(), corners[1].getX(), corners[2].getX(), corners[3].getX()};
+        double[] raw_y = new double[]{corners[0].getY(), corners[1].getY(), corners[2].getY(), corners[3].getY()};
+
+        for (int i = 0; i < 4; i++) {
+            raw_x[i] -= 1.8288;
+            raw_y[i] -= 1.8288;
+
+            raw_x[i] *= 3.6576 * 12;
+            raw_y[i] *= 3.6576 * 12;
+        }
+
+
+        canvas.strokePolygon(raw_x, raw_y);
+
+        canvas.setFill("#ff0000");
+
+        canvas.fillCircle((getPosition().getX()  - 1.8288) * 3.6576 * 12,
+                (getPosition().getY() - 1.8288) * 3.6576 * 12,1);
+    }
+
+    private void draw_robot_intake(Canvas canvas) {
+        Translation2d[] corners = getIntakeCorners();
+
+        double[] raw_x = new double[]{corners[0].getX(), corners[1].getX(), corners[2].getX(), corners[3].getX()};
+        double[] raw_y = new double[]{corners[0].getY(), corners[1].getY(), corners[2].getY(), corners[3].getY()};
+
+        for (int i = 0; i < 4; i++) {
+            raw_x[i] -= 1.8288;
+            raw_y[i] -= 1.8288;
+
+            raw_x[i] *= 3.6576 * 12;
+            raw_y[i] *= 3.6576 * 12;
+        }
+
+
+        canvas.strokePolygon(raw_x, raw_y);
+    }
+
+    private void draw_robot(Canvas canvas) {
+        canvas.setStroke("#f10fc7");
+        draw_robot_base(canvas);
+        draw_robot_intake(canvas);
+    }
+
+    public TelemetryPacket draw_robot(@NotNull TelemetryPacket packet) {
+
+        Canvas canvas = packet.fieldOverlay();
+
+        draw_robot(canvas);
+
+        return packet;
     }
 }

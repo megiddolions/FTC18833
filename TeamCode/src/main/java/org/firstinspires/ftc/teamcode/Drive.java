@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.DashPathEffect;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -43,6 +48,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -192,16 +198,30 @@ public class Drive extends CommandBasedTeleOp {
 //        new LoopTimeCommand().schedule();
 //        getLogCommand().schedule();
 
+        new CommandBase() {
+            @Override
+            public void execute() {
+                TelemetryPacket telemetry = new TelemetryPacket();
+                telemetry.put("left", shooter.getLeftVelocity());
+                telemetry.put("right", shooter.getRightVelocity());
+                telemetry.put("x", driveTrain.getPosition().getX());
+                telemetry.put("y", driveTrain.getPosition().getY());
+                telemetry.put("heading", driveTrain.getPosition().getRotation().getDegrees());
+                FtcDashboard.getInstance().sendTelemetryPacket(driveTrain.draw_robot(telemetry));
+                FtcDashboard.getInstance().getTelemetry().update();
+
+            }
+        }.schedule();
 //        telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
-        telemetry.addData("Odometry", driveTrain::getPosition);
-//        telemetry.addData("Lift", shooter::getLift);
+//        telemetry.addData("Odometry", driveTrain::getPosition);
+        telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("pos", driveTrain::getPosition);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-//        telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("Vision error", vision::getError);
 //        telemetry.addData("Vision target", vision::getTarget);
 //        telemetry.addData("align active", alignRobotCommand::isScheduled);
 //        telemetry.addData("color(red)", storage.getColorSensor()::red);
@@ -222,6 +242,8 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Left", driveTrain::getLeftOdometryEncoder);
 //        telemetry.addData("Right", driveTrain::getRightOdometryEncoder);
 //        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryEncoder);
+
+        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288 , Math.toRadians(0)));
     }
 
     @NotNull
