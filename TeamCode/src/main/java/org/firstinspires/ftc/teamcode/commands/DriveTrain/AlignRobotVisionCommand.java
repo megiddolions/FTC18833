@@ -13,7 +13,7 @@ public class AlignRobotVisionCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
 //    private final PIDController pid = new PIDController(0.001,0,0.00001);
-    private final PIDController pid = new PIDController(0.001, 0.000002,0);
+    private final PIDController pid = new PIDController(0.001, 0.000001,0);
     private final double offset;
 
     public AlignRobotVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {

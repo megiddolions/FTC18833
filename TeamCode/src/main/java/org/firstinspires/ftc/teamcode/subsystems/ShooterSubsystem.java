@@ -53,7 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
 //            Socket server = new Socket(Constants.NetworkConstants.computer_ip, Constants.NetworkConstants.server_port);
 //            outputStream = new DataOutputStream(server.getOutputStream());
 //
-//            outputStream.write(ByteBuffer.allocate(4).putInt(2).array());
+//            outputStream.write(ByteBuffer.allocate(4).putInt(1).array());
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
@@ -65,7 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
 //        if (opMode.getRuntime() - last >= 0.2) {
 //            last = opMode.getRuntime();
 //            try {
-//                outputStream.write(ByteBuffer.allocate(8 + 8 * 2)
+//                outputStream.write(ByteBuffer.allocate(Double.BYTES * 2)
 //                        .putDouble(opMode.getRuntime())
 //                        .putDouble(getLeftVelocity())
 //                        .putDouble(getRightVelocity())

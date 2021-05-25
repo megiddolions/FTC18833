@@ -78,7 +78,7 @@ public class Drive extends CommandBasedTeleOp {
     protected SequentialCommandGroup startShooterSequenceCommand;
     protected Command stopShooterSequenceCommand;
 
-    protected final VisionTarget visionTarget = VisionTarget.RedTower;
+    protected final VisionTarget visionTarget = VisionTarget.BlueTower;
 
     protected double drive_speed_modifier;
 
@@ -101,8 +101,8 @@ public class Drive extends CommandBasedTeleOp {
         vision.setTarget(visionTarget);
         vision.update_align_pipeline();
 
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooter.setLift(0.275);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter.setLift(0.3);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
@@ -121,11 +121,13 @@ public class Drive extends CommandBasedTeleOp {
 
         startShooterCommand = new SetShooterSpeedCommand(shooter, 0.55);
         stopShooterCommand = new SetShooterSpeedCommand(shooter, 0);
-        waitForShooterCommand = new WaitForShooterCommand(shooter, 2500);
+        waitForShooterCommand = new WaitForShooterCommand(shooter, 2700);
 
         startShooterSequenceCommand = new SequentialCommandGroup(
                 startShooterCommand,
+                new InstantCommand(() -> manualIntakeCommand.setConstIntake(false)),
                 waitForShooterCommand,
+                new WaitCommand(0.7),
                 startStorageCommand,
                 new WaitCommand(5)
 //                new InstantCommand(() -> shooter.setPower(0))
@@ -192,14 +194,14 @@ public class Drive extends CommandBasedTeleOp {
 
 //        telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
-//        telemetry.addData("Odometry", driveTrain::getPosition);
-        telemetry.addData("Lift", shooter::getLift);
+        telemetry.addData("Odometry", driveTrain::getPosition);
+//        telemetry.addData("Lift", shooter::getLift);
 //        telemetry.addData("pos", driveTrain::getPosition);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
-        telemetry.addData("Vision error", vision::getError);
+//        telemetry.addData("Vision error", vision::getError);
 //        telemetry.addData("Vision target", vision::getTarget);
 //        telemetry.addData("align active", alignRobotCommand::isScheduled);
 //        telemetry.addData("color(red)", storage.getColorSensor()::red);

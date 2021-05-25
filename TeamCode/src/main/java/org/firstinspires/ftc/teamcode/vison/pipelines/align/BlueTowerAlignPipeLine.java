@@ -23,7 +23,7 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
     public final static double filterContoursMinWidth = 0;
     public final static double filterContoursMaxWidth = 35;
     public final static double filterContoursMinHeight = 0;
-    public final static double filterContoursMaxHeight = 200;
+    public final static double filterContoursMaxHeight = 250;
     public final static double[] filterContoursSolidity = {0, 100};
     public final static double filterContoursMaxVertices = 1000000;
     public final static double filterContoursMinVertices = 0;
