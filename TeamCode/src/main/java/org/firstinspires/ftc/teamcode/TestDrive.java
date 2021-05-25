@@ -36,14 +36,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
-@TeleOp(name="Odometry")
+@TeleOp(name="DriveTest")
 public class TestDrive extends OpMode {
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
-
-    OdometryInterface odometry;
 
     @Override
     public void init() {
@@ -59,8 +57,6 @@ public class TestDrive extends OpMode {
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        odometry = new Odometry5();
     }
 
     @Override
@@ -70,16 +66,6 @@ public class TestDrive extends OpMode {
         frontRight.setPower(-gamepad1.right_stick_y);
         rearRight.setPower(-gamepad1.right_stick_y);
 
-        odometry.update(getLeftTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick,
-                getRightTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick,
-                getCenterTicks() * Constants.DriveTrainConstants.kOdometryConstants.meters_per_tick);
-
-        telemetry.addData("x", odometry.getX());
-        telemetry.addData("y", odometry.getY());
-        telemetry.addData("a", odometry.getA());
-        telemetry.addData("Left", getLeftTicks());
-        telemetry.addData("Right", getRightTicks());
-        telemetry.addData("Center", getCenterTicks());
         telemetry.update();
     }
 
