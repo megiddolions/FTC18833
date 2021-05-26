@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ManualStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
+import org.firstinspires.ftc.teamcode.lib.DashboardUtil;
 import org.firstinspires.ftc.teamcode.lib.Util;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -207,16 +208,16 @@ public class Drive extends CommandBasedTeleOp {
                 telemetry.put("x", driveTrain.getPosition().getX());
                 telemetry.put("y", driveTrain.getPosition().getY());
                 telemetry.put("heading", driveTrain.getPosition().getRotation().getDegrees());
-                FtcDashboard.getInstance().sendTelemetryPacket(driveTrain.draw_robot(telemetry));
+                DashboardUtil.drawRobot(telemetry.fieldOverlay(), driveTrain.getPoseEstimate());
+                FtcDashboard.getInstance().sendTelemetryPacket(telemetry);
                 FtcDashboard.getInstance().getTelemetry().update();
-
             }
         }.schedule();
 //        telemetry.addData("Runtime", this::getRuntime);
         telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
 //        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
-//        telemetry.addData("pos", driveTrain::getPosition);
+        telemetry.addData("pos", driveTrain::getPosition);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
@@ -243,7 +244,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Right", driveTrain::getRightOdometryEncoder);
 //        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryEncoder);
 
-        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288 , Math.toRadians(0)));
+        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288));
     }
 
     @NotNull

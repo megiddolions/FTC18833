@@ -13,9 +13,9 @@ public class RoadRunnerOdometry extends ThreeTrackingWheelLocalizer {
     private final DoubleSupplier[] encoders;
     public RoadRunnerOdometry(DoubleSupplier[] encoders) {
         super(Arrays.asList(
-                new Pose2d(-0.105, 0.0935, 0.0), // left parallel
-                new Pose2d(-0.105, -0.0935, 0.0), // right parallel
-                new Pose2d(0.005, 0, Math.toRadians(-90)) // perpendicular
+                new Pose2d(-0.105, 0.0954, 0), // left parallel
+                new Pose2d(-0.105, -0.0954, 0), // right parallel
+                new Pose2d(0.025, 0, Math.toRadians(-90)) // perpendicular
         ));
         this.encoders = encoders;
     }
