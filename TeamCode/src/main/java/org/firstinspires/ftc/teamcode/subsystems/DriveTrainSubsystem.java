@@ -1,9 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
+import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,6 +22,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
 import org.firstinspires.ftc.teamcode.lib.kinematics.RoadRunnerOdometry;
+import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequenceRunner;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -20,31 +33,51 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
 
 public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.MecanumDrive implements MecanumDrive, Subsystem {
-    private final DcMotor rearLeft;
-    private final DcMotor rearRight;
-    private final DcMotor frontLeft;
-    private final DcMotor frontRight;
+    private final DcMotorEx rearLeft;
+    private final DcMotorEx rearRight;
+    private final DcMotorEx frontLeft;
+    private final DcMotorEx frontRight;
 
     private final BNO055IMU imu;
     private double imu_angle_offset;
+
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+
+    public static double LATERAL_MULTIPLIER = 1;
+
+    public static double VX_WEIGHT = 1;
+    public static double VY_WEIGHT = 1;
+    public static double OMEGA_WEIGHT = 1;
+
+    private final TrajectoryFollower follower;
+    private final TrajectorySequenceRunner trajectorySequenceRunner;
+
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.4, Math.toRadians(165), 0.1908);
+    private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
+
     public DriveTrainSubsystem() {
-        super(2770, 0, 0.187, 0.187, 1);
+        super(DriveTrainConstants.kV, DriveTrainConstants.kA, DriveTrainConstants.kStatic, 0.187, 1);
         setLocalizer(new RoadRunnerOdometry(
                 new DoubleSupplier[]{
                         this::getLeftOdometryDistance,
                         this::getRightOdometryDistance,
-                        this::getHorizontalOdometryDistance}));
-        rearLeft = hardwareMap.dcMotor.get("RearLeft");
-        rearRight = hardwareMap.dcMotor.get( "RearRight");
-        frontLeft = hardwareMap.dcMotor.get("FrontLeft");
-        frontRight = hardwareMap.dcMotor.get("FrontRight");
+                        this::getHorizontalOdometryDistance},
+                new DoubleSupplier[]{
+                        this::getLeftOdometryVelocity,
+                        this::getRightOdometryVelocity,
+                        this::getHorizontalOdometryVelocity
+                }));
+        rearLeft = (DcMotorEx) hardwareMap.dcMotor.get("RearLeft");
+        rearRight = (DcMotorEx)hardwareMap.dcMotor.get( "RearRight");
+        frontLeft = (DcMotorEx)hardwareMap.dcMotor.get("FrontLeft");
+        frontRight = (DcMotorEx) hardwareMap.dcMotor.get("FrontRight");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -78,11 +111,17 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         imu.initialize(parameters);
 
         resetAngle();
+
+        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
+                new Pose2d(0.5, 0.5, new Rotation2d(Math.toRadians(5.0))).convert(), 0.5);
+
+        trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
 
     @Override
     public void periodic() {
         updatePoseEstimate();
+        getLocalizer().update();
     }
 
     public int getLeftOdometryEncoder() {
@@ -107,6 +146,18 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     public double getHorizontalOdometryDistance() {
         return getHorizontalOdometryEncoder() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+    }
+
+    public double getLeftOdometryVelocity() {
+        return -rearRight.getVelocity() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+    }
+
+    public double getRightOdometryVelocity() {
+        return -frontLeft.getVelocity() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
+    }
+
+    public double getHorizontalOdometryVelocity() {
+        return frontRight.getVelocity() * DriveTrainConstants.kOdometryConstants.meters_per_tick;
     }
 
     public boolean isGyroCalibrated() {
@@ -260,7 +311,8 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     public boolean isBusy() {
-        return frontLeft.isBusy() || frontRight.isBusy() || rearRight.isBusy() || rearLeft.isBusy();
+//        return frontLeft.isBusy() || frontRight.isBusy() || rearRight.isBusy() || rearLeft.isBusy();
+        return trajectorySequenceRunner.isBusy();
     }
 
     public void driveForwardDistance(double mm) {
@@ -313,5 +365,60 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     @Override
     protected double getRawExternalHeading() {
         return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
+        return new TrajectoryBuilder(startPose.convert(), VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
+        return new TrajectoryBuilder(startPose.convert(), reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
+        return new TrajectoryBuilder(startPose.convert(), startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
+        return new TrajectorySequenceBuilder(
+                startPose.convert(),
+                VEL_CONSTRAINT, ACCEL_CONSTRAINT,
+                Math.toRadians(165), Math.toRadians(165)
+        );
+    }
+
+    public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
+        return new MinVelocityConstraint(Arrays.asList(
+                new AngularVelocityConstraint(maxAngularVel),
+                new MecanumVelocityConstraint(maxVel, trackWidth)
+        ));
+    }
+
+    public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
+        return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public void turnAsync(double angle) {
+        trajectorySequenceRunner.followTrajectorySequenceAsync(
+                trajectorySequenceBuilder(getPosition())
+                        .turn(angle)
+                        .build()
+        );
+    }
+
+    public void followTrajectoryAsync(Trajectory trajectory) {
+        trajectorySequenceRunner.followTrajectorySequenceAsync(
+                trajectorySequenceBuilder(new Pose2d(trajectory.start()))
+                        .addTrajectory(trajectory)
+                        .build()
+        );
+    }
+
+    public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
+        trajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
+    }
+
+    public Pose2d getLastError() {
+        return new Pose2d(trajectorySequenceRunner.getLastPoseError());
     }
 }

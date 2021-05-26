@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.teamcode.lib.kinematics.OdometryConstants;
 
 import java.util.function.DoubleFunction;
@@ -23,7 +25,8 @@ public final class Constants {
             public final static double ticks_per_revolution = 8192;
         }
     }
-    
+
+    @Config
     public final static class  DriveTrainConstants {
         public final static double ticks_per_revolution =
                 15 * MotorConstants.REV_HD_HEX.ticks_per_revolution;
@@ -48,6 +51,10 @@ public final class Constants {
             new Translation2d(0, 0.005),
                 0.06,
                 MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
+
+        public final static double kV = 0.7849;
+        public final static double kStatic = 0.13083;
+        public final static double kA = 0.19;
     }
 
     public final static class ShooterConstants {

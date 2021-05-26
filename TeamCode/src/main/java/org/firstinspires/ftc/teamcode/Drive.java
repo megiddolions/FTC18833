@@ -244,7 +244,10 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Right", driveTrain::getRightOdometryEncoder);
 //        telemetry.addData("Horizontal", driveTrain::getHorizontalOdometryEncoder);
 
-        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288));
+        telemetry.addData("dv", () -> (driveTrain.getPoseVelocity() != null ? driveTrain.getPoseVelocity() : "null"));
+//        telemetry.addData("loc", driveTrain.getLocalizer().getClass().getSimpleName());
+
+//        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288));
     }
 
     @NotNull
