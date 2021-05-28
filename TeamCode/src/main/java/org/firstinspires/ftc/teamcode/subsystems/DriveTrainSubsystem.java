@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -17,24 +18,24 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
 import org.firstinspires.ftc.teamcode.lib.kinematics.RoadRunnerOdometry;
 import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.lib.tragectory.TrajectorySequenceRunner;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
+import static org.commandftc.RobotUniversal.telemetry;
 
 public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.MecanumDrive implements MecanumDrive, Subsystem {
     private final DcMotorEx rearLeft;
@@ -114,12 +115,16 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
                 new Pose2d(0.5, 0.5, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+
+        // I couldn't use SubsystemBase so I had to register it here
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     @Override
     public void periodic() {
         updatePoseEstimate();
-        getLocalizer().update();
+        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        if (signal != null) setDriveSignal(signal);
     }
 
     public int getLeftOdometryEncoder() {
@@ -351,13 +356,16 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     @Override
-    public void setMotorPowers(double v, double v1, double v2, double v3) {
-        setPower(v, v1, v2, v3);
+    public void setMotorPowers(double frontLeft, double rearLeft, double rearRight, double frontRight) {
+        this.frontLeft.setPower(frontLeft);
+        this.rearLeft.setPower(rearLeft);
+        this.frontRight.setPower(frontRight);
+        this.rearRight.setPower(rearRight);
     }
 
     @Override
     protected double getRawExternalHeading() {
-        return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+        return imu.getAngularOrientation().firstAngle;
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -380,6 +388,8 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         );
     }
 
+    @NotNull
+    @Contract("_, _, _ -> new")
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
         return new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(maxAngularVel),
@@ -387,6 +397,8 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         ));
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
     }
@@ -399,7 +411,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         );
     }
 
-    public void followTrajectoryAsync(Trajectory trajectory) {
+    public void followTrajectoryAsync(@NotNull Trajectory trajectory) {
         trajectorySequenceRunner.followTrajectorySequenceAsync(
                 trajectorySequenceBuilder(trajectory.start())
                         .addTrajectory(trajectory)

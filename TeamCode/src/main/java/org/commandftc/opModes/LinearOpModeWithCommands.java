@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.ThreadPool;
 
 import org.commandftc.Gp;
 import org.commandftc.RobotUniversal;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
 
 import java.util.concurrent.CancellationException;
