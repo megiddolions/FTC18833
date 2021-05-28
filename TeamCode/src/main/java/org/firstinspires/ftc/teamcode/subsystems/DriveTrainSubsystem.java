@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -31,9 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
@@ -113,7 +111,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         resetAngle();
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, new Rotation2d(Math.toRadians(5.0))).convert(), 0.5);
+                new Pose2d(0.5, 0.5, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
@@ -187,9 +185,9 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         setMode(mode);
     }
 
-    public Rotation2d getHeading() {
-        return new Rotation2d((imu.getAngularOrientation().firstAngle - imu_angle_offset)
-                / 180 * Math.PI); // Convert to radians
+    public double getHeading() {
+        return (imu.getAngularOrientation().firstAngle - imu_angle_offset)
+                / 180 * Math.PI; // Convert to radians
     }
 
     public void resetAngle() {
@@ -346,11 +344,6 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         frontLeft.setTargetPosition((int)(frontLeft.getCurrentPosition() + DriveTrainConstants.mm_to_ticks.apply(2.5*mm)));
     }
 
-    public Pose2d getPosition() {
-        com.acmerobotics.roadrunner.geometry.Pose2d pose = getPoseEstimate();
-        return new Pose2d(new Translation2d(pose.getX(), pose.getY()), new Rotation2d(pose.getHeading()));
-    }
-
     @NotNull
     @Override
     public List<Double> getWheelPositions() {
@@ -368,20 +361,20 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
-        return new TrajectoryBuilder(startPose.convert(), VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+        return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
-        return new TrajectoryBuilder(startPose.convert(), reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+        return new TrajectoryBuilder(startPose, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
-        return new TrajectoryBuilder(startPose.convert(), startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+        return new TrajectoryBuilder(startPose, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }
 
     public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
         return new TrajectorySequenceBuilder(
-                startPose.convert(),
+                startPose,
                 VEL_CONSTRAINT, ACCEL_CONSTRAINT,
                 Math.toRadians(165), Math.toRadians(165)
         );
@@ -400,7 +393,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     public void turnAsync(double angle) {
         trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(getPosition())
+                trajectorySequenceBuilder(getPoseEstimate())
                         .turn(angle)
                         .build()
         );
@@ -408,7 +401,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     public void followTrajectoryAsync(Trajectory trajectory) {
         trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(new Pose2d(trajectory.start()))
+                trajectorySequenceBuilder(trajectory.start())
                         .addTrajectory(trajectory)
                         .build()
         );
@@ -419,6 +412,6 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     public Pose2d getLastError() {
-        return new Pose2d(trajectorySequenceRunner.getLastPoseError());
+        return trajectorySequenceRunner.getLastPoseError();
     }
 }

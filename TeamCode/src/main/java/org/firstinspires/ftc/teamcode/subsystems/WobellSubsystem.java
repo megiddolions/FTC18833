@@ -64,8 +64,8 @@ public class WobellSubsystem extends SubsystemBase {
     }
 
     public void close() {
-        leftGrab.setPosition(1);
-        rightGrab.setPosition(1);
+        leftGrab.setPosition(0.6);
+        rightGrab.setPosition(0.6);
     }
 
     public void setLift(double power) {

@@ -71,7 +71,7 @@ public class Auto extends LinearOpModeWithCommands {
 //        telemetry.addData("FL", driveTrain::getFrontLeftEncoder);
 //        telemetry.addData("FR", driveTrain::getFrontRightEncoder);
 //        telemetry.addData("wobell", wobellSubsystem::getCurrentPosition);
-        telemetry.addData("gyro", () -> driveTrain.getHeading().getDegrees());
+        telemetry.addData("gyro", () -> Math.toDegrees(driveTrain.getHeading()));
         telemetry.update();
 
         waitForStart();
@@ -301,7 +301,7 @@ public class Auto extends LinearOpModeWithCommands {
 //        driveTrain.set_for_drive();
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         while (opModeIsActive()) {
-            double error = -driveTrain.getHeading().getDegrees() + offset;
+            double error = Math.toDegrees(-driveTrain.getHeading()) + offset;
             driveTrain.tankDrive(-error / 35, error / 35);
 
             if (Math.abs(error) <= 1) {
