@@ -49,13 +49,15 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.6, Math.toRadians(165), 0.1908);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
+
+    private final boolean trajectoryControled;
 
     public DriveTrainSubsystem() {
         super(DriveTrainConstants.kV, DriveTrainConstants.kA, DriveTrainConstants.kStatic, 0.187, 1);
@@ -109,12 +111,14 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
         // I couldn't use SubsystemBase so I had to register it here
         CommandScheduler.getInstance().registerSubsystem(this);
+
+        trajectoryControled = !CommandBasedTeleOp.class.isAssignableFrom(opMode.getClass());
     }
 
     @Override
     public void periodic() {
         updatePoseEstimate();
-        if (!opMode.getClass().isAssignableFrom(CommandBasedTeleOp.class)) {
+        if (trajectoryControled) {
             DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
             if (signal != null) setDriveSignal(signal);
         }

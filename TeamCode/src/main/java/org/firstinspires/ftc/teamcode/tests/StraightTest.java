@@ -6,18 +6,17 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.commandftc.RobotUniversal;
 import org.commandftc.opModes.LinearOpModeWithCommands;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
-
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /*
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
+@Disabled
 @Autonomous(group = "tests")
 public class StraightTest extends LinearOpModeWithCommands {
     public static double DISTANCE = 1; // meters

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.FollowTrajectoryComman
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
+import org.firstinspires.ftc.teamcode.lib.DashboardUtil;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
@@ -65,24 +66,16 @@ public class Auto2 extends CommandBasedAuto {
         telemetry.addData("Vision error", vision::getError);
         telemetry.addData("align active", alignWobellCommand::isScheduled);
         telemetry.addData("pos", driveTrain::getPoseEstimate);
-
-        new CommandBase() {
-            @Override
-            public void execute() {
-                FtcDashboard.getInstance().getTelemetry().addData("drive power", driveTrain.getFrontRightPower());
-                FtcDashboard.getInstance().getTelemetry().update();
-            }
-        }.schedule();
     }
 
     @Override
     public Command getAutonomousCommand() {
         Trajectory trajectory1 = driveTrain.trajectoryBuilder(driveTrain.getPoseEstimate())
-                .forward(-2.6)
+                .forward(-2)
                 .build();
 
         Trajectory trajectory2 = driveTrain.trajectoryBuilder(trajectory1.end())
-                .forward(0.7)
+                .forward(2)
                 .build();
 
         return new SequentialCommandGroup(

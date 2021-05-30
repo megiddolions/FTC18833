@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -50,6 +51,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
+
+import static org.commandftc.RobotUniversal.opMode;
 
 @TeleOp(name="Drive for Robotosh")
 public class Drive extends CommandBasedTeleOp {
@@ -202,9 +205,12 @@ public class Drive extends CommandBasedTeleOp {
             private final Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
             @Override
             public void execute() {
-                telemetry.addData("left", shooter.getLeftVelocity());
-                telemetry.addData("right", shooter.getRightVelocity());
-                telemetry.addData("vx", Objects.requireNonNull(driveTrain.getPoseVelocity()).getX());
+                TelemetryPacket packet = new TelemetryPacket();
+                packet.put("left", shooter.getLeftVelocity());
+                packet.put("right", shooter.getRightVelocity());
+                packet.put("vx", Objects.requireNonNull(driveTrain.getPoseVelocity()).getX());
+                DashboardUtil.drawRobot(packet.fieldOverlay(), driveTrain.getPoseEstimate());
+                FtcDashboard.getInstance().sendTelemetryPacket(packet);
                 telemetry.update();
             }
         }.schedule();
@@ -243,7 +249,7 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("velocity", () -> (driveTrain.getPoseVelocity() != null ? driveTrain.getPoseVelocity() : "null"));
 //        telemetry.addData("loc", driveTrain.getLocalizer().getClass().getSimpleName());
 
-//        driveTrain.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(1.8288 , 1.8288));
+        driveTrain.setPoseEstimate(new Pose2d(1.8288 , 1.8288));
     }
 
     @NotNull

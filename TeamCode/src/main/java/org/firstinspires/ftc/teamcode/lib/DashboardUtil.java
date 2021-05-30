@@ -114,8 +114,8 @@ public class DashboardUtil {
 
         canvas.strokePolygon(raw_x, raw_y);
 
-        canvas.fillCircle((pose.getX()  - 1.8288) * 3.6576 * 12,
-                (pose.getY() - 1.8288) * 3.6576 * 12,1);
+        canvas.fillCircle(pose.getX() * 39.3700787 - 6 * 12,
+                pose.getY() * 39.3700787 - 6 * 12,0.5);
     }
 
     private static void draw_robot_intake(Canvas canvas, edu.wpi.first.wpilibj.geometry.Pose2d pose) {
@@ -137,7 +137,7 @@ public class DashboardUtil {
     }
 
     public static void drawRobot(Canvas canvas, Pose2d pose) {
-        draw_robot_base(canvas, new edu.wpi.first.wpilibj.geometry.Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(pose.getHeading())));
-        draw_robot_intake(canvas, new edu.wpi.first.wpilibj.geometry.Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(pose.getHeading())));
+        draw_robot_base(canvas, new edu.wpi.first.wpilibj.geometry.Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getHeading())));
+        draw_robot_intake(canvas, new edu.wpi.first.wpilibj.geometry.Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getHeading())));
     }
 }

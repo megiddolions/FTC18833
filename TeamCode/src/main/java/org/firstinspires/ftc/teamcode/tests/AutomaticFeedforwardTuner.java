@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.commandftc.opModes.LinearOpModeWithCommands;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
@@ -27,11 +28,12 @@ import java.util.List;
  *      regression.
  */
 @Config
+//@Disabled
 @Autonomous(group = "tests")
 public class AutomaticFeedforwardTuner extends LinearOpModeWithCommands {
-    public static double MAX_POWER = 1d;
-    public static double DISTANCE = 1; // meter
-    public static double MAX_VELOCITY = 0.6;
+    public static double MAX_POWER = 1;
+    public static double DISTANCE = 4; // meter
+    public static double MAX_VELOCITY = 2;
 
     private DriveTrainSubsystem drive;
 
@@ -96,6 +98,9 @@ public class AutomaticFeedforwardTuner extends LinearOpModeWithCommands {
         double finalVel = MAX_POWER * MAX_VELOCITY;
         double accel = (finalVel * finalVel) / (2.0 * DISTANCE);
         double rampTime = Math.sqrt(2.0 * DISTANCE / accel);
+        telemetry.addData("accel", accel);
+        telemetry.addData("rampTime", rampTime);
+        telemetry.update();
 
         List<Double> timeSamples = new ArrayList<>();
         List<Double> positionSamples = new ArrayList<>();
