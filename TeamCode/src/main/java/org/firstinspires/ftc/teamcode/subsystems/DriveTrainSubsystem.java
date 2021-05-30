@@ -49,8 +49,9 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients FORWARD_PID = new PIDCoefficients(2, 0, 0);
+    public static PIDCoefficients STRAFE_PID = new PIDCoefficients(7, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 0, 0);
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
@@ -104,7 +105,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
         resetAngle();
 
-        TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
+        TrajectoryFollower follower = new HolonomicPIDVAFollower(FORWARD_PID, STRAFE_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);

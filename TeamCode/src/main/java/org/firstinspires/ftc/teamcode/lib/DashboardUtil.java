@@ -106,16 +106,13 @@ public class DashboardUtil {
         for (int i = 0; i < 4; i++) {
             raw_x[i] *= 39.3700787;
             raw_y[i] *= 39.3700787;
-
-            raw_x[i] -= 6 * 12;
-            raw_y[i] -= 6 * 12;
         }
 
 
         canvas.strokePolygon(raw_x, raw_y);
 
-        canvas.fillCircle(pose.getX() * 39.3700787 - 6 * 12,
-                pose.getY() * 39.3700787 - 6 * 12,0.5);
+        canvas.fillCircle(pose.getX() * 39.3700787,
+                pose.getY() * 39.3700787,0.5);
     }
 
     private static void draw_robot_intake(Canvas canvas, edu.wpi.first.wpilibj.geometry.Pose2d pose) {
@@ -127,9 +124,6 @@ public class DashboardUtil {
         for (int i = 0; i < 4; i++) {
             raw_x[i] *= 39.3700787;
             raw_y[i] *= 39.3700787;
-
-            raw_x[i] -= 6 * 12;
-            raw_y[i] -= 6 * 12;
         }
 
 

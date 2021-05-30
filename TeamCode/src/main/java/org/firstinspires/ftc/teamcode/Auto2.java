@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,7 +51,7 @@ public class Auto2 extends CommandBasedAuto {
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveTrain.setPoseEstimate(new Pose2d(1.145, 0.2425, Math.toRadians(180)));
+//        driveTrain.setPoseEstimate(new Pose2d(1.145, 0.2425, Math.toRadians(180)));
 //        driveTrain.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
 
         alignWobellCommand = new AlignRobotVisionCommand(driveTrain, vision);
@@ -71,21 +72,11 @@ public class Auto2 extends CommandBasedAuto {
     @Override
     public Command getAutonomousCommand() {
         Trajectory trajectory1 = driveTrain.trajectoryBuilder(driveTrain.getPoseEstimate())
-                .forward(-2)
-                .build();
-
-        Trajectory trajectory2 = driveTrain.trajectoryBuilder(trajectory1.end())
-                .forward(2)
+                .splineTo(new Vector2d(0, .61), Math.toRadians(90))
                 .build();
 
         return new SequentialCommandGroup(
-                new FollowTrajectoryCommand(driveTrain, trajectory1),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
-                new WaitCommand(2),
-                new InstantCommand(() -> wobellSubsystem.close()),
-        new InstantCommand(() -> wobellSubsystem.setTargetPosition(0)),
-                new WaitCommand(2),
-                new FollowTrajectoryCommand(driveTrain, trajectory2)
+                new FollowTrajectoryCommand(driveTrain, trajectory1)
         );
     }
 }

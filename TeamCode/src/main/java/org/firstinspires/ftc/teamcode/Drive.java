@@ -249,7 +249,7 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("velocity", () -> (driveTrain.getPoseVelocity() != null ? driveTrain.getPoseVelocity() : "null"));
 //        telemetry.addData("loc", driveTrain.getLocalizer().getClass().getSimpleName());
 
-        driveTrain.setPoseEstimate(new Pose2d(1.8288 , 1.8288));
+//        driveTrain.setPoseEstimate(new Pose2d(1.8288 , 1.8288));
     }
 
     @NotNull
