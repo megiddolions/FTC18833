@@ -6,10 +6,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.commandftc.RobotUniversal;
+import org.commandftc.opModes.LinearOpModeWithCommands;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 import org.firstinspires.ftc.teamcode.lib.LoggingUtil;
 import org.firstinspires.ftc.teamcode.lib.RegressionUtil;
@@ -29,19 +27,23 @@ import java.util.List;
  *      regression.
  */
 @Config
-@Disabled
 @Autonomous(group = "tests")
-public class AutomaticFeedforwardTuner extends LinearOpMode {
-    public static double MAX_POWER = 0.7;
+public class AutomaticFeedforwardTuner extends LinearOpModeWithCommands {
+    public static double MAX_POWER = 1d;
     public static double DISTANCE = 1; // meter
+    public static double MAX_VELOCITY = 0.6;
+
+    private DriveTrainSubsystem drive;
+
+    @Override
+    public void init_subsystems() {
+        drive = new DriveTrainSubsystem();
+    }
 
     @Override
     public void runOpMode() {
-        RobotUniversal.hardwareMap = hardwareMap;
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        DriveTrainSubsystem drive = new DriveTrainSubsystem();
 
         NanoClock clock = NanoClock.system();
 
@@ -76,7 +78,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
 
         telemetry.clearAll();
         telemetry.addLine(Misc.formatInvariant(
-                "Place your robot on the field with at least %.2f in of room in front", DISTANCE));
+                "Place your robot on the field with at least %.2f meters of room in front", DISTANCE));
         telemetry.addLine("Press (Y/Δ) to begin");
         telemetry.update();
 
@@ -91,8 +93,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
         telemetry.addLine("Running...");
         telemetry.update();
 
-        double maxVel = 0.4;
-        double finalVel = MAX_POWER * maxVel;
+        double finalVel = MAX_POWER * MAX_VELOCITY;
         double accel = (finalVel * finalVel) / (2.0 * DISTANCE);
         double rampTime = Math.sqrt(2.0 * DISTANCE / accel);
 
@@ -109,7 +110,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
                 break;
             }
             double vel = accel * elapsedTime;
-            double power = vel / maxVel;
+            double power = vel / MAX_VELOCITY;
 
             timeSamples.add(elapsedTime);
             positionSamples.add(drive.getPoseEstimate().getX());
@@ -172,7 +173,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
             telemetry.addLine("Running...");
             telemetry.update();
 
-            double maxPowerTime = DISTANCE / maxVel;
+            double maxPowerTime = DISTANCE / MAX_VELOCITY;
 
             timeSamples.clear();
             positionSamples.clear();

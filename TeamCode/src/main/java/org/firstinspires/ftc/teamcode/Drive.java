@@ -6,22 +6,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.opModes.CommandBasedTeleOp;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToDirectionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
+import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.ConstStorageCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.ManualStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.SetStorageIndexCommand;
 import org.firstinspires.ftc.teamcode.commands.Util.LoggerCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.KeepCurrentWobellPositionCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.OpenWobellCommand;
-import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
-import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
-import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
-import org.firstinspires.ftc.teamcode.commands.Storage.ManualStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellLiftCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.lib.DashboardUtil;
@@ -40,9 +41,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -104,7 +105,7 @@ public class Drive extends CommandBasedTeleOp {
         vision.update_align_pipeline();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooter.setLift(0.3);
+        shooter.setLift(0.34);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
@@ -119,7 +120,7 @@ public class Drive extends CommandBasedTeleOp {
         automaticStorageCommand = new AutomaticStorageCommand(storage);
         manualStorageCommand = new ManualStorageCommand(storage, () -> gamepad2.right_stick_y);
         constStorageCommand = new ConstStorageCommand(storage);
-        startStorageCommand = new SetStorageIndexCommand(storage, 1);
+        startStorageCommand = new SetStorageIndexCommand(storage, 0.7);
 
         startShooterCommand = new SetShooterSpeedCommand(shooter, 0.55);
         stopShooterCommand = new SetShooterSpeedCommand(shooter, 0);
@@ -129,6 +130,7 @@ public class Drive extends CommandBasedTeleOp {
                 startShooterCommand,
                 new InstantCommand(() -> manualIntakeCommand.setConstIntake(false)),
                 waitForShooterCommand,
+                new WaitCommand(0.4),
                 new WaitCommand(0.7),
                 startStorageCommand,
                 new WaitCommand(5)
@@ -152,7 +154,7 @@ public class Drive extends CommandBasedTeleOp {
 
         // ROBOT REVEAL CODE
 //        gp1.a().whileHeld(new InstantCommand(() -> driveTrain.setPower(0.3), driveTrain)).whenReleased(new InstantCommand(()->driveTrain.setPower(0)));
-//        gp2.a().whileHeld(new InstantCommand(() -> shooter.setPower(0.55), shooter)).whenReleased(() -> shooter.setPower(0));
+        gp2.b().whileHeld(new InstantCommand(() -> shooter.setPower(0.55), shooter)).whenReleased(() -> shooter.setPower(0));
 
         new Button(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> drive_speed_modifier = 0.5))
@@ -190,24 +192,20 @@ public class Drive extends CommandBasedTeleOp {
         new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobellSubsystem));
         gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
 
-        gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(shooter.getLift() == 0.5 ? 0 : 0.5), shooter));
+        gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(Math.abs(shooter.getLift() - 0.35) < 0.001 ? 0.2 : 0.35), shooter));
 
         // Show time to make each loop
 //        new LoopTimeCommand().schedule();
 //        getLogCommand().schedule();
 
         new CommandBase() {
+            private final Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
             @Override
             public void execute() {
-                TelemetryPacket telemetry = new TelemetryPacket();
-                telemetry.put("left", shooter.getLeftVelocity());
-                telemetry.put("right", shooter.getRightVelocity());
-                telemetry.put("x", driveTrain.getPoseEstimate().getX());
-                telemetry.put("y", driveTrain.getPoseEstimate().getY());
-                telemetry.put("heading", Math.toDegrees(driveTrain.getPoseEstimate().getHeading()));
-                DashboardUtil.drawRobot(telemetry.fieldOverlay(), driveTrain.getPoseEstimate());
-                FtcDashboard.getInstance().sendTelemetryPacket(telemetry);
-                FtcDashboard.getInstance().getTelemetry().update();
+                telemetry.addData("left", shooter.getLeftVelocity());
+                telemetry.addData("right", shooter.getRightVelocity());
+                telemetry.addData("vx", Objects.requireNonNull(driveTrain.getPoseVelocity()).getX());
+                telemetry.update();
             }
         }.schedule();
 //        telemetry.addData("Runtime", this::getRuntime);
@@ -220,6 +218,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
 //        telemetry.addData("gyro", driveTrain::getHeading);
         telemetry.addData("Vision error", vision::getError);
+        telemetry.addData("ExternalHeading", driveTrain::getExternalHeading);
 //        telemetry.addData("Vision target", vision::getTarget);
 //        telemetry.addData("align active", alignRobotCommand::isScheduled);
 //        telemetry.addData("color(red)", storage.getColorSensor()::red);

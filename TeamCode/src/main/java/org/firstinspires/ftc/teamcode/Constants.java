@@ -52,9 +52,9 @@ public final class Constants {
                 0.06,
                 MotorConstants.REV_THROUGH_BORE_ENCODER.ticks_per_revolution);
 
-        public final static double kV = 0.7849;
-        public final static double kStatic = 0.13083;
-        public final static double kA = 0.19;
+        public final static double kV = 0.55854;
+        public final static double kStatic = 0.23611;
+        public final static double kA = 0.0283;
     }
 
     public final static class ShooterConstants {

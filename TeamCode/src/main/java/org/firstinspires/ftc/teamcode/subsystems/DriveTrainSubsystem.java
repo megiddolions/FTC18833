@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
@@ -18,6 +19,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.teamcode.Constants.DriveTrainConstants;
 import org.firstinspires.ftc.teamcode.lib.kinematics.MecanumDrive;
 import org.firstinspires.ftc.teamcode.lib.kinematics.RoadRunnerOdometry;
@@ -35,8 +37,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
-import static org.commandftc.RobotUniversal.telemetry;
+import static org.commandftc.RobotUniversal.opMode;
 
+@Config
 public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.MecanumDrive implements MecanumDrive, Subsystem {
     private final DcMotorEx rearLeft;
     private final DcMotorEx rearRight;
@@ -46,19 +49,12 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     private final BNO055IMU imu;
     private double imu_angle_offset;
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
-
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
-
-    private final TrajectoryFollower follower;
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.4, Math.toRadians(165), 0.1908);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.6, Math.toRadians(165), 0.1908);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
 
     public DriveTrainSubsystem() {
@@ -101,17 +97,12 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        parameters.mode                = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled      = false;
-
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
         resetAngle();
 
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
+        TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
@@ -123,8 +114,10 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     @Override
     public void periodic() {
         updatePoseEstimate();
-        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
-        if (signal != null) setDriveSignal(signal);
+        if (!opMode.getClass().isAssignableFrom(CommandBasedTeleOp.class)) {
+            DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+            if (signal != null) setDriveSignal(signal);
+        }
     }
 
     public int getLeftOdometryEncoder() {
@@ -191,8 +184,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     public double getHeading() {
-        return (imu.getAngularOrientation().firstAngle - imu_angle_offset)
-                / 180 * Math.PI; // Convert to radians
+        return imu.getAngularOrientation().firstAngle - imu_angle_offset;
     }
 
     public void resetAngle() {
@@ -311,6 +303,22 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     public int getFrontRightTarget() {
         return frontRight.getTargetPosition();
+    }
+
+    public double getRearLeftPower() {
+        return rearLeft.getPower();
+    }
+
+    public double getRearRightPower() {
+        return rearRight.getPower();
+    }
+
+    public double getFrontLeftPower() {
+        return frontLeft.getPower();
+    }
+
+    public double getFrontRightPower() {
+        return frontRight.getPower();
     }
 
     public boolean isBusy() {
