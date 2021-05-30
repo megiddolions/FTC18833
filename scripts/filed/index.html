@@ -2,10 +2,21 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Filed</title>
+        <title>Field</title>
+        <link href="style.css" rel="stylesheet">
     </head>
     <body>
-        <img src="field.png" onclick="update_robot_position()">
+        <span class="field_container" onclick="update_robot_position()" id="field_container">
+            <img src="field.png" alt="">
+            <canvas id="field" width="600" height="600" style="position:absolute; top:0px; left:0px;"></canvas>
+        </span>
+        <span class="input_container"></span>
+        <span class="data_container">
+            <label>x</label>
+            <div id="x"></div>
+            <label>y</label>
+            <div id="y"></div>
+        </span>
     </body>
     <script src="source.js"></script>
 </html>

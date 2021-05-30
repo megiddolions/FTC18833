@@ -1,0 +1,29 @@
+span.field_container {
+    position:absolute;
+	display: block;
+	width: 600px;
+	height: 600px;
+	padding: 0px; 
+	margin: 0px 0px;
+	background-color: aqua;
+}
+
+span.input_container {
+    position:absolute;
+	display: block;
+	width: 300px;
+	height: 600px;
+	padding: 0px; 
+	background-color: yellow;
+	left: 630px;
+}
+
+span.data_container {
+    position:absolute;
+	display: block;
+	width: 925px;
+	height: 200px;
+	padding: 0px; 
+	background-color: yellowgreen;
+	top: 630px;
+}
