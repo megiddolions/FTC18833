@@ -28,7 +28,7 @@ public class VisionTest extends CommandBasedTeleOp {
 
         powerShootsAlignPipeLine = new BluePowerShootsAlignPipeLine();
 
-        tankDriveCommand = new TankDriveCommand(driveTrain, () -> -gamepad1.left_stick_y * (gamepad2.left_trigger > 0.5 ? 1 : 0.5), () -> -gamepad1.right_stick_y * (gamepad2.left_trigger > 0.5 ? 1 : 0.5));
+        tankDriveCommand = new TankDriveCommand(driveTrain, () -> -gamepad1.left_stick_y * (gamepad1.left_trigger > 0.5 ? 1 : 0.5), () -> -gamepad1.right_stick_y * (gamepad1.left_trigger > 0.5 ? 1 : 0.5));
         alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
 
         vision.setAlignPipeLine(powerShootsAlignPipeLine);
@@ -40,7 +40,7 @@ public class VisionTest extends CommandBasedTeleOp {
 
     public void assign_buttons() {
         gp1.dpad_left().whenPressed(new InstantCommand(() -> powerShootsAlignPipeLine.target = powerShootsAlignPipeLine.target.left()));
-        gp1.dpad_left().whenPressed(new InstantCommand(() -> powerShootsAlignPipeLine.target = powerShootsAlignPipeLine.target.right()));
+        gp1.dpad_right().whenPressed(new InstantCommand(() -> powerShootsAlignPipeLine.target = powerShootsAlignPipeLine.target.right()));
 
         gp1.y().whenHeld(alignRobotCommand);
     }

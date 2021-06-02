@@ -28,7 +28,7 @@ public class BluePowerShootsAlignPipeLine extends AlignPipeLine {
 
     public static double filterContoursMinArea = 40;
     public static double filterContoursMinPerimeter = 0;
-    public static double filterContoursMinWidth = 10;
+    public static double filterContoursMinWidth = 5;
     public static double filterContoursMaxWidth = 30;
     public static double filterContoursMinHeight = 0;
     public static double filterContoursMaxHeight = 1000;
