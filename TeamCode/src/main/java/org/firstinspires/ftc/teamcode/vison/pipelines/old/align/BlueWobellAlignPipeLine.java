@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.vison.pipelines.old.align;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.vison.VisionTarget;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;

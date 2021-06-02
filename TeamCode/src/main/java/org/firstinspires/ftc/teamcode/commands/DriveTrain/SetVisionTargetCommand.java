@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.vison.VisionTarget;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 

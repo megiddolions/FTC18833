@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.vison.pipelines;
 
+import android.graphics.Bitmap;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -8,6 +13,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.camera_height;
+import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.camera_width;
 
 public class RingPipeLine extends OpenCvPipeline {
 
@@ -18,9 +26,7 @@ public class RingPipeLine extends OpenCvPipeline {
 //    public Mat cvErodeKernel = new Mat();
     public int orange_pixels = 0;
 
-    private static final Rect ring_area_rect = new Rect(
-            new Point(0,300),
-            new Point(50,430));
+    private static final Rect ring_area_rect = new Rect(0, 550, 50, 130);
     
     @Override
     public Mat processFrame(Mat input) {
@@ -28,15 +34,8 @@ public class RingPipeLine extends OpenCvPipeline {
 
         hsvThreshold(input, hsvThresholdOutput);
 
-//        Mat cvErodeOutput = new Mat();
-//        cvErode(hsvThresholdOutput, cvErodeKernel, cvErodeAnchor, cvErodeIterations, cvErodeBordertype, cvErodeBordervalue, cvErodeOutput);
-
-//        Mat output = new Mat();
-//        mask(input, hsvThresholdOutput, output);
-
         Mat ring_area = hsvThresholdOutput.submat(ring_area_rect);
 
-//        Imgproc.cvtColor(ring_area, ring_area, Imgproc.COLOR_BGR2GRAY);
         orange_pixels = Core.countNonZero(ring_area);
 
         Imgproc.rectangle(
@@ -46,7 +45,12 @@ public class RingPipeLine extends OpenCvPipeline {
 
         hsvThresholdOutput.release();
         ring_area.release();
-//        output.release();
+
+        Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
+        Utils.matToBitmap(input, map);
+
+        FtcDashboard.getInstance().sendImage(map);
+
         return input;
     }
 

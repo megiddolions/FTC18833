@@ -1,19 +1,20 @@
 package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 import org.firstinspires.ftc.teamcode.lib.kinematics.TankDrive;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.vison.VisionTarget;
-import org.firstinspires.ftc.teamcode.vison.pipelines.align.AlignPipeLine;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+@Config
 public class AlignRobotVisionCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
-//    private final PIDController pid = new PIDController(0.001,0,0.00001);
-    private final PIDController pid = new PIDController(0.001, 0.000001,0);
+    private final PIDController pid = new PIDController(pidCoefficients.p, pidCoefficients.i, pidCoefficients.d);
+    public static PIDFCoefficients pidCoefficients = new PIDFCoefficients(0.001, 0.00005,0, 0);
     private final double offset;
 
     public AlignRobotVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {
@@ -42,6 +43,7 @@ public class AlignRobotVisionCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pid.atSetpoint();
+//        return pid.atSetpoint();
+        return pid.atSetpoint() || Math.abs(vision.getError()) <= 5;
     }
 }

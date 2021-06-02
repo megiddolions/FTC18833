@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants.VisionConstants;
-import org.firstinspires.ftc.teamcode.vison.VisionTarget;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.AlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.RingPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BlueTowerAlignPipeLine;
@@ -19,12 +19,14 @@ import java.util.Objects;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.hardwareMap;
+import static org.commandftc.RobotUniversal.telemetry;
 
 public class VisionSubsystem extends SubsystemBase {
     public final OpenCvCamera camera;
     private final Map<VisionTarget, AlignPipeLine> align_pipeLines;
     private VisionTarget target = VisionTarget.None;
     private final RingPipeLine ringPipeLine;
+    private AlignPipeLine currentAlignPipeLine;
 
     public VisionSubsystem() {
         ringPipeLine = new RingPipeLine();
@@ -48,12 +50,17 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public void update_align_pipeline() {
-        camera.setPipeline(align_pipeLines.get(target));
+        setAlignPipeLine(align_pipeLines.get(target));
     }
 
     public void setTarget(VisionTarget target) {
         this.target  = target;
         update_align_pipeline();
+    }
+
+    public void setAlignPipeLine(AlignPipeLine pipeLine) {
+        currentAlignPipeLine = pipeLine;
+        camera.setPipeline(pipeLine);
     }
 
     public VisionTarget getTarget() {
@@ -62,11 +69,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     public void set_for_autonomous() {
         camera.setPipeline(ringPipeLine);
+        telemetry.addData("pixels", () -> ringPipeLine.orange_pixels);
     }
 
     public int count_rings() {
         int orange_pixels = ringPipeLine.orange_pixels;
-        if (orange_pixels < 700) {
+        if (orange_pixels < 400) {
             return 0;
         } else if (orange_pixels < 2500) {
             return 1;
@@ -76,7 +84,9 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public double getError() {
-        return Objects.requireNonNull(align_pipeLines.get(target)).getError();
+        if (currentAlignPipeLine == null)
+            return 0;
+        return Objects.requireNonNull(currentAlignPipeLine).getError();
     }
 
     public int getOrangePixels() {
