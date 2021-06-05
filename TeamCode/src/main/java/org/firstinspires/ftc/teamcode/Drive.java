@@ -50,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 @TeleOp(name="Drive for Robotosh")
 public class Drive extends CommandBasedTeleOp {
@@ -176,7 +177,9 @@ public class Drive extends CommandBasedTeleOp {
                 .whenPressed(new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake));
 
         // Storage
-        storage.setDefaultCommand(manualStorageCommand);
+//        storage.setDefaultCommand(manualStorageCommand);
+        storage.setDefaultCommand(automaticStorageCommand);
+        new Trigger(() -> Math.abs(gamepad2.right_stick_y) >= 0.25).whileActiveOnce(manualStorageCommand);
         // Shooter
         gp2.left_bumper().whenPressed(startShooterSequenceCommand
         ).whenReleased(stopShooterSequenceCommand);
@@ -232,7 +235,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("right(h)", () -> vision.align_pipeLine.right_rect == null ? 0 : vision.align_pipeLine.right_rect.y + vision.align_pipeLine.right_rect.height);
 
 //        telemetry.addData("Storage", storage::getEncoder);
-//        telemetry.addData("has ring", storage::seeing_ring);
+        telemetry.addData("has ring", storage::seeing_ring);
 
 //        telemetry.addData("RL", driveTrain::getRearLeftEncoder);
 //        telemetry.addData("RR", driveTrain::getRearRightEncoder);

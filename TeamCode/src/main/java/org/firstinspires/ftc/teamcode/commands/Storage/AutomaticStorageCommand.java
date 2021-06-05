@@ -2,66 +2,25 @@ package org.firstinspires.ftc.teamcode.commands.Storage;
 
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutomaticStorageCommand extends CommandBase {
-    private enum StorageState {
-        Waiting(false, true),
-        Start(true, false),
-        Middle(true, true),
-        End(true, false);
-
-        final boolean active;
-        final boolean seen_ring;
-
-        StorageState(boolean active, boolean seen_ring) {
-            this.active = active;
-            this.seen_ring = seen_ring;
-        }
-
-        StorageState next(boolean seeing_ring) {
-            if (this.seen_ring == seeing_ring) {
-                switch (this) {
-                    case Waiting:
-                        return Start;
-                    case Start:
-                        return Middle;
-                    case Middle:
-                        return End;
-                    case End:
-                        return Waiting;
-                }
-            }
-            return this;
-        }
-    }
-
-    StorageSubSystem storage;
-    private StorageState storageState;
+    private final StorageSubSystem storage;
+    private final Command index_command;
 
     public AutomaticStorageCommand(StorageSubSystem storage) {
         this.storage = storage;
+        index_command = new WaitCommand(0.2).andThen(new IndexDistanceCommand(storage, 115));
 
         addRequirements(storage);
-
-        storageState = StorageState.Waiting;
     }
 
     @Override
     public void execute() {
-        storageState = storageState.next(storage.seeing_ring());
-
-        if (storageState.active) {
-            storage.index(1);
-        } else {
-            storage.index(0);
+        if (!index_command.isScheduled() && storage.seeing_ring()) {
+            index_command.schedule();
         }
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        storage.index(0);
-        // reset storage state
-        storageState = StorageState.Waiting;
     }
 }
