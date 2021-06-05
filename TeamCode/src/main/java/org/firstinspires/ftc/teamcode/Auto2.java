@@ -164,7 +164,7 @@ public class Auto2 extends CommandBasedAuto {
                 .build();
 
         Trajectory put_second_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory_part_2.end(), true)
-                .splineTo(new Vector2d(0.22, 1.07), Math.toRadians(90))
+                .splineTo(new Vector2d(0.22, 1.15), Math.toRadians(90))
                 .build();
 
         Trajectory parking_trajectory = driveTrain.trajectoryBuilder(put_second_wobell_trajectory.end(), true)
@@ -252,9 +252,9 @@ public class Auto2 extends CommandBasedAuto {
                 .splineTo(new Vector2d(-0.20, 0.92), Math.toRadians(183))
                 .build();
 
-        Trajectory score_rings_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end(), DriveTrainSubsystem.getVelocityConstraint(0.3, Math.toRadians(165), 0.28))
+        Trajectory score__first_ring_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end(), DriveTrainSubsystem.getVelocityConstraint(0.3, Math.toRadians(165), 0.28))
 //                .back(0.1)
-                .forward(0.5)
+                .forward(0.2)
                 .build();
 
         return new SequentialCommandGroup(
@@ -266,10 +266,10 @@ public class Auto2 extends CommandBasedAuto {
                 new InstantCommand(() -> shooter.setLift(0.2)),
                 new InstantCommand(() -> shooter.setPower(0.55)),
                 follow(go_to_index_position_trajectory),
-                new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
                 driveForward(0.12, 1),
-                follow(score_rings_trajectory),
-                driveForward(0.4, 0.5)
+                new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
+                follow(score__first_ring_trajectory),
+                new InstantCommand(() -> shooter.setPower(0))
         );
     }
 
