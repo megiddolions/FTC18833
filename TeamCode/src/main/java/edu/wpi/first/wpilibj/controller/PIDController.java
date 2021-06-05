@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+
 import org.commandftc.RobotUniversal;
 
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -65,6 +67,10 @@ public class PIDController implements AutoCloseable {
     m_kd = kd;
 
     instances++;
+  }
+
+  public PIDController(PIDCoefficients coefficients) {
+    this(coefficients.p, coefficients.i, coefficients.d);
   }
 
   @Override

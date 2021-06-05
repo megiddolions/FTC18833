@@ -32,6 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     private VisionTarget target = VisionTarget.None;
     private final RingPipeLine ringPipeLine;
     private AlignPipeLine currentAlignPipeLine;
+    public AlignPipeLine front_pipeline = new NonePipeLine();
 
     public VisionSubsystem() {
         ringPipeLine = new RingPipeLine();
@@ -89,6 +90,10 @@ public class VisionSubsystem extends SubsystemBase {
         if (currentAlignPipeLine == null)
             return 0;
         return Objects.requireNonNull(currentAlignPipeLine).getError();
+    }
+
+    public double getFrontError() {
+        return front_pipeline.getError();
     }
 
     public int getOrangePixels() {

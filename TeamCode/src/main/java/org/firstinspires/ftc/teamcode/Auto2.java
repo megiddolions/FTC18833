@@ -30,6 +30,8 @@ import org.firstinspires.ftc.teamcode.vison.pipelines.align.NonePipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 
+import java.util.LinkedHashSet;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -259,7 +261,11 @@ public class Auto2 extends CommandBasedAuto {
                 .build();
 
         Trajectory store_other_rings_trajectory = driveTrain.trajectoryBuilder(score__first_ring_trajectory.end())
-                .forward(0.4)
+                .forward(0.6)
+                .build();
+
+        Trajectory pick_up_second_wobble_trajectory = driveTrain.trajectoryBuilder(store_other_rings_trajectory.end(), true)
+                .splineTo(new Vector2d(-0.91, 0.95), Math.toRadians(45))
                 .build();
 
         return new SequentialCommandGroup(
@@ -274,9 +280,16 @@ public class Auto2 extends CommandBasedAuto {
                 driveForward(0.12, 1),
                 new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
                 follow(score__first_ring_trajectory),
+                new WaitCommand(2.5),
+                new InstantCommand(() -> {storage.index(0); shooter.setPower(0);}),
                 new InstantCommand(() -> storage.setDefaultCommand(new AutomaticStorageCommand(storage))),
-                new InstantCommand(() -> shooter.setPower(0)),
-                follow(store_other_rings_trajectory)
+                follow(store_other_rings_trajectory),
+                turn(Math.toRadians(135)),
+                new WaitCommand(2),
+                new InstantCommand(() -> wobellSubsystem.setTargetPosition(5000)),
+                new WaitCommand(0.5),
+                follow(pick_up_second_wobble_trajectory),
+                new InstantCommand(() -> wobellSubsystem.open())
         );
     }
 

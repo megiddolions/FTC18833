@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.vison.pipelines.align;
 
+import android.graphics.Bitmap;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
@@ -11,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.camera_height;
 import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.camera_width;
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.filterContours;
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.findContours;
@@ -61,6 +67,12 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
 
         draw_vertical_line(input, camera_width/2, new Scalar(255, 255, 255), 2);
         draw_vertical_line(input, (int)(camera_width/2-getError()), new Scalar(200, 100, 100), 2);
+
+        Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
+        Utils.matToBitmap(input, map);
+
+        FtcDashboard.getInstance().sendImage(map);
+
         return input;
     }
     @Override

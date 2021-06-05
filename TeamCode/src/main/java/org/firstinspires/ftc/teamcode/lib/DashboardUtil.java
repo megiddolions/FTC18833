@@ -21,8 +21,8 @@ public class DashboardUtil {
         double[] yPoints = new double[poseHistory.size()];
         for (int i = 0; i < poseHistory.size(); i++) {
             Pose2d pose = poseHistory.get(i);
-            xPoints[i] = pose.getX();
-            yPoints[i] = pose.getY();
+            xPoints[i] = pose.getX() * 39.3700787;
+            yPoints[i] = pose.getY() * 39.3700787;
         }
         canvas.strokePolyline(xPoints, yPoints);
     }
@@ -35,8 +35,8 @@ public class DashboardUtil {
         for (int i = 0; i < samples; i++) {
             double displacement = i * dx;
             Pose2d pose = path.get(displacement);
-            xPoints[i] = pose.getX();
-            yPoints[i] = pose.getY();
+            xPoints[i] = pose.getX() * 39.3700787;
+            yPoints[i] = pose.getY() * 39.3700787;
         }
         canvas.strokePolyline(xPoints, yPoints);
     }

@@ -19,7 +19,7 @@ import static org.firstinspires.ftc.teamcode.Constants.VisionConstants.camera_wi
 import static org.firstinspires.ftc.teamcode.lib.CvUtil.*;
 
 public class RingAlignPipeLine extends AlignPipeLine {
-    public final static double filterContoursMinArea = 0;
+    public final static double filterContoursMinArea = 1000;
     public final static double filterContoursMinPerimeter = 0;
     public final static double filterContoursMinWidth = 0;
     public final static double filterContoursMaxWidth = 1000;
@@ -38,7 +38,7 @@ public class RingAlignPipeLine extends AlignPipeLine {
 
     @Override
     public double getError() {
-        return 0;
+        return camera_width/2d - target.x - target.width/2d;
     }
 
     @Override
@@ -58,13 +58,7 @@ public class RingAlignPipeLine extends AlignPipeLine {
                 filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices,
                 filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
 
-        Mat mask_out = new Mat();
-        mask(input, hsv_out, mask_out);
-
-        mask_out.assignTo(input);
-
         hsv_out.release();
-        mask_out.release();
 
         Rect max_object = new Rect();
         double max_area = 0;
@@ -80,10 +74,10 @@ public class RingAlignPipeLine extends AlignPipeLine {
 
         target = max_object;
 
-        Imgproc.rectangle(input, target, new Scalar(255, 255, 0), 3);
+        Imgproc.rectangle(input, target, new Scalar(255, 0, 0), 3);
 
-        draw_vertical_line(input, target.x + target.width/2, new Scalar(255, 255, 0), 2);
-        draw_horizontal_line(input, target.y + target.height/2, new Scalar(255, 255, 0), 2);
+        draw_vertical_line(input, target.x + target.width/2, new Scalar(255, 0, 0), 2);
+        draw_horizontal_line(input, target.y + target.height/2, new Scalar(255, 0, 0), 2);
         draw_vertical_line(input, camera_width/2, new Scalar(255, 255, 255), 2);
 
         Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
