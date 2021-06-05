@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.commands.DriveTrain.ReturnToStartCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TurnCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.WaitForShooterCommand;
+import org.firstinspires.ftc.teamcode.commands.Storage.AutomaticStorageCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.IndexOneRingCommand;
 import org.firstinspires.ftc.teamcode.commands.Wobell.WobellTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.lib.DashboardUtil;
@@ -257,6 +258,10 @@ public class Auto2 extends CommandBasedAuto {
                 .forward(0.2)
                 .build();
 
+        Trajectory store_other_rings_trajectory = driveTrain.trajectoryBuilder(score__first_ring_trajectory.end())
+                .forward(0.4)
+                .build();
+
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooter.setLift(0.35)),
                 new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
@@ -269,7 +274,9 @@ public class Auto2 extends CommandBasedAuto {
                 driveForward(0.12, 1),
                 new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
                 follow(score__first_ring_trajectory),
-                new InstantCommand(() -> shooter.setPower(0))
+                new InstantCommand(() -> storage.setDefaultCommand(new AutomaticStorageCommand(storage))),
+                new InstantCommand(() -> shooter.setPower(0)),
+                follow(store_other_rings_trajectory)
         );
     }
 
