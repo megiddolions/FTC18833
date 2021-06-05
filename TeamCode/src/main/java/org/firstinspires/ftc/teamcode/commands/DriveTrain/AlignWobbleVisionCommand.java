@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.teamcode.lib.kinematics.TankDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
@@ -10,14 +11,13 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 @Config
-public class HorizontalAlignCommand extends CommandBase {
-    private final DriveTrainSubsystem driveTrain;
+public class AlignWobbleVisionCommand extends CommandBase {
+    private final TankDrive driveTrain;
     private final VisionSubsystem vision;
     private PIDController pid;
-    public static PIDCoefficients pidCoefficientsA = new PIDCoefficients(0.0015, 0,0);
-    public static PIDCoefficients pidCoefficientsB = new PIDCoefficients(0.002, 0,0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01, 0.005, 0);
 
-    public HorizontalAlignCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision) {
+    public AlignWobbleVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
         this.vision = vision;
 
@@ -26,21 +26,22 @@ public class HorizontalAlignCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        if (Math.abs(vision.getFrontError()) >= 180) {
-            pid = new PIDController(pidCoefficientsA);
-        } else {
-            pid = new PIDController(pidCoefficientsB);
-        }
+        pid = new PIDController(pidCoefficients);
     }
 
     @Override
     public void execute() {
-        double out = pid.calculate(vision.getFrontError());
-        driveTrain.driveLeft(-out);
+        double out = pid.calculate(vision.getError());
+        driveTrain.tankDrive(out, -out);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        driveTrain.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return pid.atSetpoint() || Math.abs(pid.getPositionError()) <= 30;
+        return pid.atSetpoint() || Math.abs(pid.getPositionError()) < 30 && Math.abs(pid.getVelocityError()) <= 10;
     }
 }

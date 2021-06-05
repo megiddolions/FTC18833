@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.commandftc.RobotUniversal.*;
 
-public class WobellSubsystem extends SubsystemBase {
+public class WobbleSubsystem extends SubsystemBase {
     private final CRServo leftLift;
     private final CRServo rightLift;
     private final Servo leftGrab;
@@ -18,7 +18,7 @@ public class WobellSubsystem extends SubsystemBase {
     private final IntSupplier encoder;
     private int target_position;
 
-    public WobellSubsystem() {
+    public WobbleSubsystem() {
         leftLift = hardwareMap.crservo.get("LeftWobellLift");
         rightLift = hardwareMap.crservo.get("RightWobellLift");
         leftGrab = hardwareMap.servo.get("LeftWobellServo");

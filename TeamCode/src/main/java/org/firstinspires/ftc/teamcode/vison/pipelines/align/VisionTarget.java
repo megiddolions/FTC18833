@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.vison.pipelines.align;
 public enum VisionTarget {
     RedTower,
     BlueTower,
-    RedWobell,
-    BlueWobell,
+    RedWobble,
+    BlueWobble,
     BluePowerShoots,
     RedPowerShoots,
     RingStack,

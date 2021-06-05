@@ -1,25 +1,25 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class OpenWobellCommand extends CommandBase {
-    private final WobellSubsystem wobellSubsystem;
+    private final WobbleSubsystem wobbleSubsystem;
 
-    public OpenWobellCommand(WobellSubsystem wobellSubsystem) {
-        this.wobellSubsystem = wobellSubsystem;
+    public OpenWobellCommand(WobbleSubsystem wobbleSubsystem) {
+        this.wobbleSubsystem = wobbleSubsystem;
 
 //        addRequirements(wobellSubsystem);
     }
 
     @Override
     public void initialize() {
-        wobellSubsystem.open();
+        wobbleSubsystem.open();
     }
 
     @Override
     public void end(boolean interrupted) {
-        wobellSubsystem.close();
+        wobbleSubsystem.close();
     }
 }

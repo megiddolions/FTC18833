@@ -1,30 +1,30 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class WobellLiftCommand extends CommandBase {
-    private final WobellSubsystem wobellSubsystem;
+    private final WobbleSubsystem wobbleSubsystem;
     private final DoubleSupplier supplier;
 
 
-    public WobellLiftCommand(WobellSubsystem wobellSubsystem, DoubleSupplier supplier) {
-        this.wobellSubsystem = wobellSubsystem;
+    public WobellLiftCommand(WobbleSubsystem wobbleSubsystem, DoubleSupplier supplier) {
+        this.wobbleSubsystem = wobbleSubsystem;
         this.supplier = supplier;
 
-        addRequirements(wobellSubsystem);
+        addRequirements(wobbleSubsystem);
     }
 
     @Override
     public void execute() {
-        wobellSubsystem.setLift(supplier.getAsDouble());
+        wobbleSubsystem.setLift(supplier.getAsDouble());
     }
 
     @Override
     public void end(boolean interrupted) {
-        wobellSubsystem.setLift(0);
+        wobbleSubsystem.setLift(0);
     }
 }

@@ -1,21 +1,21 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class KeepCurrentWobellPositionCommand extends CommandBase {
-    private final WobellSubsystem wobellSubsystem;
+    private final WobbleSubsystem wobbleSubsystem;
 
-    public KeepCurrentWobellPositionCommand(WobellSubsystem wobellSubsystem) {
-        this.wobellSubsystem = wobellSubsystem;
+    public KeepCurrentWobellPositionCommand(WobbleSubsystem wobbleSubsystem) {
+        this.wobbleSubsystem = wobbleSubsystem;
 
-        addRequirements(wobellSubsystem);
+        addRequirements(wobbleSubsystem);
     }
 
     @Override
     public void initialize() {
-        wobellSubsystem.setTargetPosition(wobellSubsystem.getCurrentPosition());
+        wobbleSubsystem.setTargetPosition(wobbleSubsystem.getCurrentPosition());
     }
 
     @Override

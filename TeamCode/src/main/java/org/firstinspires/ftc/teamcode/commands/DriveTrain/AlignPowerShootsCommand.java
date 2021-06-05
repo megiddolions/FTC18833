@@ -11,18 +11,18 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 @Config
-public class AlignRobotVisionCommand extends CommandBase {
+public class AlignPowerShootsCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
     private final PIDController pid = new PIDController(pidCoefficients.p, pidCoefficients.i, pidCoefficients.d);
     public static PIDFCoefficients pidCoefficients = new PIDFCoefficients(0.008, 0.001,0, 0);
     private final double offset;
 
-    public AlignRobotVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {
+    public AlignPowerShootsCommand(TankDrive driveTrain, VisionSubsystem vision) {
         this(driveTrain, vision, 0);
     }
 
-    public AlignRobotVisionCommand(TankDrive driveTrain, VisionSubsystem vision, double offset) {
+    public AlignPowerShootsCommand(TankDrive driveTrain, VisionSubsystem vision, double offset) {
         this.driveTrain = driveTrain;
         this.vision = vision;
         this.offset = offset;

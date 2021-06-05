@@ -8,7 +8,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.opModes.CommandBasedAuto;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignPowerShootsCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.FollowTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
 import org.firstinspires.ftc.teamcode.commands.Storage.IndexOneRingCommand;
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BluePowerShootsAlignPipeLine;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,12 +30,12 @@ public class TestAuto extends CommandBasedAuto {
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
     protected StorageSubSystem storage;
-    protected WobellSubsystem wobellSubsystem;
+    protected WobbleSubsystem wobbleSubsystem;
     protected VisionSubsystem vision;
 
     protected BluePowerShootsAlignPipeLine powerShootsPipeLine;
 
-    protected AlignRobotVisionCommand alignWobellCommand;
+    protected AlignPowerShootsCommand alignWobellCommand;
 
     protected SetShooterSpeedCommand startShooter;
     protected SetShooterSpeedCommand stopShooter;
@@ -48,7 +48,7 @@ public class TestAuto extends CommandBasedAuto {
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
-        wobellSubsystem = new WobellSubsystem();
+        wobbleSubsystem = new WobbleSubsystem();
         vision = new VisionSubsystem();
 
         powerShootsPipeLine = new BluePowerShootsAlignPipeLine();
@@ -58,16 +58,16 @@ public class TestAuto extends CommandBasedAuto {
         driveTrain.setPoseEstimate(new Pose2d(-1.5438, 0.40463692038495186, Math.toRadians(180)));
 //        driveTrain.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
 
-        alignWobellCommand = new AlignRobotVisionCommand(driveTrain, vision);
+        alignWobellCommand = new AlignPowerShootsCommand(driveTrain, vision);
 
         startShooter = new SetShooterSpeedCommand(shooter, 0.5);
         stopShooter = new SetShooterSpeedCommand(shooter, 0);
 
         index_ring = new IndexOneRingCommand(storage);
 
-        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+        wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
 
-        wobellSubsystem.open();
+        wobbleSubsystem.open();
 
         vision.set_for_autonomous();
         shooter.setLift(0.27);

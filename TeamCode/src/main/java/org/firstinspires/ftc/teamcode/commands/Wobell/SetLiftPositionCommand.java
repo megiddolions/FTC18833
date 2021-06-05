@@ -1,32 +1,32 @@
 package org.firstinspires.ftc.teamcode.commands.Wobell;
 
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class SetLiftPositionCommand extends CommandBase {
-    private final WobellSubsystem wobellSubsystem;
+    private final WobbleSubsystem wobbleSubsystem;
     private final int target_position;
 
-    public SetLiftPositionCommand(WobellSubsystem wobellSubsystem, int target_position) {
-        this.wobellSubsystem = wobellSubsystem;
+    public SetLiftPositionCommand(WobbleSubsystem wobbleSubsystem, int target_position) {
+        this.wobbleSubsystem = wobbleSubsystem;
         this.target_position = target_position;
 
-        addRequirements(wobellSubsystem);
+        addRequirements(wobbleSubsystem);
     }
 
     @Override
     public void initialize() {
-        wobellSubsystem.setTargetPosition(target_position);
+        wobbleSubsystem.setTargetPosition(target_position);
     }
 
     @Override
     public void execute() {
-        wobellSubsystem.setLift((wobellSubsystem.getTargetPosition() - wobellSubsystem.getCurrentPosition()) / 2000.0);
+        wobbleSubsystem.setLift((wobbleSubsystem.getTargetPosition() - wobbleSubsystem.getCurrentPosition()) / 2000.0);
     }
 
     @Override
     public void end(boolean interrupted) {
-        wobellSubsystem.setLift(0);
+        wobbleSubsystem.setLift(0);
     }
 }

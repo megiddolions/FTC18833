@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.opModes.CommandBasedAuto;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignPowerShootsCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.FollowTrajectoryCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.HorizontalAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.ReturnToStartCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TurnCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterSpeedCommand;
@@ -24,13 +25,11 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BluePowerShootsAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.NonePipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
-
-import java.util.LinkedHashSet;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -45,12 +44,12 @@ public class Auto2 extends CommandBasedAuto {
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
     protected StorageSubSystem storage;
-    protected WobellSubsystem wobellSubsystem;
+    protected WobbleSubsystem wobbleSubsystem;
     protected VisionSubsystem vision;
 
     protected BluePowerShootsAlignPipeLine powerShootsAlign;
 
-    protected AlignRobotVisionCommand alignRobot;
+    protected AlignPowerShootsCommand alignRobot;
 
     protected SetShooterSpeedCommand startShooter;
     protected SetShooterSpeedCommand stopShooter;
@@ -63,7 +62,7 @@ public class Auto2 extends CommandBasedAuto {
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
-        wobellSubsystem = new WobellSubsystem();
+        wobbleSubsystem = new WobbleSubsystem();
         vision = new VisionSubsystem();
 
         powerShootsAlign = new BluePowerShootsAlignPipeLine();
@@ -73,16 +72,16 @@ public class Auto2 extends CommandBasedAuto {
         driveTrain.setPoseEstimate(new Pose2d(-1.5438, 0.43463692038495186, Math.toRadians(180)));
 //        driveTrain.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
 
-        alignRobot = new AlignRobotVisionCommand(driveTrain, vision);
+        alignRobot = new AlignPowerShootsCommand(driveTrain, vision);
 
         startShooter = new SetShooterSpeedCommand(shooter, 0.5);
         stopShooter = new SetShooterSpeedCommand(shooter, 0);
 
         index_ring = new IndexOneRingCommand(storage);
 
-        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+        wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
 
-        wobellSubsystem.open();
+        wobbleSubsystem.open();
 
         vision.set_for_autonomous();
         shooter.setLift(0.27);
@@ -132,7 +131,8 @@ public class Auto2 extends CommandBasedAuto {
                 stopShooter,
                 new InstantCommand(() -> {
                     vision.rearCamera.setPipeline(new NonePipeLine());
-                    vision.frontCamera.setPipeline(new RingAlignPipeLine());
+                    vision.front_pipeline = new RingAlignPipeLine();
+                    vision.frontCamera.setPipeline(vision.front_pipeline);
                 }),
                 getRingCommand(rings, first_power_shoot_trajectory.end()),
                 new WaitCommand(5),
@@ -175,18 +175,18 @@ public class Auto2 extends CommandBasedAuto {
                 .build();
 
         return new SequentialCommandGroup(
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close()),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4800)),
+                new InstantCommand(() -> wobbleSubsystem.close()),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4800)),
                 follow(second_wobell_trajectory_part_1),
                 turn(Math.toRadians(90)),
                 follow(second_wobell_trajectory_part_2),
-                new InstantCommand(() -> wobellSubsystem.open()),
+                new InstantCommand(() -> wobbleSubsystem.open()),
                 new WaitCommand(0.4),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4200)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4200)),
                 follow(put_second_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close()),
+                new InstantCommand(() -> wobbleSubsystem.close()),
                 follow(parking_trajectory)
         );
     }
@@ -223,10 +223,10 @@ public class Auto2 extends CommandBasedAuto {
 
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooter.setLift(0.26)),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close()),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(3000)),
+                new InstantCommand(() -> wobbleSubsystem.close()),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(3000)),
                 new SetShooterSpeedCommand(shooter, 0.55),
                 follow(go_to_index_position_trajectory),
                 new InstantCommand(() -> intake.intake(1)),
@@ -236,12 +236,12 @@ public class Auto2 extends CommandBasedAuto {
                 new InstantCommand(() -> intake.intake(0)),
                 new InstantCommand(() -> storage.index(0)),
                 new SetShooterSpeedCommand(shooter, 0),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(5000)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(5000)),
                 follow(second_wobell_trajectory),
                 follow(pick_up_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.open()),
+                new InstantCommand(() -> wobbleSubsystem.open()),
                 follow(drop_second_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close()),
+                new InstantCommand(() -> wobbleSubsystem.close()),
                 follow(parking_trajectory)
         );
     }
@@ -270,13 +270,16 @@ public class Auto2 extends CommandBasedAuto {
 
         return new SequentialCommandGroup(
                 new InstantCommand(() -> shooter.setLift(0.35)),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close()),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(3000)),
+                new InstantCommand(() -> wobbleSubsystem.close()),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(3000)),
                 new InstantCommand(() -> shooter.setLift(0.2)),
                 new InstantCommand(() -> shooter.setPower(0.55)),
                 follow(go_to_index_position_trajectory),
+
+                new HorizontalAlignCommand(driveTrain, vision),
+                new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(driveTrain.getPoseEstimate().getX(), 0.93, Math.toRadians(180)))),
                 driveForward(0.12, 1),
                 new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
                 follow(score__first_ring_trajectory),
@@ -286,10 +289,10 @@ public class Auto2 extends CommandBasedAuto {
                 follow(store_other_rings_trajectory),
                 turn(Math.toRadians(135)),
                 new WaitCommand(2),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(5000)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(5000)),
                 new WaitCommand(0.5),
                 follow(pick_up_second_wobble_trajectory),
-                new InstantCommand(() -> wobellSubsystem.open())
+                new InstantCommand(() -> wobbleSubsystem.open())
         );
     }
 

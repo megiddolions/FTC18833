@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignRobotVisionCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignPowerShootsCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToDirectionCommand;
@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -58,13 +58,13 @@ public class Drive extends CommandBasedTeleOp {
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
     protected StorageSubSystem storage;
-    protected WobellSubsystem wobellSubsystem;
+    protected WobbleSubsystem wobbleSubsystem;
     protected VisionSubsystem vision;
 
     protected TankDriveCommand tankDriveCommand;
     protected DriveToDirectionCommand driveCommand;
     protected DriveSideWaysCommand driveSideWaysCommandCommand;
-    protected AlignRobotVisionCommand alignRobotCommand;
+    protected AlignPowerShootsCommand alignRobotCommand;
 
     protected ManualIntakeCommand manualIntakeCommand;
 
@@ -97,7 +97,7 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("state", "storage");telemetry.update();
         storage = new StorageSubSystem();
         telemetry.addData("state", "wobellSubsystem");telemetry.update();
-        wobellSubsystem = new WobellSubsystem();
+        wobbleSubsystem = new WobbleSubsystem();
         telemetry.addData("state", "vision");telemetry.update();
         vision = new VisionSubsystem();
 
@@ -114,7 +114,7 @@ public class Drive extends CommandBasedTeleOp {
                 () -> -gamepad1.right_stick_y, () -> -gamepad1.right_stick_x, () -> -gamepad1.left_stick_x);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x * drive_speed_modifier, -gamepad1.right_stick_x * drive_speed_modifier));
-        alignRobotCommand = new AlignRobotVisionCommand(driveTrain, vision);
+        alignRobotCommand = new AlignPowerShootsCommand(driveTrain, vision);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
 
@@ -188,12 +188,12 @@ public class Drive extends CommandBasedTeleOp {
         gp2.dpad_up().whenPressed(raiseShooterCommand);
         gp2.dpad_down().whenPressed(lowerShooterCommand);
 
-        // wobell
-        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+        // wobble
+        wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
 
-        new Button(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> gamepad2.left_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobellSubsystem));
-        new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobellSubsystem, () -> -gamepad2.right_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobellSubsystem));
-        gp2.x().toggleWhenPressed(new OpenWobellCommand(wobellSubsystem));
+        new Button(() -> gamepad2.left_trigger > 0.1).whenHeld(new WobellLiftCommand(wobbleSubsystem, () -> gamepad2.left_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobbleSubsystem));
+        new Button(() -> gamepad2.right_trigger > 0.1).whenHeld(new WobellLiftCommand(wobbleSubsystem, () -> -gamepad2.right_trigger)).whenReleased(new KeepCurrentWobellPositionCommand(wobbleSubsystem));
+        gp2.x().toggleWhenPressed(new OpenWobellCommand(wobbleSubsystem));
 
         gp2.a().whenPressed(new InstantCommand(() -> shooter.setLift(Math.abs(shooter.getLift() - 0.35) < 0.001 ? 0.2 : 0.35), shooter));
 
@@ -266,9 +266,9 @@ public class Drive extends CommandBasedTeleOp {
         map.put("index(busy)", storage::isBusy);
         map.put("index(current)", storage::getTarget);
 
-        map.put("wobell target", wobellSubsystem::getTargetPosition);
-        map.put("wobell current", wobellSubsystem::getCurrentPosition);
-        map.put("wobell power", wobellSubsystem::getPower);
+        map.put("wobell target", wobbleSubsystem::getTargetPosition);
+        map.put("wobell current", wobbleSubsystem::getCurrentPosition);
+        map.put("wobell power", wobbleSubsystem::getPower);
 
         map.put("FL(current)", driveTrain::getFrontLeftEncoder);
         map.put("FR(current)", driveTrain::getFrontRightEncoder);

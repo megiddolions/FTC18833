@@ -12,8 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
-import org.jetbrains.annotations.NotNull;
+import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
 
 @Deprecated
 @Disabled
@@ -23,7 +22,7 @@ public class Auto extends LinearOpModeWithCommands {
     protected ShooterSubsystem shooter;
     protected IntakeSubsystem intake;
     protected StorageSubSystem storage;
-    protected WobellSubsystem wobellSubsystem;
+    protected WobbleSubsystem wobbleSubsystem;
     protected VisionSubsystem vision;
 
     private long state;
@@ -35,7 +34,7 @@ public class Auto extends LinearOpModeWithCommands {
         shooter = new ShooterSubsystem();
         intake = new IntakeSubsystem();
         storage = new StorageSubSystem();
-        wobellSubsystem = new WobellSubsystem();
+        wobbleSubsystem = new WobbleSubsystem();
         vision = new VisionSubsystem();
 
 //        addSubsystems(driveTrain, shooter, intake, storage, wobellSubsystem, vision);
@@ -48,13 +47,13 @@ public class Auto extends LinearOpModeWithCommands {
         RobotUniversal.opMode = this;
         RobotUniversal.hardwareMap = hardwareMap;
 
-        wobellSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobellSubsystem));
+        wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
 
 //        driveTrain.set_for_autonomous();
         storage.set_for_autonomous();
         vision.set_for_autonomous();
 
-        wobellSubsystem.close();
+        wobbleSubsystem.close();
         shooter.setLift(0.27);
 
 //        while (opModeIsActive() && !driveTrain.isGyroCalibrated())
@@ -101,7 +100,7 @@ public class Auto extends LinearOpModeWithCommands {
         driveLeft(-45);
         shoot_ring();
         shooter.setPower(0);
-        wobellSubsystem.setTargetPosition(4100);
+        wobbleSubsystem.setTargetPosition(4100);
 
         // Act according to the amount of rings
         switch (rings) {
@@ -122,27 +121,27 @@ public class Auto extends LinearOpModeWithCommands {
         spinLeft(590);
         driveForward(-1400);
         // Unload wobell
-        while (wobellSubsystem.isBusy() && opModeIsActive())
+        while (wobbleSubsystem.isBusy() && opModeIsActive())
             ;
-        wobellSubsystem.open();
-        wobellSubsystem.setTargetPosition(3500);
+        wobbleSubsystem.open();
+        wobbleSubsystem.setTargetPosition(3500);
         // drive backward
         driveForward(400);
         // Drive to pickup second
-        wobellSubsystem.setTargetPosition(4500);
+        wobbleSubsystem.setTargetPosition(4500);
         driveTrain.setPower(0.7);
         spinLeft(690);
         driveForward(-1450);
         // Pickup second wobell
-        wobellSubsystem.close();
+        wobbleSubsystem.close();
         sleep(500);
-        wobellSubsystem.setLift(0.15);
+        wobbleSubsystem.setLift(0.15);
         // Drive to A again
         driveForward(1550);
         // Drop the second wobell
-        wobellSubsystem.setLift(0);
+        wobbleSubsystem.setLift(0);
         spinLeft(-680);
-        wobellSubsystem.open();
+        wobbleSubsystem.open();
         // Go back
         driveForward(300);
     }
@@ -152,10 +151,10 @@ public class Auto extends LinearOpModeWithCommands {
         spinLeft(300);
         driveForward(-1000);
         // Drop first wobell
-        while (wobellSubsystem.isBusy() && opModeIsActive())
+        while (wobbleSubsystem.isBusy() && opModeIsActive())
             ;
-        wobellSubsystem.open();
-        wobellSubsystem.setTargetPosition(3500);
+        wobbleSubsystem.open();
+        wobbleSubsystem.setTargetPosition(3500);
         // Go to pick up the ring
         driveForward(200);
         spinLeft(-310);
@@ -172,18 +171,18 @@ public class Auto extends LinearOpModeWithCommands {
         shooter.setPower(0);
         storage.index(0);
         // Spin toward the second wobell
-        wobellSubsystem.setTargetPosition(4500);
+        wobbleSubsystem.setTargetPosition(4500);
         spinLeft(1100);
         storage.set_for_autonomous();
         // Go to the second wobell
         driveForward(-400);
-        wobellSubsystem.close();
+        wobbleSubsystem.close();
         sleep(500);
 //        spinLeft(310);
         driveForward(1550);
         spinLeft(-1400);
         driveForward(300);
-        wobellSubsystem.open();
+        wobbleSubsystem.open();
     }
 
     private void wobell_C() {
@@ -193,8 +192,8 @@ public class Auto extends LinearOpModeWithCommands {
         spinLeft(320);
         driveForward(-2100);
         // Put first Wobell
-        wobellSubsystem.open();
-        wobellSubsystem.setTargetPosition(0);
+        wobbleSubsystem.open();
+        wobbleSubsystem.setTargetPosition(0);
         // Move to ring group
         driveTrain.setPower(1);
         spinLeft(-240);
