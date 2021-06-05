@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.profile.VelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -55,7 +56,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.6, Math.toRadians(165), 0.1908);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.6, Math.toRadians(165), 0.28);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
 
     private final boolean trajectoryControled;
@@ -106,7 +107,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         resetAngle();
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(FORWARD_PID, STRAFE_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(0.5)), 0.5);
+                new Pose2d(0.01, 0.01, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
 
@@ -382,6 +383,10 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
+        return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, TrajectoryVelocityConstraint VEL_CONSTRAINT) {
         return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }
 

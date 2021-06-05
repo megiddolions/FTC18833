@@ -22,6 +22,10 @@ public abstract class AlignPipeLine extends OpenCvPipeline {
     public static double[] red_offset_hsvThresholdHue= {115, 145};
     public static double[] red_offset_hsvThresholdSaturation = {120, 255.0};
     public static double[] red_offset_hsvThresholdValue = {100, 255};
+    // Orange filter //
+    public static double[] orange_hsvThresholdHue = {8, 52};
+    public static double[] orange_hsvThresholdSaturation = {110.07193916564364, 255.0};
+    public static double[] orange_hsvThresholdValue = {171, 255.0};
 
     public abstract double getError();
 
@@ -38,7 +42,15 @@ public abstract class AlignPipeLine extends OpenCvPipeline {
         hsvThreshold(src, blue_hsvThresholdHue, blue_hsvThresholdSaturation, blue_hsvThresholdValue, dst);
     }
 
+    protected static void filter_orange(Mat src, Mat dst) {
+        hsvThreshold(src, orange_hsvThresholdHue, orange_hsvThresholdSaturation, orange_hsvThresholdValue, dst);
+    }
+
     protected static void draw_vertical_line(Mat img, int x, Scalar color, int thickness) {
-        Imgproc.line(img, new Point(x, 0), new Point(x, img.cols()-1), color, thickness);
+        Imgproc.line(img, new Point(x, 0), new Point(x, img.rows()-1), color, thickness);
+    }
+
+    protected static void draw_horizontal_line(Mat img, int y, Scalar color, int thickness) {
+        Imgproc.line(img, new Point(0, y), new Point(img.cols()-1, y), color, thickness);
     }
 }

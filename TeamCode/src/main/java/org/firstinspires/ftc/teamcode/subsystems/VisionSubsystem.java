@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants.VisionConstants;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.AlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.RingPipeLine;
@@ -22,7 +26,8 @@ import static org.commandftc.RobotUniversal.hardwareMap;
 import static org.commandftc.RobotUniversal.telemetry;
 
 public class VisionSubsystem extends SubsystemBase {
-    public final OpenCvCamera camera;
+    public final OpenCvCamera rearCamera;
+    public final OpenCvCamera frontCamera;
     private final Map<VisionTarget, AlignPipeLine> align_pipeLines;
     private VisionTarget target = VisionTarget.None;
     private final RingPipeLine ringPipeLine;
@@ -30,23 +35,20 @@ public class VisionSubsystem extends SubsystemBase {
 
     public VisionSubsystem() {
         ringPipeLine = new RingPipeLine();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "RearWebcam"), cameraMonitorViewId);
+        frontCamera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "FrontWebcam"));
+        rearCamera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "RearWebcam"));
 
-        camera.openCameraDeviceAsync(() -> camera.startStreaming(VisionConstants.camera_width, VisionConstants.camera_height, OpenCvCameraRotation.UPRIGHT));
+        rearCamera.openCameraDeviceAsync(() -> rearCamera.startStreaming(VisionConstants.camera_width, VisionConstants.camera_height, OpenCvCameraRotation.UPRIGHT));
+        frontCamera.openCameraDeviceAsync(() -> frontCamera.startStreaming(VisionConstants.camera_width, VisionConstants.camera_height, OpenCvCameraRotation.UPRIGHT));
 
         align_pipeLines = new HashMap<>();
         align_pipeLines.put(VisionTarget.BlueTower, new BlueTowerAlignPipeLine());
         align_pipeLines.put(VisionTarget.RedTower, new RedTowerAlignPipeLine());
+//        align_pipeLines.put(VisionTarget.RingStack, new RingAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.BlueWobell, new BlueWobellAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.RedWobell, new RedWobellAlignPipeLine());
 //        align_pipeLines.put(VisionTarget.BluePowerShoots, new BluePowerShootsAlignPipeLine());
         align_pipeLines.put(VisionTarget.None, new NonePipeLine());
-    }
-
-    public void setPowerShootTarget(VisionTarget.PowerShoot powerShoot) {
-//        ((BluePowerShootsAlignPipeLine) Objects.requireNonNull(
-//                align_pipeLines.get(VisionTarget.BluePowerShoots))).setPowerShoot(powerShoot);
     }
 
     public void update_align_pipeline() {
@@ -60,7 +62,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public void setAlignPipeLine(AlignPipeLine pipeLine) {
         currentAlignPipeLine = pipeLine;
-        camera.setPipeline(pipeLine);
+        rearCamera.setPipeline(pipeLine);
     }
 
     public VisionTarget getTarget() {
@@ -68,7 +70,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public void set_for_autonomous() {
-        camera.setPipeline(ringPipeLine);
+        rearCamera.setPipeline(ringPipeLine);
         telemetry.addData("pixels", () -> ringPipeLine.orange_pixels);
     }
 

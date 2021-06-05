@@ -90,7 +90,6 @@ public class BluePowerShootsAlignPipeLine extends AlignPipeLine {
 
         Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
         Utils.matToBitmap(input, map);
-
         FtcDashboard.getInstance().sendImage(map);
 
         return input;

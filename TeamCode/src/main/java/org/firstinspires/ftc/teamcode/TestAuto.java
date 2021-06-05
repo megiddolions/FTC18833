@@ -73,7 +73,7 @@ public class TestAuto extends CommandBasedAuto {
         shooter.setLift(0.27);
 
         telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+        telemetry.addData("Vision pipeline ms", vision.rearCamera::getPipelineTimeMs);
         telemetry.addData("Vision error", vision::getError);
         telemetry.addData("align active", alignWobellCommand::isScheduled);
         telemetry.addData("pos", driveTrain::getPoseEstimate);

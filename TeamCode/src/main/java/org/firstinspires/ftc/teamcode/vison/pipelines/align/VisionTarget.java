@@ -7,7 +7,7 @@ public enum VisionTarget {
     BlueWobell,
     BluePowerShoots,
     RedPowerShoots,
-    Ring,
+    RingStack,
     None;
 
     public enum PowerShoot {

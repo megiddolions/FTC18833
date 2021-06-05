@@ -81,7 +81,7 @@ public class Drive extends CommandBasedTeleOp {
     protected SequentialCommandGroup startShooterSequenceCommand;
     protected Command stopShooterSequenceCommand;
 
-    protected final VisionTarget visionTarget = VisionTarget.BlueTower;
+    protected final VisionTarget visionTarget = VisionTarget.RingStack;
 
     protected double drive_speed_modifier;
 
@@ -212,7 +212,7 @@ public class Drive extends CommandBasedTeleOp {
             }
         }.schedule();
 //        telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+        telemetry.addData("Vision pipeline ms", vision.rearCamera::getPipelineTimeMs);
 //        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
         telemetry.addData("pos", driveTrain::getPoseEstimate);

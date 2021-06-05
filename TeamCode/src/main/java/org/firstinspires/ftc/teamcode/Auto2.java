@@ -25,9 +25,12 @@ import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobellSubsystem;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BluePowerShootsAlignPipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.NonePipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -82,12 +85,12 @@ public class Auto2 extends CommandBasedAuto {
         shooter.setLift(0.27);
 
         telemetry.addData("Runtime", this::getRuntime);
-        telemetry.addData("Vision pipeline ms", vision.camera::getPipelineTimeMs);
+        telemetry.addData("Vision rear(ms)", vision.rearCamera::getPipelineTimeMs);
+        telemetry.addData("Vision front(ms)", vision.frontCamera::getPipelineTimeMs);
         telemetry.addData("Vision error", vision::getError);
         telemetry.addData("align active", alignRobot::isScheduled);
         telemetry.addData("pos", driveTrain::getPoseEstimate);
 //        telemetry.addData("left", shooter::getLeftVelocity);
-        telemetry.addData("vision(ms)", vision.camera::getPipelineTimeMs);
 
         TelemetryPacket init_telemetry_packet = new TelemetryPacket();
         DashboardUtil.drawRobot(init_telemetry_packet.fieldOverlay(), driveTrain.getPoseEstimate());
@@ -114,19 +117,23 @@ public class Auto2 extends CommandBasedAuto {
                 new InstantCommand(() -> powerShootsAlign.target = VisionTarget.PowerShoot.Center),
 //                new WaitCommand(2),
                 index_ring,
-                new TurnCommand(driveTrain, Math.toRadians(4)),
+                new TurnCommand(driveTrain, Math.toRadians(3)),
 //                alignRobot,
                 new InstantCommand(() -> powerShootsAlign.target = VisionTarget.PowerShoot.Left),
                 new WaitCommand(0.2),
                 index_ring,
-                new TurnCommand(driveTrain, Math.toRadians(4)),
+                new TurnCommand(driveTrain, Math.toRadians(5)),
 //                alignRobot,
                 new WaitCommand(0.2),
                 index_ring,
                 stopShooter,
+                new InstantCommand(() -> {
+                    vision.rearCamera.setPipeline(new NonePipeLine());
+                    vision.frontCamera.setPipeline(new RingAlignPipeLine());
+                }),
                 getRingCommand(rings, first_power_shoot_trajectory.end()),
                 new WaitCommand(5),
-                new ReturnToStartCommand(driveTrain, new Pose2d(-1.3738, 0.40463692038495186, Math.toRadians(180)))
+                new ReturnToStartCommand(driveTrain, new Pose2d(-1.1, 0.40463692038495186, Math.toRadians(180)))
         );
     }
 
@@ -137,6 +144,7 @@ public class Auto2 extends CommandBasedAuto {
             case 1:
                 return getBCommand(end);
             case 4:
+                return getCCommand(end);
             default:
                 return new InstantCommand();
         }
@@ -159,6 +167,10 @@ public class Auto2 extends CommandBasedAuto {
                 .splineTo(new Vector2d(0.22, 1.07), Math.toRadians(90))
                 .build();
 
+        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(put_second_wobell_trajectory.end(), true)
+                .forward(0.3)
+                .build();
+
         return new SequentialCommandGroup(
                 new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
@@ -169,19 +181,20 @@ public class Auto2 extends CommandBasedAuto {
                 follow(second_wobell_trajectory_part_2),
                 new InstantCommand(() -> wobellSubsystem.open()),
                 new WaitCommand(0.4),
-                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
+                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4200)),
                 follow(put_second_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close())
+                new InstantCommand(() -> wobellSubsystem.close()),
+                follow(parking_trajectory)
         );
     }
 
     private Command getBCommand(Pose2d end) {
         Trajectory first_wobell_trajectory = driveTrain.trajectoryBuilder(end, true)
-                .splineTo(new Vector2d(0.85, 0.65), Math.toRadians(90))
+                .splineTo(new Vector2d(0.70, 0.80), Math.toRadians(45))
                 .build();
 
         Trajectory go_to_index_position_trajectory = driveTrain.trajectoryBuilder(first_wobell_trajectory.end())
-                .splineTo(new Vector2d(-0.14, 0.85), Math.toRadians(185))
+                .splineTo(new Vector2d(-0.14, 0.90), Math.toRadians(180))
                 .build();
 
         Trajectory intake_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end())
@@ -189,7 +202,7 @@ public class Auto2 extends CommandBasedAuto {
                 .build();
 
         Trajectory second_wobell_trajectory = driveTrain.trajectoryBuilder(intake_trajectory.end(), true)
-                .splineTo(new Vector2d(-0.73, 1), Math.toRadians(180))
+                .splineTo(new Vector2d(-0.73, 1.1), Math.toRadians(180))
                 .build();
 
         Trajectory pick_up_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory.end(), true)
@@ -198,11 +211,15 @@ public class Auto2 extends CommandBasedAuto {
 
         Trajectory drop_second_wobell_trajectory = driveTrain.trajectoryBuilder(pick_up_wobell_trajectory.end(), true)
                 .forward(0.4)
-                .splineTo(new Vector2d(0.43, 0.75), Math.toRadians(180))
+                .splineTo(new Vector2d(0.43, 0.83), Math.toRadians(180))
+                .build();
+
+        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(drop_second_wobell_trajectory.end(), true)
+                .forward(0.3)
                 .build();
 
         return new SequentialCommandGroup(
-                new InstantCommand(() -> shooter.setLift(0.275)),
+                new InstantCommand(() -> shooter.setLift(0.26)),
                 new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
                 new InstantCommand(() -> wobellSubsystem.close()),
@@ -221,7 +238,38 @@ public class Auto2 extends CommandBasedAuto {
                 follow(pick_up_wobell_trajectory),
                 new InstantCommand(() -> wobellSubsystem.open()),
                 follow(drop_second_wobell_trajectory),
-                new InstantCommand(() -> wobellSubsystem.close())
+                new InstantCommand(() -> wobellSubsystem.close()),
+                follow(parking_trajectory)
+        );
+    }
+
+    private Command getCCommand(Pose2d end) {
+        Trajectory first_wobell_trajectory = driveTrain.trajectoryBuilder(end, true)
+                .splineTo(new Vector2d(1.3, 1.5), Math.toRadians(45))
+                .build();
+
+        Trajectory go_to_index_position_trajectory = driveTrain.trajectoryBuilder(first_wobell_trajectory.end())
+                .splineTo(new Vector2d(-0.20, 0.92), Math.toRadians(183))
+                .build();
+
+        Trajectory score_rings_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end(), DriveTrainSubsystem.getVelocityConstraint(0.3, Math.toRadians(165), 0.28))
+//                .back(0.1)
+                .forward(0.5)
+                .build();
+
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> shooter.setLift(0.35)),
+                new InstantCommand(() -> wobellSubsystem.setTargetPosition(4000)),
+                follow(first_wobell_trajectory),
+                new InstantCommand(() -> wobellSubsystem.close()),
+                new InstantCommand(() -> wobellSubsystem.setTargetPosition(3000)),
+                new InstantCommand(() -> shooter.setLift(0.2)),
+                new InstantCommand(() -> shooter.setPower(0.55)),
+                follow(go_to_index_position_trajectory),
+                new InstantCommand(() -> {storage.index(1);intake.intake(1);}),
+                driveForward(0.12, 1),
+                follow(score_rings_trajectory),
+                driveForward(0.4, 0.5)
         );
     }
 
@@ -239,5 +287,27 @@ public class Auto2 extends CommandBasedAuto {
 
     private Command wait(double seconds) {
         return new WaitCommand(seconds);
+    }
+
+    private Command driveForward(double distance, double speed) {
+        return new CommandBase() {
+
+            private Pose2d start;
+            @Override
+            public void initialize() {
+                driveTrain.setPower(speed);
+                start = driveTrain.getPoseEstimate();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return driveTrain.getPoseEstimate().vec().distTo(start.vec()) >= distance;
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                driveTrain.stop();
+            }
+        };
     }
 }
