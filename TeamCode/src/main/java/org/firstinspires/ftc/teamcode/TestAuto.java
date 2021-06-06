@@ -67,7 +67,7 @@ public class TestAuto extends CommandBasedAuto {
 
         wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
 
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
 
         vision.set_for_autonomous();
         shooter.setLift(0.27);

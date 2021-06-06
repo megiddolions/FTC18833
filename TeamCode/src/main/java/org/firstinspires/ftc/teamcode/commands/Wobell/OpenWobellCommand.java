@@ -15,11 +15,11 @@ public class OpenWobellCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
     }
 
     @Override
     public void end(boolean interrupted) {
-        wobbleSubsystem.close();
+        wobbleSubsystem.open();
     }
 }

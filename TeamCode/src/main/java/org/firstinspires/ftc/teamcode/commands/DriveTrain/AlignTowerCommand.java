@@ -5,20 +5,19 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.teamcode.lib.Util;
 import org.firstinspires.ftc.teamcode.lib.kinematics.TankDrive;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 @Config
-public class AlignWobbleVisionCommand extends CommandBase {
+public class AlignTowerCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
-    private PIDController pid;
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.001, 0, 0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01, 0.001, 0);
+    public PIDController pidController;
 
-    public AlignWobbleVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {
+    public AlignTowerCommand(TankDrive driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
         this.vision = vision;
 
@@ -27,12 +26,12 @@ public class AlignWobbleVisionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        pid = new PIDController(pidCoefficients);
+        pidController = new PIDController(pidCoefficients);
     }
 
     @Override
     public void execute() {
-        double out = Util.clamp(pid.calculate(vision.getError()), 0.18, -0.8);
+        double out = Util.clamp(pidController.calculate(vision.getError()), 0.2, -0.2);
         driveTrain.tankDrive(out, -out);
     }
 
@@ -43,6 +42,6 @@ public class AlignWobbleVisionCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pid.atSetpoint() || Math.abs(pid.getPositionError()) < 120 && Math.abs(pid.getVelocityError()) <= 10;
+        return pidController.atSetpoint() || Math.abs(pidController.getPositionError()) <= 70 && Math.abs(pidController.getVelocityError()) <= 10;
     }
 }

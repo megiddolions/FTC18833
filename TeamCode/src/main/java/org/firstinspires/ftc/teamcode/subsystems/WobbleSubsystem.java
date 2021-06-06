@@ -58,14 +58,14 @@ public class WobbleSubsystem extends SubsystemBase {
         this.target_position = target_position;
     }
 
-    public void open() {
-        leftGrab.setPosition(-1);
-        rightGrab.setPosition(-1);
+    public void close() {
+        leftGrab.setPosition(0);
+        rightGrab.setPosition(0.1);
     }
 
-    public void close() {
+    public void open() {
         leftGrab.setPosition(0.7);
-        rightGrab.setPosition(0.4);
+        rightGrab.setPosition(0.9);
     }
 
     public void setLift(double power) {

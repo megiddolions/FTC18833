@@ -53,7 +53,7 @@ public class Auto extends LinearOpModeWithCommands {
         storage.set_for_autonomous();
         vision.set_for_autonomous();
 
-        wobbleSubsystem.close();
+        wobbleSubsystem.open();
         shooter.setLift(0.27);
 
 //        while (opModeIsActive() && !driveTrain.isGyroCalibrated())
@@ -123,7 +123,7 @@ public class Auto extends LinearOpModeWithCommands {
         // Unload wobell
         while (wobbleSubsystem.isBusy() && opModeIsActive())
             ;
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
         wobbleSubsystem.setTargetPosition(3500);
         // drive backward
         driveForward(400);
@@ -133,7 +133,7 @@ public class Auto extends LinearOpModeWithCommands {
         spinLeft(690);
         driveForward(-1450);
         // Pickup second wobell
-        wobbleSubsystem.close();
+        wobbleSubsystem.open();
         sleep(500);
         wobbleSubsystem.setLift(0.15);
         // Drive to A again
@@ -141,7 +141,7 @@ public class Auto extends LinearOpModeWithCommands {
         // Drop the second wobell
         wobbleSubsystem.setLift(0);
         spinLeft(-680);
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
         // Go back
         driveForward(300);
     }
@@ -153,7 +153,7 @@ public class Auto extends LinearOpModeWithCommands {
         // Drop first wobell
         while (wobbleSubsystem.isBusy() && opModeIsActive())
             ;
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
         wobbleSubsystem.setTargetPosition(3500);
         // Go to pick up the ring
         driveForward(200);
@@ -176,13 +176,13 @@ public class Auto extends LinearOpModeWithCommands {
         storage.set_for_autonomous();
         // Go to the second wobell
         driveForward(-400);
-        wobbleSubsystem.close();
+        wobbleSubsystem.open();
         sleep(500);
 //        spinLeft(310);
         driveForward(1550);
         spinLeft(-1400);
         driveForward(300);
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
     }
 
     private void wobell_C() {
@@ -192,7 +192,7 @@ public class Auto extends LinearOpModeWithCommands {
         spinLeft(320);
         driveForward(-2100);
         // Put first Wobell
-        wobbleSubsystem.open();
+        wobbleSubsystem.close();
         wobbleSubsystem.setTargetPosition(0);
         // Move to ring group
         driveTrain.setPower(1);

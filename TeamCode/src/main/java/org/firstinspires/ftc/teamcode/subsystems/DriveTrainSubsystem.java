@@ -56,7 +56,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.6, Math.toRadians(165), 0.28);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.9, Math.toRadians(165), 0.28);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
 
     private final boolean trajectoryControled;

@@ -45,6 +45,6 @@ public class AlignPowerShootsCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 //        return pid.atSetpoint();
-        return pid.atSetpoint() || Math.abs(vision.getError()) <= 25;
+        return pid.atSetpoint() || Math.abs(vision.getError()) <= 25 && Math.abs(pid.getVelocityError()) <= 10;
     }
 }
