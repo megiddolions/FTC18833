@@ -41,6 +41,6 @@ public class HorizontalAlignCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pid.atSetpoint() || Math.abs(pid.getPositionError()) <= 30;
+        return pid.atSetpoint() || Math.abs(pid.getPositionError()) <= 40;
     }
 }

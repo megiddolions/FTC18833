@@ -15,7 +15,7 @@ public class AlignWobbleVisionCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
     private PIDController pid;
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01, 0.005, 0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.001, 0, 0);
 
     public AlignWobbleVisionCommand(TankDrive driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
@@ -42,6 +42,6 @@ public class AlignWobbleVisionCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pid.atSetpoint() || Math.abs(pid.getPositionError()) < 30 && Math.abs(pid.getVelocityError()) <= 10;
+        return pid.atSetpoint() || Math.abs(pid.getPositionError()) < 120 && Math.abs(pid.getVelocityError()) <= 10;
     }
 }
