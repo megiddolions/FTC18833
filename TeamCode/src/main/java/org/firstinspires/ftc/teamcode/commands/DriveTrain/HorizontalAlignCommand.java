@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.commands.DriveTrain;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.teamcode.lib.Util;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
@@ -14,8 +15,7 @@ public class HorizontalAlignCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
     private PIDController pid;
-    public static PIDCoefficients pidCoefficientsA = new PIDCoefficients(0.0015, 0,0);
-    public static PIDCoefficients pidCoefficientsB = new PIDCoefficients(0.002, 0,0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.007, 0,0);
 
     public HorizontalAlignCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
@@ -26,16 +26,12 @@ public class HorizontalAlignCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        if (Math.abs(vision.getFrontError()) >= 180) {
-            pid = new PIDController(pidCoefficientsA);
-        } else {
-            pid = new PIDController(pidCoefficientsB);
-        }
+        pid = new PIDController(pidCoefficients);
     }
 
     @Override
     public void execute() {
-        double out = pid.calculate(vision.getFrontError());
+        double out = Util.clamp(pid.calculate(vision.getFrontError()), 0.18, -0.18);
         driveTrain.driveLeft(-out);
     }
 
