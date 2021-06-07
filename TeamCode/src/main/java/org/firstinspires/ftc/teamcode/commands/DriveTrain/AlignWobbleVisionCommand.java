@@ -32,7 +32,7 @@ public class AlignWobbleVisionCommand extends CommandBase {
 
     @Override
     public void execute() {
-        double out = Util.clamp(pid.calculate(vision.getError()), 0.18, -0.8);
+        double out = Util.clamp(pid.calculate(vision.getError()), 0.18, -0.18);
         driveTrain.tankDrive(out, -out);
     }
 

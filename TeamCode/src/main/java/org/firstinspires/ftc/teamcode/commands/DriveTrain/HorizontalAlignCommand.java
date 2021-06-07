@@ -15,7 +15,7 @@ public class HorizontalAlignCommand extends CommandBase {
     private final DriveTrainSubsystem driveTrain;
     private final VisionSubsystem vision;
     private PIDController pid;
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.007, 0,0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.02, 0,0);
 
     public HorizontalAlignCommand(DriveTrainSubsystem driveTrain, VisionSubsystem vision) {
         this.driveTrain = driveTrain;
@@ -31,8 +31,13 @@ public class HorizontalAlignCommand extends CommandBase {
 
     @Override
     public void execute() {
-        double out = Util.clamp(pid.calculate(vision.getFrontError()), 0.18, -0.18);
+        double out = Util.clamp(pid.calculate(vision.getFrontError()), 0.25, -0.25);
         driveTrain.driveLeft(-out);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        driveTrain.stop();
     }
 
     @Override

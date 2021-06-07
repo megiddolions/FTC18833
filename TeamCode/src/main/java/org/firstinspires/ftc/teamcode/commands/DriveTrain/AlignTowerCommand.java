@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AlignTowerCommand extends CommandBase {
     private final TankDrive driveTrain;
     private final VisionSubsystem vision;
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01, 0.001, 0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.02, 0, 0);
     public PIDController pidController;
 
     public AlignTowerCommand(TankDrive driveTrain, VisionSubsystem vision) {

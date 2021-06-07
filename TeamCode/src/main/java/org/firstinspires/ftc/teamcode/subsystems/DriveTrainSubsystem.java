@@ -56,7 +56,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(0.9, Math.toRadians(165), 0.28);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(6, Math.toRadians(165), 0.28);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(0.4);
 
     private final boolean trajectoryControled;
@@ -107,7 +107,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
         resetAngle();
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(FORWARD_PID, STRAFE_PID, HEADING_PID,
-                new Pose2d(0.01, 0.01, Math.toRadians(0.5)), 0.5);
+                new Pose2d(0.1, 0.1, Math.toRadians(0.5)), 0.5);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
 
