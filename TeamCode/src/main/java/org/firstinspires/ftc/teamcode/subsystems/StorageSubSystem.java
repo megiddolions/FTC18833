@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants.IndexConstants;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.commandftc.RobotUniversal.hardwareMap;
 
 public class StorageSubSystem extends SubsystemBase {
-    private final DcMotor indexer;
+    private final DcMotorEx indexer;
     private final ColorSensor colorSensor;
 
 //    private final DistanceSensor distanceSensor;
@@ -20,7 +21,7 @@ public class StorageSubSystem extends SubsystemBase {
             .red(550, 3000).green(0, 2000).blue(0, 2000);
 
     public StorageSubSystem() {
-        indexer = hardwareMap.dcMotor.get("IndexMotor");
+        indexer = hardwareMap.get(DcMotorEx.class, "IndexMotor");
         colorSensor = hardwareMap.get(ColorSensor.class, "StorageSensor");
         indexer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         indexer.setTargetPosition(0);
@@ -102,6 +103,10 @@ public class StorageSubSystem extends SubsystemBase {
     public void index_distance(double mm) {
 //        indexer.setTargetPosition((int)(indexer.getCurrentPosition() + IndexConstants.mm_to_ticks.apply(125)));
         indexer.setTargetPosition((int)(indexer.getCurrentPosition() + IndexConstants.mm_to_ticks.apply(mm)));
+    }
+
+    public double getIndexSpeed() {
+        return indexer.getVelocity();
     }
 
     public boolean isBusy() {

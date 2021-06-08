@@ -42,6 +42,6 @@ public class AlignTowerCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pidController.atSetpoint() || Math.abs(pidController.getPositionError()) <= 70 && Math.abs(pidController.getVelocityError()) <= 10;
+        return pidController.atSetpoint() || Math.abs(pidController.getPositionError()) <= 50 && Math.abs(pidController.getVelocityError()) <= 10;
     }
 }

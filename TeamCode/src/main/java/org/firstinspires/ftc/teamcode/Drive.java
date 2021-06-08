@@ -106,7 +106,7 @@ public class Drive extends CommandBasedTeleOp {
         vision.update_align_pipeline();
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooter.setLift(0.34);
+        shooter.setLift(0.32);
 
         tankDriveCommand = new TankDriveCommand(driveTrain,
                 () -> -gamepad1.left_stick_y * drive_speed_modifier, () -> -gamepad1.right_stick_y * drive_speed_modifier);
@@ -121,11 +121,13 @@ public class Drive extends CommandBasedTeleOp {
         automaticStorageCommand = new AutomaticStorageCommand(storage);
         manualStorageCommand = new ManualStorageCommand(storage, () -> gamepad2.right_stick_y);
         constStorageCommand = new ConstStorageCommand(storage);
-        startStorageCommand = new SetStorageIndexCommand(storage, 0.7);
+        startStorageCommand = new SetStorageIndexCommand(storage, 1);
 
-        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.55);
+        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.497);
+//        startShooterCommand = new SetShooterSpeedCommand(shooter, 0.55);
         stopShooterCommand = new SetShooterSpeedCommand(shooter, 0);
-        waitForShooterCommand = new WaitForShooterCommand(shooter, 2700);
+//        waitForShooterCommand = new WaitForShooterCommand(shooter, 2700);
+        waitForShooterCommand = new WaitForShooterCommand(shooter, 2440);
 
         startShooterSequenceCommand = new SequentialCommandGroup(
                 startShooterCommand,
@@ -134,7 +136,7 @@ public class Drive extends CommandBasedTeleOp {
                 new WaitCommand(0.4),
                 new WaitCommand(0.7),
                 startStorageCommand,
-                new WaitCommand(5)
+                new WaitCommand(500)
 //                new InstantCommand(() -> shooter.setPower(0))
         );
 
@@ -155,7 +157,7 @@ public class Drive extends CommandBasedTeleOp {
 
         // ROBOT REVEAL CODE
 //        gp1.a().whileHeld(new InstantCommand(() -> driveTrain.setPower(0.3), driveTrain)).whenReleased(new InstantCommand(()->driveTrain.setPower(0)));
-        gp2.b().whileHeld(new InstantCommand(() -> shooter.setPower(0.55), shooter)).whenReleased(() -> shooter.setPower(0));
+        gp2.b().whileHeld(new InstantCommand(() -> shooter.setPower(0.497), shooter)).whenReleased(() -> shooter.setPower(0));
 
         new Button(() -> gamepad1.left_trigger > 0.1)
                 .whenPressed(new InstantCommand(() -> drive_speed_modifier = 0.5))
@@ -177,8 +179,8 @@ public class Drive extends CommandBasedTeleOp {
                 .whenPressed(new InstantCommand(() -> manualIntakeCommand.setConstIntake(false), intake));
 
         // Storage
-//        storage.setDefaultCommand(manualStorageCommand);
-        storage.setDefaultCommand(automaticStorageCommand);
+        storage.setDefaultCommand(manualStorageCommand);
+//        storage.setDefaultCommand(automaticStorageCommand);
         new Trigger(() -> Math.abs(gamepad2.right_stick_y) >= 0.25).whileActiveOnce(manualStorageCommand);
         // Shooter
         gp2.left_bumper().whenPressed(startShooterSequenceCommand
@@ -209,6 +211,7 @@ public class Drive extends CommandBasedTeleOp {
                 packet.put("left", shooter.getLeftVelocity());
                 packet.put("right", shooter.getRightVelocity());
                 packet.put("vx", Objects.requireNonNull(driveTrain.getPoseVelocity()).getX());
+                packet.put("index", storage.getIndexSpeed());
                 DashboardUtil.drawRobot(packet.fieldOverlay(), driveTrain.getPoseEstimate());
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
                 telemetry.update();
