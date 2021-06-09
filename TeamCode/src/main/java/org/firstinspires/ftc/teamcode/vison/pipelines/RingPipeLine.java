@@ -37,7 +37,7 @@ public class RingPipeLine extends OpenCvPipeline {
                 break;
             default:
             case Red:
-                ring_area_rect = new Rect(1230, 550, 50, 130);
+                ring_area_rect = new Rect(1100, 550, 50, 130);
                 break;
         }
     }

@@ -48,6 +48,7 @@ public class RedAuto extends DefaultAuto {
 
     @Override
     public Command getAutonomousCommand() {
+        resetStartTime();
         int rings = vision.count_rings();
         telemetry.addLine("rings: " + rings);
         FtcDashboard.getInstance().getTelemetry().addLine("rings: " + rings);
@@ -70,7 +71,7 @@ public class RedAuto extends DefaultAuto {
                 new InstantCommand(() -> powerShootsAlign.target = VisionTarget.PowerShoot.Center),
 //                new WaitCommand(2),
                 index_distance(105),
-                new TurnCommand(driveTrain, -Math.toRadians(4)),
+                new TurnCommand(driveTrain, -Math.toRadians(6)),
 //                alignRobot,
                 new InstantCommand(() -> powerShootsAlign.target = VisionTarget.PowerShoot.Right),
                 new WaitCommand(0.2),
@@ -150,11 +151,11 @@ public class RedAuto extends DefaultAuto {
 
     private Command getBCommand(Pose2d end) {
         Trajectory first_wobell_trajectory = driveTrain.trajectoryBuilder(end, true)
-                .splineTo(new Vector2d(0.70, 0.70), Math.toRadians(45))
+                .splineTo(new Vector2d(0.70, -0.70), -Math.toRadians(45))
                 .build();
 
         Trajectory go_to_index_position_trajectory = driveTrain.trajectoryBuilder(first_wobell_trajectory.end())
-                .splineTo(new Vector2d(-0.14, 0.85), Math.toRadians(180))
+                .splineTo(new Vector2d(-0.14, -0.85), Math.toRadians(180))
                 .build();
 
         Trajectory intake_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end())
@@ -162,7 +163,7 @@ public class RedAuto extends DefaultAuto {
                 .build();
 
         Trajectory second_wobell_trajectory = driveTrain.trajectoryBuilder(intake_trajectory.end(), true)
-                .splineTo(new Vector2d(-0.65, 1.25), Math.toRadians(180))
+                .splineTo(new Vector2d(-0.65, -1.20), Math.toRadians(180))
                 .build();
 
         Trajectory pick_up_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory.end(), true)
@@ -171,7 +172,7 @@ public class RedAuto extends DefaultAuto {
 
         Trajectory drop_second_wobell_trajectory_part_1 = driveTrain.trajectoryBuilder(pick_up_wobell_trajectory.end(), true)
                 .forward(0.3)
-                .splineTo(new Vector2d(0.2, 0.83), Math.toRadians(180))
+                .splineTo(new Vector2d(0.2, -0.83), Math.toRadians(180))
                 .build();
 
         Trajectory drop_second_wobell_trajectory_part_2 = driveTrain.trajectoryBuilder(drop_second_wobell_trajectory_part_1.end())
@@ -201,6 +202,8 @@ public class RedAuto extends DefaultAuto {
                 follow(second_wobell_trajectory),
                 follow(pick_up_wobell_trajectory),
                 new InstantCommand(() -> wobbleSubsystem.close()),
+                new WaitCommand(0.4),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
                 follow(drop_second_wobell_trajectory_part_1),
                 follow(drop_second_wobell_trajectory_part_2),
                 new InstantCommand(() -> wobbleSubsystem.open()),
