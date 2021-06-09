@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 
+import org.commandftc.RobotUniversal;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -42,6 +43,10 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
     private Rect left;
     private Rect right;
 
+    public BlueTowerAlignPipeLine() {
+        RobotUniversal.telemetry.addData("size", filterContoursOutput::size);
+    }
+
     @Override
     public Mat processFrame(Mat input) {
 
@@ -51,13 +56,16 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
         filter_red(view, hsv_out);
         view.release();
         // Find and filter contours
-        findContours(hsv_out, false, findContoursOutput);
+        findContours(hsv_out, true, findContoursOutput);
         hsv_out.release();
         filterContours(findContoursOutput, filterContoursMinArea, filterContoursMinPerimeter,
                 filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight,
                 filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices,
                 filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
         // Draw contours
+        for (MatOfPoint object : findContoursOutput) {
+            Imgproc.rectangle(input, Imgproc.boundingRect(object), new Scalar(150, 0, 0), 4);
+        }
         for (MatOfPoint object : filterContoursOutput) {
             Imgproc.rectangle(input, Imgproc.boundingRect(object), new Scalar(0, 150, 0), 4);
         }
@@ -88,12 +96,13 @@ public class BlueTowerAlignPipeLine extends AlignPipeLine {
     }
 
     private void cal_position(Mat frame) {
-        Map<Integer, Rect> map = new TreeMap<>();
+        Map<Double, Rect> map = new TreeMap<>();
 
+        int i = 0;
         for (MatOfPoint object : filterContoursOutput) {
             Rect object_rect = Imgproc.boundingRect(object);
 
-            map.put(object_rect.x, object_rect);
+            map.put(object_rect.x + (i++)/1000.0, object_rect);
         }
 
         Rect[] sorted_objects = new Rect[map.values().size()];

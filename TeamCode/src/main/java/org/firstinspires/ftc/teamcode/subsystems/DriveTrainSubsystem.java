@@ -61,6 +61,8 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
 
     private final boolean trajectoryControled;
 
+    public boolean trajectories = true;
+
     public DriveTrainSubsystem() {
         super(DriveTrainConstants.kV, DriveTrainConstants.kA, DriveTrainConstants.kStatic, 0.187, 1);
         setLocalizer(new RoadRunnerOdometry(
@@ -120,7 +122,7 @@ public class DriveTrainSubsystem extends com.acmerobotics.roadrunner.drive.Mecan
     @Override
     public void periodic() {
         updatePoseEstimate();
-        if (trajectoryControled) {
+        if (trajectoryControled && trajectories) {
             DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
             if (signal != null) setDriveSignal(signal);
         }

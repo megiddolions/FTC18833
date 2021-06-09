@@ -80,10 +80,10 @@ public class RingAlignPipeLine extends AlignPipeLine {
         draw_horizontal_line(input, target.y + target.height/2, new Scalar(255, 0, 0), 2);
         draw_vertical_line(input, camera_width/2, new Scalar(255, 255, 255), 2);
 
-        Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
-        Utils.matToBitmap(input, map);
+//        Bitmap map = Bitmap.createBitmap(camera_width, camera_height, Bitmap.Config.RGB_565);
+//        Utils.matToBitmap(input, map);
 
-        FtcDashboard.getInstance().sendImage(map);
+//        FtcDashboard.getInstance().sendImage(map);
 
         return input;
     }

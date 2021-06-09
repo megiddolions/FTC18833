@@ -81,7 +81,7 @@ public class VisionSubsystem extends SubsystemBase {
         int orange_pixels = ringPipeLine.orange_pixels;
         if (orange_pixels < 400) {
             return 0;
-        } else if (orange_pixels < 2500) {
+        } else if (orange_pixels < 2000) {
             return 1;
         } else {
             return 4;

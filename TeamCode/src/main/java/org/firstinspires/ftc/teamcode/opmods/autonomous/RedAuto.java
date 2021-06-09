@@ -101,6 +101,7 @@ public class RedAuto extends DefaultAuto {
             case 1:
                 return getBCommand(end);
             case 4:
+                return getCCommand(end);
             default:
                 return new InstantCommand();
         }
@@ -208,6 +209,55 @@ public class RedAuto extends DefaultAuto {
                 follow(drop_second_wobell_trajectory_part_2),
                 new InstantCommand(() -> wobbleSubsystem.open()),
                 follow(parking_trajectory)
+        );
+    }
+
+    private Command getCCommand(Pose2d end) {
+
+        Trajectory first_wobell_trajectory = driveTrain.trajectoryBuilder(end, true)
+                .splineTo(new Vector2d(1.3, -1.3), -Math.toRadians(45))
+                .build();
+
+        Trajectory go_to_index_position_trajectory = driveTrain.trajectoryBuilder(first_wobell_trajectory.end())
+                .splineTo(new Vector2d(-0.10, -0.92), -Math.toRadians(183))
+                .build();
+
+        Trajectory second_wobell_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end(), true)
+                .splineTo(new Vector2d(-0.6, -1.2), -Math.toRadians(180))
+                .build();
+
+        Trajectory pick_up_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory.end(), true)
+                .back(0.3)
+                .build();
+
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> shooter.setLift(0.35)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
+                follow(first_wobell_trajectory),
+                new InstantCommand(() -> wobbleSubsystem.open()),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(3000)),
+                new InstantCommand(() -> shooter.setLift(0.2)),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(3000)),
+                new SetShooterSpeedCommand(shooter, 0.5),
+                new InstantCommand(() -> intake.intake(1)),
+                new InstantCommand(() -> storage.index(1)),
+                follow(go_to_index_position_trajectory),
+                driveForward(0.5, 1),
+                wait(2),
+                new InstantCommand(() -> intake.intake(0)),
+                new InstantCommand(() -> storage.index(0)),
+                new SetShooterSpeedCommand(shooter, 0),
+                new InstantCommand(() -> wobbleSubsystem.setTargetPosition(5000)),
+                follow(second_wobell_trajectory),
+                follow(pick_up_wobell_trajectory),
+                new InstantCommand(() -> wobbleSubsystem.close()),
+                new WaitCommand(0.4),
+                driveForward(1.8, 1),
+                turn(Math.toRadians(140)),
+                new WaitCommand(1),
+                new InstantCommand(() -> driveTrain.trajectories = false),
+                new InstantCommand(() -> wobbleSubsystem.open()),
+                driveForward(0.9, 1)
         );
     }
 }

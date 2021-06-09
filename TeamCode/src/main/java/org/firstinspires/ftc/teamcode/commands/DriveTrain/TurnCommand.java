@@ -20,6 +20,7 @@ public class TurnCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return driveTrain.isBusy();
+//        return driveTrain.isBusy();
+        return true;
     }
 }

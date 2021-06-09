@@ -31,7 +31,7 @@ public class AlignTowerCommand extends CommandBase {
 
     @Override
     public void execute() {
-        double out = Util.clamp(pidController.calculate(vision.getError()), 0.2, -0.2);
+        double out = Util.clamp(pidController.calculate(vision.getError()), 0.18, -0.18);
         driveTrain.tankDrive(out, -out);
     }
 
@@ -42,6 +42,6 @@ public class AlignTowerCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return pidController.atSetpoint() || Math.abs(pidController.getPositionError()) <= 50 && Math.abs(pidController.getVelocityError()) <= 10;
+        return pidController.atSetpoint() || Math.abs(pidController.getPositionError()) <= 25 && Math.abs(pidController.getVelocityError()) <= 10;
     }
 }

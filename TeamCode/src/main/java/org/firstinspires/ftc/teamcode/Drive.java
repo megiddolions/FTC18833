@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.commandftc.opModes.CommandBasedTeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignPowerShootsCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.AlignTowerCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveForwardCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveSideWaysCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.DriveToDirectionCommand;
+import org.firstinspires.ftc.teamcode.commands.DriveTrain.HorizontalAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveTrain.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.Intake.ManualIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.Shooter.SetShooterLiftCommand;
@@ -33,6 +35,9 @@ import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StorageSubSystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.WobbleSubsystem;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.BluePowerShootsAlignPipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.RedPowerShootsAlignPipeLine;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.VisionTarget;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +69,7 @@ public class Drive extends CommandBasedTeleOp {
     protected TankDriveCommand tankDriveCommand;
     protected DriveToDirectionCommand driveCommand;
     protected DriveSideWaysCommand driveSideWaysCommandCommand;
-    protected AlignPowerShootsCommand alignRobotCommand;
+    protected Command alignRobotCommand;
 
     protected ManualIntakeCommand manualIntakeCommand;
 
@@ -86,6 +91,9 @@ public class Drive extends CommandBasedTeleOp {
 
     protected double drive_speed_modifier;
 
+    protected BluePowerShootsAlignPipeLine bluePowerShootsAlignPipeLine;
+    protected RedPowerShootsAlignPipeLine redPowerShootsAlignPipeLine;
+
     @Override
     public void assign() {
         telemetry.addData("state", "DriveTrain");telemetry.update();
@@ -104,6 +112,8 @@ public class Drive extends CommandBasedTeleOp {
         telemetry.addData("state", "vision for drive");telemetry.update();
         vision.setTarget(visionTarget);
         vision.update_align_pipeline();
+        vision.front_pipeline = new RingAlignPipeLine();
+        vision.frontCamera.setPipeline(vision.front_pipeline);
 
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setLift(0.32);
@@ -114,6 +124,7 @@ public class Drive extends CommandBasedTeleOp {
                 () -> -gamepad1.right_stick_y, () -> -gamepad1.right_stick_x, () -> -gamepad1.left_stick_x);
         driveSideWaysCommandCommand = new DriveSideWaysCommand(driveTrain,
                 () -> Util.maxAbs(-gamepad1.left_stick_x * drive_speed_modifier, -gamepad1.right_stick_x * drive_speed_modifier));
+        alignRobotCommand = new AlignTowerCommand(driveTrain, vision);
         alignRobotCommand = new AlignPowerShootsCommand(driveTrain, vision);
 
         manualIntakeCommand = new ManualIntakeCommand(intake, () -> gamepad2.left_stick_y);
@@ -154,6 +165,9 @@ public class Drive extends CommandBasedTeleOp {
         gp1.left_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> drive_speed_modifier));
         gp1.right_bumper().whileHeld(new DriveSideWaysCommand(driveTrain, () -> -drive_speed_modifier));
         gp1.x().whileHeld(alignRobotCommand);
+        gp1.y().whileHeld(new HorizontalAlignCommand(driveTrain, vision));
+        gp1.dpad_left().whenPressed(() -> bluePowerShootsAlignPipeLine.target = bluePowerShootsAlignPipeLine.target.left());
+        gp1.dpad_right().whenPressed(() -> bluePowerShootsAlignPipeLine.target = bluePowerShootsAlignPipeLine.target.right());
 
         // ROBOT REVEAL CODE
 //        gp1.a().whileHeld(new InstantCommand(() -> driveTrain.setPower(0.3), driveTrain)).whenReleased(new InstantCommand(()->driveTrain.setPower(0)));
@@ -203,6 +217,20 @@ public class Drive extends CommandBasedTeleOp {
 //        new LoopTimeCommand().schedule();
 //        getLogCommand().schedule();
 
+        // Change vision
+        new CommandBase() {
+            @Override
+            public boolean isFinished() {
+                return getRuntime() > 10;
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                vision.setAlignPipeLine(bluePowerShootsAlignPipeLine);
+                alignRobotCommand = new AlignPowerShootsCommand(driveTrain, vision);
+            }
+        }.schedule();
+
         new CommandBase() {
             private final Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
             @Override
@@ -222,6 +250,7 @@ public class Drive extends CommandBasedTeleOp {
 //        telemetry.addData("Odometry", driveTrain::getPosition);
         telemetry.addData("Lift", shooter::getLift);
         telemetry.addData("pos", driveTrain::getPoseEstimate);
+        telemetry.addData("powershoot", () -> bluePowerShootsAlignPipeLine.target);
 //        telemetry.addData("Wobell", wobellSubsystem::getCurrentPosition);
 //        telemetry.addData("Wobell Lift", wobellSubsystem::getLift);
 //        telemetry.addData("Shooter", shooter::getLeftVelocity);
