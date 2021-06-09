@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Alliance;
 import org.firstinspires.ftc.teamcode.Constants.VisionConstants;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.BlueWobbleAlignPipeLine;
 import org.firstinspires.ftc.teamcode.vison.pipelines.align.RingAlignPipeLine;
@@ -31,12 +32,11 @@ public class VisionSubsystem extends SubsystemBase {
     public final OpenCvCamera frontCamera;
     private final Map<VisionTarget, AlignPipeLine> align_pipeLines;
     private VisionTarget target = VisionTarget.None;
-    private final RingPipeLine ringPipeLine;
+    private RingPipeLine ringPipeLine;
     private AlignPipeLine currentAlignPipeLine;
     public AlignPipeLine front_pipeline = new NonePipeLine();
 
     public VisionSubsystem() {
-        ringPipeLine = new RingPipeLine();
         frontCamera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "FrontWebcam"));
         rearCamera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "RearWebcam"));
 
@@ -71,7 +71,8 @@ public class VisionSubsystem extends SubsystemBase {
         return target;
     }
 
-    public void set_for_autonomous() {
+    public void set_for_autonomous(Alliance alliance) {
+        ringPipeLine = new RingPipeLine(alliance);
         rearCamera.setPipeline(ringPipeLine);
         telemetry.addData("pixels", () -> ringPipeLine.orange_pixels);
     }

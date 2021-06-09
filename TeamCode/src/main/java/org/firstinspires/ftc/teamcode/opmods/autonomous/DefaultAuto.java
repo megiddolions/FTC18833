@@ -37,8 +37,10 @@ public abstract class DefaultAuto extends CommandBasedAuto {
         vision = new VisionSubsystem();
         wobbleSubsystem = new WobbleSubsystem();
 
-        vision.set_for_autonomous();
+        wobbleSubsystem.close();
         wobbleSubsystem.setDefaultCommand(new WobellTargetPositionCommand(wobbleSubsystem));
+
+        shooter.setLift(0.27);
 
         init_robot();
     }

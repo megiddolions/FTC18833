@@ -51,7 +51,7 @@ public class Auto extends LinearOpModeWithCommands {
 
 //        driveTrain.set_for_autonomous();
         storage.set_for_autonomous();
-        vision.set_for_autonomous();
+        vision.set_for_autonomous(Alliance.Blue);
 
         wobbleSubsystem.open();
         shooter.setLift(0.27);

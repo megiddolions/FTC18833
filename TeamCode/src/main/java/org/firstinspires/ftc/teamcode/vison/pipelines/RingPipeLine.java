@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 
+import org.firstinspires.ftc.teamcode.Alliance;
+import org.firstinspires.ftc.teamcode.vison.pipelines.align.AlignPipeLine;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -26,7 +28,19 @@ public class RingPipeLine extends OpenCvPipeline {
 //    public Mat cvErodeKernel = new Mat();
     public int orange_pixels = 0;
 
-    private static final Rect ring_area_rect = new Rect(0, 550, 50, 130);
+    private final Rect ring_area_rect;
+
+    public RingPipeLine(Alliance alliance) {
+        switch (alliance) {
+            case Blue:
+                ring_area_rect = new Rect(0, 550, 50, 130);
+                break;
+            default:
+            case Red:
+                ring_area_rect = new Rect(1230, 550, 50, 130);
+                break;
+        }
+    }
     
     @Override
     public Mat processFrame(Mat input) {

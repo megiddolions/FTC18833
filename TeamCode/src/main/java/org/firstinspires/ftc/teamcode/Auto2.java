@@ -88,7 +88,7 @@ public class Auto2 extends CommandBasedAuto {
 
         wobbleSubsystem.close();
 
-        vision.set_for_autonomous();
+        vision.set_for_autonomous(Alliance.Blue);
         shooter.setLift(0.27);
 
         telemetry.addData("Runtime", this::getRuntime);
@@ -215,7 +215,7 @@ public class Auto2 extends CommandBasedAuto {
                 new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4200)),
                 follow(put_second_wobell_trajectory_part_1),
                 follow(put_second_wobell_trajectory_part_2),
-                new InstantCommand(() -> wobbleSubsystem.open()),
+                new InstantCommand(() -> {wobbleSubsystem.open();wobbleSubsystem.setTargetPosition(0);}),
                 follow(parking_trajectory)
         );
     }
@@ -225,38 +225,42 @@ public class Auto2 extends CommandBasedAuto {
 
         status = "make trajectories";telemetry.update();
         Trajectory first_wobell_trajectory = driveTrain.trajectoryBuilder(end, true)
-                .splineTo(new Vector2d(0.70, 0.80), Math.toRadians(45))
+                .splineTo(new Vector2d(0.70, 0.70), Math.toRadians(45))
                 .build();
 
         Trajectory go_to_index_position_trajectory = driveTrain.trajectoryBuilder(first_wobell_trajectory.end())
-                .splineTo(new Vector2d(-0.14, 0.90), Math.toRadians(180))
+                .splineTo(new Vector2d(-0.14, 0.85), Math.toRadians(180))
                 .build();
 
         Trajectory intake_trajectory = driveTrain.trajectoryBuilder(go_to_index_position_trajectory.end())
-                .forward(.4)
+                .forward(.35)
                 .build();
 
         Trajectory second_wobell_trajectory = driveTrain.trajectoryBuilder(intake_trajectory.end(), true)
-                .splineTo(new Vector2d(-0.73, 1.1), Math.toRadians(180))
+                .splineTo(new Vector2d(-0.65, 1.25), Math.toRadians(180))
                 .build();
 
         Trajectory pick_up_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory.end(), true)
                 .back(0.3)
                 .build();
 
-        Trajectory drop_second_wobell_trajectory = driveTrain.trajectoryBuilder(pick_up_wobell_trajectory.end(), true)
-                .forward(0.4)
-                .splineTo(new Vector2d(0.43, 0.83), Math.toRadians(180))
+        Trajectory drop_second_wobell_trajectory_part_1 = driveTrain.trajectoryBuilder(pick_up_wobell_trajectory.end(), true)
+                .forward(0.3)
+                .splineTo(new Vector2d(0.2, 0.83), Math.toRadians(180))
                 .build();
 
-        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(drop_second_wobell_trajectory.end(), true)
+        Trajectory drop_second_wobell_trajectory_part_2 = driveTrain.trajectoryBuilder(drop_second_wobell_trajectory_part_1.end())
+                .back(0.4)
+                .build();
+
+        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(drop_second_wobell_trajectory_part_2.end(), true)
                 .forward(0.3)
                 .build();
 
         status = "join Commands";telemetry.update();
 
         return new SequentialCommandGroup(
-                new InstantCommand(() -> shooter.setLift(0.26)),
+                new InstantCommand(() -> shooter.setLift(0.29)),
                 new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4000)),
                 follow(first_wobell_trajectory),
                 new InstantCommand(() -> wobbleSubsystem.open()),
@@ -274,7 +278,8 @@ public class Auto2 extends CommandBasedAuto {
                 follow(second_wobell_trajectory),
                 follow(pick_up_wobell_trajectory),
                 new InstantCommand(() -> wobbleSubsystem.close()),
-                follow(drop_second_wobell_trajectory),
+                follow(drop_second_wobell_trajectory_part_1),
+                follow(drop_second_wobell_trajectory_part_2),
                 new InstantCommand(() -> wobbleSubsystem.open()),
                 follow(parking_trajectory)
         );

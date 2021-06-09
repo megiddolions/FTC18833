@@ -69,7 +69,7 @@ public class TestAuto extends CommandBasedAuto {
 
         wobbleSubsystem.close();
 
-        vision.set_for_autonomous();
+        vision.set_for_autonomous(Alliance.Blue);
         shooter.setLift(0.27);
 
         telemetry.addData("Runtime", this::getRuntime);
