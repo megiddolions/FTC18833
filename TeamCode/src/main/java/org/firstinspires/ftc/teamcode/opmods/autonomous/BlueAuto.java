@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.opmods.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-@Autonomous(name = "RedAuto")
-public class RedAuto extends DefaultAuto {
+public class BlueAuto extends DefaultAuto {
     @Override
     public void init_robot() {
 

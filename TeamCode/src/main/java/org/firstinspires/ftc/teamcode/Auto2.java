@@ -188,11 +188,15 @@ public class Auto2 extends CommandBasedAuto {
                 .splineTo(new Vector2d(-0.86, 1.25), Math.toRadians(180))
                 .build();
 
-        Trajectory put_second_wobell_trajectory = driveTrain.trajectoryBuilder(second_wobell_trajectory_part_2.end(), true)
+        Trajectory put_second_wobell_trajectory_part_1 = driveTrain.trajectoryBuilder(second_wobell_trajectory_part_2.end(), true)
+                .forward(0.4)
+                .build();
+
+        Trajectory put_second_wobell_trajectory_part_2 = driveTrain.trajectoryBuilder(put_second_wobell_trajectory_part_1.end(), true)
                 .splineTo(new Vector2d(0.35, 1.15), Math.toRadians(60))
                 .build();
 
-        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(put_second_wobell_trajectory.end(), true)
+        Trajectory parking_trajectory = driveTrain.trajectoryBuilder(put_second_wobell_trajectory_part_2.end(), true)
                 .forward(0.3)
                 .build();
 
@@ -209,7 +213,8 @@ public class Auto2 extends CommandBasedAuto {
                 new InstantCommand(() -> wobbleSubsystem.close()),
                 new WaitCommand(0.4),
                 new InstantCommand(() -> wobbleSubsystem.setTargetPosition(4200)),
-                follow(put_second_wobell_trajectory),
+                follow(put_second_wobell_trajectory_part_1),
+                follow(put_second_wobell_trajectory_part_2),
                 new InstantCommand(() -> wobbleSubsystem.open()),
                 follow(parking_trajectory)
         );
